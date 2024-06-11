@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
+using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.Interfaces;
 using ShopWithMe.Models.Seed;
+using SportsStore.Models;
 
 namespace ShopWithMe
 {
@@ -12,16 +14,23 @@ namespace ShopWithMe
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            var config = builder.Configuration.GetConnectionString("DefaultConnection");
-
             builder.Services.AddControllers();
             builder.Services.AddDbContext<DefaultContext>(opts =>
             {
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(builder.Configuration.GetValue<int>("Session:Timeout"));
+                options.Cookie.HttpOnly = true;
+            });
+            builder.Services.AddScoped(sp => SessionCart.GetCart(sp));
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -35,7 +44,7 @@ namespace ShopWithMe
             }
 
             app.UseAuthorization();
-
+            app.UseSession();
 
             app.MapControllers();
 

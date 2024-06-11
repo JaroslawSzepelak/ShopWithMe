@@ -11,17 +11,22 @@ namespace ShopWithMe.Controllers
     {
         protected DefaultContext _context;
 
+        #region ProductsController()
         public ProductsController(DefaultContext context) 
         {
             _context = context;
         }
+        #endregion
 
+        #region GetList()
         [HttpGet]
         public IAsyncEnumerable<Product> GetList()
         {
             return _context.Products.AsAsyncEnumerable();
         }
+        #endregion
 
+        #region Get()
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
@@ -34,7 +39,9 @@ namespace ShopWithMe.Controllers
 
             return Ok(entity);
         }
+        #endregion
 
+        #region Create()
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Product product)
         {
@@ -45,7 +52,9 @@ namespace ShopWithMe.Controllers
 
             return Ok(entity);
         }
+        #endregion
 
+        #region Update()
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] Product product)
         {
@@ -56,7 +65,9 @@ namespace ShopWithMe.Controllers
 
             return Ok(entity);
         }
+        #endregion
 
+        #region Delete()
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
@@ -72,5 +83,6 @@ namespace ShopWithMe.Controllers
 
             return Ok();
         }
+        #endregion
     }
 }
