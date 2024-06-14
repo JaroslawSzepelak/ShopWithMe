@@ -1,5 +1,5 @@
-﻿using ShopWithMe.Models.Interfaces;
-using ShopWithMe.Models.Products;
+﻿using ShopWithMe.Models.Products;
+using ShopWithMe.Tools.Interfaces;
 
 namespace ShopWithMe.Models.Cart
 {

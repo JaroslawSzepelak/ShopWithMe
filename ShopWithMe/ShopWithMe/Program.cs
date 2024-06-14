@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
 using ShopWithMe.Models.Cart;
-using ShopWithMe.Models.Interfaces;
 using ShopWithMe.Models.Seed;
+using ShopWithMe.Session.Models;
+using ShopWithMe.Tools.Interfaces;
 using SportsStore.Models;
 
 namespace ShopWithMe
@@ -27,6 +28,7 @@ namespace ShopWithMe
                 options.Cookie.HttpOnly = true;
             });
             builder.Services.AddScoped(sp => SessionCart.GetCart(sp));
+            builder.Services.AddScoped(sp => SessionContactData.GetContactData(sp));
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();

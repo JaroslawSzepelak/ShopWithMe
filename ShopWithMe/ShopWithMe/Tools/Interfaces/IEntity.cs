@@ -1,4 +1,4 @@
-﻿namespace ShopWithMe.Models.Interfaces
+﻿namespace ShopWithMe.Tools.Interfaces
 {
     public interface IEntity
     {

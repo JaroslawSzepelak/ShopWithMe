@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using ShopWithMe.Models.Interfaces;
+using ShopWithMe.Tools.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopWithMe.Models.Products

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using ShopWithMe.Models.Cart;
+﻿using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.Products;
+using ShopWithMe.Tools.Interfaces;
 using ShopWithMe.Utils.Extensions;
-using System;
 using System.Text.Json.Serialization;
 
 namespace SportsStore.Models
 {
-    public class SessionCart : Cart
+    public class SessionCart : Cart, ISessionModel
     {
+        public static string SessionKey => "Cart";
+
         [JsonIgnore]
         public ISession Session { get; set; }
 
@@ -17,7 +17,7 @@ namespace SportsStore.Models
         public static Cart GetCart(IServiceProvider services)
         {
             ISession session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext.Session;
-            SessionCart cart = session?.GetJson<SessionCart>("Cart") ?? new SessionCart();
+            SessionCart cart = session?.GetJson<SessionCart>(SessionKey) ?? new SessionCart();
             cart.Session = session;
             return cart;
         }
@@ -27,7 +27,7 @@ namespace SportsStore.Models
         public override void AddItem(Product product, int quantity)
         {
             base.AddItem(product, quantity);
-            Session.SetJson("Cart", this);
+            Session.SetJson(SessionKey, this);
         }
         #endregion
 
@@ -35,7 +35,7 @@ namespace SportsStore.Models
         public override void RemoveLine(Product product)
         {
             base.RemoveLine(product);
-            Session.SetJson("Cart", this);
+            Session.SetJson(SessionKey, this);
         }
         #endregion
 
@@ -43,7 +43,7 @@ namespace SportsStore.Models
         public override void Clear()
         {
             base.Clear();
-            Session.Remove("Cart");
+            Session.Remove(SessionKey);
         }
         #endregion
     }

@@ -1,6 +1,6 @@
 ﻿using ShopWithMe.Models.Products;
 
-namespace ShopWithMe.Models.Interfaces
+namespace ShopWithMe.Tools.Interfaces
 {
     public interface IStoreRepository
     {
