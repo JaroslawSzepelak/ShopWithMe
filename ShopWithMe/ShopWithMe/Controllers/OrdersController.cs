@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopWithMe.Models;
 using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.ContactData;
 using ShopWithMe.Models.Orders;
+using ShopWithMe.Tools.Exceptions;
 
 namespace ShopWithMe.Controllers
 {
@@ -11,14 +10,14 @@ namespace ShopWithMe.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        protected DefaultContext _context;
+        protected IOrderRepository _repository;
         protected Cart _cart;
         protected ContactData _contactData;
 
         #region OrdersController()
-        public OrdersController(DefaultContext context, Cart cart, ContactData contactData)
+        public OrdersController(IOrderRepository repository, Cart cart, ContactData contactData)
         {
-            _context = context;
+            _repository = repository;
             _cart = cart;
             _contactData = contactData;
         }
@@ -28,10 +27,7 @@ namespace ShopWithMe.Controllers
         [HttpGet]
         public IAsyncEnumerable<Order> GetList()
         {
-            return _context.Orders
-                .Include(o => o.Lines)
-                .ThenInclude(l => l.Product)
-                .AsAsyncEnumerable();
+            return _repository.GetList();
         }
         #endregion
 
@@ -49,14 +45,7 @@ namespace ShopWithMe.Controllers
         {
             var entity = new Order(_cart, _contactData);
 
-            _context.AttachRange(entity.Lines.Select(l => l.Product));
-
-            if (entity.Id == 0)
-            {
-                await _context.Orders.AddAsync(entity);
-            }
-
-            await _context.SaveChangesAsync();
+            await _repository.SaveOrder(entity);
 
             return Ok(entity);
         }
@@ -66,17 +55,16 @@ namespace ShopWithMe.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
-            var entity = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
+            try
+            {
+                await _repository.Delete(id);
 
-            if (entity == null)
+                return Ok();
+            }
+            catch (NotFoundException)
             {
                 return NotFound();
             }
-
-            _context.Orders.Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
         #endregion
     }

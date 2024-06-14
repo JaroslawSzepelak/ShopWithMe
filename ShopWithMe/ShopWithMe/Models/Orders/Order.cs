@@ -25,7 +25,7 @@ namespace ShopWithMe.Models.Orders
             Lastname = contactData.Lastname;
             Email = contactData.Email;
             PhoneNumber = contactData.PhoneNumber;
-            Address = contactData.Addrress;
+            Address = contactData.Address;
             City = contactData.City;
             Zip = contactData.Zip;
         }

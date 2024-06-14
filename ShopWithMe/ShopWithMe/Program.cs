@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
 using ShopWithMe.Models.Cart;
+using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
 using ShopWithMe.Tools.Interfaces;
@@ -31,7 +32,7 @@ namespace ShopWithMe
             builder.Services.AddScoped(sp => SessionContactData.GetContactData(sp));
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            builder.Services.AddScoped<IStoreRepository, EFStoreRepository>();
+            builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

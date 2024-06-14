@@ -6,7 +6,7 @@
         public string Lastname { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public string Addrress { get; set; }
+        public string Address { get; set; }
         public string City { get; set; }
         public string Zip { get; set; }
 
@@ -17,7 +17,7 @@
             Lastname = formModel.Lastname;
             Email = formModel.Email;
             PhoneNumber = formModel.PhoneNumber;
-            Addrress = formModel.Adrdress;
+            Address = formModel.Address;
             City = formModel.City;
             Zip = formModel.Zip;
         }
@@ -30,7 +30,7 @@
             Lastname = null;
             Email = null;
             PhoneNumber = null;
-            Addrress = null;
+            Address = null;
             City = null;
             Zip = null;
         }
