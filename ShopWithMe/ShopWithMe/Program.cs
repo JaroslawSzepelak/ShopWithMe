@@ -1,10 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
-using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
-using ShopWithMe.Tools.Interfaces;
 using SportsStore.Models;
 
 namespace ShopWithMe

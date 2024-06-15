@@ -3,7 +3,7 @@
     public interface IOrderRepository
     {
         IQueryable<Order> Orders { get; }
-        IAsyncEnumerable<Order> GetList();
+        Task<IEnumerable<Order>> GetList();
         Task SaveOrder(Order order);
         Task Delete(long id);
     }

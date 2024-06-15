@@ -25,9 +25,9 @@ namespace ShopWithMe.Controllers
 
         #region GetList()
         [HttpGet]
-        public IAsyncEnumerable<Order> GetList()
+        public async Task<IActionResult> GetList()
         {
-            return _repository.GetList();
+            return Ok(await _repository.GetList());
         }
         #endregion
 

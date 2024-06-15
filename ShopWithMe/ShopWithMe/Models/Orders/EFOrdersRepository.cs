@@ -16,12 +16,12 @@ namespace ShopWithMe.Models.Orders
         #endregion
 
         #region GetList()
-        public IAsyncEnumerable<Order> GetList()
+        public async Task<IEnumerable<Order>> GetList()
         {
-            return _context.Orders
+            return await _context.Orders
                 .Include(o => o.Lines)
                 .ThenInclude(l => l.Product)
-                .AsAsyncEnumerable();
+                .ToListAsync();
         }
         #endregion
 
@@ -39,6 +39,7 @@ namespace ShopWithMe.Models.Orders
         }
         #endregion
 
+        #region Delete()
         public async Task Delete(long id)
         {
             var entity = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
@@ -51,5 +52,6 @@ namespace ShopWithMe.Models.Orders
             _context.Orders.Remove(entity);
             await _context.SaveChangesAsync();
         }
+        #endregion
     }
 }

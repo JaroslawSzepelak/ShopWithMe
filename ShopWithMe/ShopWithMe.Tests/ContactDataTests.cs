@@ -8,7 +8,7 @@ namespace ShopWithMe.Tests
         [Fact]
         public void Can_UpdateContactData()
         {
-            // Przygotowanie - modelu formularza
+            // Przygotowanie
             var formModel = new ContactDataFormModel()
             {
                 Firstname = "Imię",
@@ -20,7 +20,6 @@ namespace ShopWithMe.Tests
                 Zip = "00-000"
             };
 
-            // Przygotowanie - utworzenie modelu danych
             var result = new ContactData();
 
             // Działanie
@@ -41,7 +40,7 @@ namespace ShopWithMe.Tests
         [Fact]
         public void Can_ClearContactData()
         {
-            // Przygotowanie - utworzenie modelu danych
+            // Przygotowanie
             var result = new ContactData()
             {
                 Firstname = "Imię",

@@ -9,11 +9,10 @@ namespace ShopWithMe.CartTests
         [Fact]
         public void Can_Add_New_Lines()
         {
-            // Przygotowanie - utworzenie produktów testowych
+            // Przygotowanie
             var p1 = new Product { Id = 1, Name = "P1" };
             var p2 = new Product { Id = 2, Name = "P2" };
 
-            // Przygotowanie - utworzenie nowego koszyka
             var target = new Cart();
 
             // Dzia³anie
@@ -32,11 +31,10 @@ namespace ShopWithMe.CartTests
         [Fact]
         public void Can_Add_Quantity_For_Existing_Lines()
         {
-            // Przygotowanie - utworzenie produktów testowych
+            // Przygotowanie
             var p1 = new Product { Id = 1, Name = "P1" };
             var p2 = new Product { Id = 2, Name = "P2" };
 
-            // Przygotowanie - utworzenie nowego koszyka
             var target = new Cart();
 
             // Dzia³anie
@@ -56,15 +54,13 @@ namespace ShopWithMe.CartTests
         [Fact]
         public void Can_Remove_Line()
         {
-            // Przygotowanie - utworzenie produktów testowych
+            // Przygotowanie
             var p1 = new Product { Id = 1, Name = "P1" };
             var p2 = new Product { Id = 2, Name = "P2" };
             var p3 = new Product { Id = 3, Name = "P3" };
 
-            // Przygotowanie - utworzenie nowego koszyka
             var target = new Cart();
 
-            // Przygotowanie - dodanie kilku produktów do koszyka
             target.AddItem(p1, 1);
             target.AddItem(p2, 3);
             target.AddItem(p3, 5);
@@ -83,11 +79,10 @@ namespace ShopWithMe.CartTests
         [Fact]
         public void Calculate_Cart_Total()
         {
-            // Przygotowanie - utworzenie produktów testowych
+            // Przygotowanie
             var p1 = new Product { Id = 1, Name = "P1", Price = 100M };
             var p2 = new Product { Id = 2, Name = "P2", Price = 50M };
 
-            // Przygotowanie - utworzenie nowego koszyka
             var target = new Cart();
 
             // Dzia³anie
@@ -105,14 +100,11 @@ namespace ShopWithMe.CartTests
         [Fact]
         public void Can_Clear_Contents()
         {
-            // Przygotowanie - utworzenie produktów testowych
+            // Przygotowanie
             var p1 = new Product { Id = 1, Name = "P1", Price = 100M };
             var p2 = new Product { Id = 2, Name = "P2", Price = 50M };
 
-            // Przygotowanie - utworzenie nowego koszyka
             var target = new Cart();
-
-            // Przygotowanie - dodanie kilku produktów do koszyka
             target.AddItem(p1, 1);
             target.AddItem(p2, 1);
 
