@@ -1,14 +1,18 @@
 <template>
   <div class="carousel">
     <div class="carousel-content">
-      <img
-        :src="currentProduct.image"
-        alt="product image"
-        class="product-image"
-      />
-      <div class="product-info">
-        <h3>{{ currentProduct.name }}</h3>
-        <p>{{ currentProduct.price }} zł</p>
+      <div class="carousel-track" :style="trackStyle">
+        <div
+          v-for="product in products"
+          :key="product.image"
+          class="carousel-slide"
+        >
+          <img :src="product.image" alt="product image" class="product-image" />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.price }} zł</p>
+          </div>
+        </div>
       </div>
       <button class="arrow-btn prev-btn" @click="prevProduct">❮</button>
       <button class="arrow-btn next-btn" @click="nextProduct">❯</button>
@@ -42,8 +46,11 @@ export default class ProductCarousel extends Vue {
   currentIndex = 0;
   intervalId: number | null = null;
 
-  get currentProduct() {
-    return this.products[this.currentIndex];
+  get trackStyle() {
+    return {
+      transform: `translateX(-${this.currentIndex * 100}%)`,
+      transition: "transform 0.6s ease-in-out",
+    };
   }
 
   mounted() {
@@ -81,41 +88,53 @@ export default class ProductCarousel extends Vue {
   position: relative;
   width: 100%;
   height: 400px;
-  background-color: #e6f7ff;
   overflow: hidden;
 
   .carousel-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 100%;
 
-    .product-image {
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
-    .product-info {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-align: left;
+    .carousel-slide {
+      min-width: 100%;
+      height: 100%;
+      position: relative;
 
-      h3 {
-        margin: 0;
-        font-size: 1.5em;
-        color: #333;
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
-      p {
-        margin: 0;
-        font-size: 1.2em;
-        color: #333;
-        font-weight: bold;
+      .product-info {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: left;
+
+        h3 {
+          margin: 0;
+          font-size: 1.5em;
+          color: #333;
+        }
+
+        p {
+          margin: 0;
+          font-size: 1.2em;
+          color: #333;
+          font-weight: bold;
+        }
       }
     }
 

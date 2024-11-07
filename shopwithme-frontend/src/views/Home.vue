@@ -2,6 +2,9 @@
   <div>
     <WelcomeSection class="welcome" />
     <ProductCarousel class="productCarousel" />
+    <PromotionsSection />
+    <SuggestedProducts />
+    <AboutSection />
   </div>
 </template>
 
@@ -9,11 +12,17 @@
 import { Component, Vue } from "vue-property-decorator";
 import WelcomeSection from "@/components/WelcomeSection.vue";
 import ProductCarousel from "@/components/ProductCarousel.vue";
+import PromotionsSection from "@/components/PromotionsSection.vue";
+import SuggestedProducts from "@/components/SuggestedProducts.vue";
+import AboutSection from "@/components/AboutSection.vue";
 
 @Component({
   components: {
     WelcomeSection,
     ProductCarousel,
+    PromotionsSection,
+    SuggestedProducts,
+    AboutSection,
   },
 })
 export default class Home extends Vue {}
