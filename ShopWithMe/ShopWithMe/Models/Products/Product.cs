@@ -8,6 +8,7 @@ namespace ShopWithMe.Models.Products
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string Lead {  get; set; }
         public string Description { get; set; }
         [Column(TypeName = "decimal(8, 2)")]
         public decimal Price { get; set; }
