@@ -16,7 +16,9 @@
               class="product-image"
             />
             <div class="product-info">
-              <h3>{{ product.name || "Nazwa produktu" }}</h3>
+              <router-link :to="`/products/${product.id}`" class="product-name">
+                {{ product.name || "Nazwa produktu" }}
+              </router-link>
               <p class="product-description">
                 {{ product.description || "Opis produktu" }}
               </p>
@@ -146,7 +148,7 @@ export default class SuggestedProducts extends Vue {
   .carousel {
     overflow: hidden;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
   }
 
   .products-list {
@@ -156,51 +158,68 @@ export default class SuggestedProducts extends Vue {
   }
 
   .product-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     flex: 0 0 calc(100% / 5);
-    max-width: 200px;
+    max-width: 240px;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
     text-align: center;
-    padding: 1rem;
+    padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     .product-image {
       width: 100%;
-      height: 150px;
+      height: 180px;
       object-fit: cover;
     }
 
     .product-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      flex-grow: 1;
       margin-top: 0.5rem;
 
-      h3 {
-        font-size: 1rem;
+      .product-name {
+        font-size: 1.1rem;
         color: #333;
-        margin: 0;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s;
+        margin-bottom: 0.5rem;
+
+        &:hover {
+          color: #c70a0a;
+        }
       }
 
       .product-description {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         color: #666;
-        margin: 0.3rem 0;
+        flex-grow: 1;
+        margin-bottom: 0.5rem;
       }
 
       .product-price {
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: bold;
         color: #c70a0a;
+        margin-top: auto; /* Umieszcza cenę przy dolnej krawędzi */
+        margin-bottom: 15px;
       }
 
       .add-to-cart {
         background-color: #c70a0a;
         color: #fff;
         border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
         border-radius: 4px;
-        margin-top: 0.5rem;
+        margin-top: auto;
         cursor: pointer;
 
         &:hover {
@@ -210,13 +229,14 @@ export default class SuggestedProducts extends Vue {
     }
   }
 
-  @media (max-width: 1400px) {
+  /* Responsywne dopasowanie liczby produktów w rzędzie */
+  @media (max-width: 1640px) {
     .product-card {
       flex: 0 0 calc(100% / 3);
     }
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 1000px) {
     .product-card {
       flex: 0 0 100%;
     }

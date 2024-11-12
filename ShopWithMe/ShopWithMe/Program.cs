@@ -64,7 +64,11 @@ namespace ShopWithMe
             app.MapControllers();
 
             // Seed database
-            SeedData.EnsurePopulated(app);
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                SeedData.EnsurePopulated(services); // Przekazujemy IServiceProvider do SeedData
+            }
 
             app.Run();
         }

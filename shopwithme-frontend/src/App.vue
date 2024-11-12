@@ -26,11 +26,13 @@ export default class App extends Vue {}
 @import "./assets/styles.scss";
 
 #app {
-  font-family: Arial, sans-serif;
-  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Cała wysokość ekranu */
 }
 
-.container {
-  margin-top: 20px;
+main {
+  flex-grow: 1;
+  padding: 20px;
 }
 </style>
