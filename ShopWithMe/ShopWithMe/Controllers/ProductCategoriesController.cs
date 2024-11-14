@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
-using ShopWithMe.Models.Products;
+using ShopWithMe.Models.ProductCategories;
 
 namespace ShopWithMe.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductCategoriesController : ControllerBase
     {
         protected DefaultContext _context;
 
-        #region ProductsController()
-        public ProductsController(DefaultContext context) 
+        #region ProductCategoriesController()
+        public ProductCategoriesController(DefaultContext context) 
         {
             _context = context;
         }
@@ -20,9 +20,9 @@ namespace ShopWithMe.Controllers
 
         #region GetList()
         [HttpGet]
-        public IAsyncEnumerable<Product> GetList()
+        public IAsyncEnumerable<ProductCategory> GetList()
         {
-            return _context.Products.AsAsyncEnumerable();
+            return _context.ProductCategories.AsAsyncEnumerable();
         }
         #endregion
 
@@ -30,9 +30,7 @@ namespace ShopWithMe.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var entity = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _context.ProductCategories.FirstOrDefaultAsync(p => p.Id == id);
 
             if (entity == null)
             {
@@ -45,11 +43,11 @@ namespace ShopWithMe.Controllers
 
         #region Create()
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<IActionResult> Create([FromBody] ProductCategory product)
         {
             var entity = product;
 
-            await _context.Products.AddAsync(entity);
+            await _context.ProductCategories.AddAsync(entity);
             await _context.SaveChangesAsync();
 
             return Ok(entity);
@@ -58,7 +56,7 @@ namespace ShopWithMe.Controllers
 
         #region Update()
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Product product)
+        public async Task<IActionResult> Update([FromBody] ProductCategory product)
         {
             var entity = product;
 
@@ -73,14 +71,14 @@ namespace ShopWithMe.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _context.ProductCategories.FirstOrDefaultAsync(p => p.Id == id);
 
             if (entity == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(entity);
+            _context.ProductCategories.Remove(entity);
             await _context.SaveChangesAsync();
 
             return Ok();

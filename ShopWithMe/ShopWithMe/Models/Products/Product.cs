@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using ShopWithMe.Models.ProductCategories;
 using ShopWithMe.Tools.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,5 +13,10 @@ namespace ShopWithMe.Models.Products
         public string Description { get; set; }
         [Column(TypeName = "decimal(8, 2)")]
         public decimal Price { get; set; }
+        [ForeignKey("ProductCategory")]
+        public long? CategoryId { get; set; }
+
+
+        public virtual ProductCategory Category { get; set; }
     }
 }
