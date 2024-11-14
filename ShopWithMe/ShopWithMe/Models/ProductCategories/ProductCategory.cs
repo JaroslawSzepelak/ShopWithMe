@@ -1,4 +1,5 @@
-﻿using ShopWithMe.Tools.Interfaces;
+﻿using ShopWithMe.Models.Products;
+using ShopWithMe.Tools.Interfaces;
 
 namespace ShopWithMe.Models.ProductCategories
 {
@@ -6,5 +7,7 @@ namespace ShopWithMe.Models.ProductCategories
     {
         public long Id { get; set; }
         public string Name { get; set; }
+
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

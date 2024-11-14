@@ -4,6 +4,7 @@ using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
 using SportsStore.Models;
+using System.Text.Json.Serialization;
 
 namespace ShopWithMe
 {
@@ -14,7 +15,8 @@ namespace ShopWithMe
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             builder.Services.AddDbContext<DefaultContext>(opts =>
             {
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

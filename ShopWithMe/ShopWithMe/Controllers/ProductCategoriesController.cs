@@ -30,7 +30,9 @@ namespace ShopWithMe.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var entity = await _context.ProductCategories.FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _context.ProductCategories
+                .Include(x => x.Products)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (entity == null)
             {

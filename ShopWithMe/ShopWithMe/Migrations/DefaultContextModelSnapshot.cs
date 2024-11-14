@@ -144,7 +144,7 @@ namespace ShopWithMe.Migrations
             modelBuilder.Entity("ShopWithMe.Models.Products.Product", b =>
                 {
                     b.HasOne("ShopWithMe.Models.ProductCategories.ProductCategory", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
@@ -153,6 +153,11 @@ namespace ShopWithMe.Migrations
             modelBuilder.Entity("ShopWithMe.Models.Orders.Order", b =>
                 {
                     b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("ShopWithMe.Models.ProductCategories.ProductCategory", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
