@@ -28,11 +28,10 @@ export default class App extends Vue {}
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Cała wysokość ekranu */
+  min-height: 100vh;
 }
 
 main {
   flex-grow: 1;
-  padding: 20px;
 }
 </style>

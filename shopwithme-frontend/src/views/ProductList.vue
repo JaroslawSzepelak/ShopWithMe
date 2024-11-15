@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import apiClient from "@/plugins/axios";
+import { productAPI } from "@/plugins/axios";
 
 @Component
 export default class ProductList extends Vue {
@@ -36,7 +36,7 @@ export default class ProductList extends Vue {
 
   async created() {
     try {
-      const response = await apiClient.get("/");
+      const response = await productAPI.getProducts();
       this.products = response.data;
     } catch (error) {
       console.error("Błąd podczas pobierania produktów:", error);

@@ -22,26 +22,32 @@ namespace ShopWithMe
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // Configure session with appropriate settings
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(builder.Configuration.GetValue<int>("Session:Timeout"));
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.None; // Wymagane dla po��cze� cross-origin
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // U�ywaj Always, je�li korzystasz z HTTPS
             });
+
+            // Set up session cart and other scoped services
             builder.Services.AddScoped(sp => SessionCart.GetCart(sp));
             builder.Services.AddScoped(sp => SessionContactData.GetContactData(sp));
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
 
-            // Configure CORS policy
+            // Configure CORS policy to allow frontend access
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:8080") // URL frontendu
+                        .WithOrigins("http://localhost:8080") // Frontend URL
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // Umo�liwienie przesy�ania ciasteczek
                 });
             });
 
@@ -61,7 +67,7 @@ namespace ShopWithMe
             app.UseCors("AllowFrontend");
 
             app.UseAuthorization();
-            app.UseSession();
+            app.UseSession(); // Musi by� po `UseCors` i przed `MapControllers`
 
             app.MapControllers();
 

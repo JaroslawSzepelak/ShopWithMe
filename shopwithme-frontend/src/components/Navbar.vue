@@ -17,7 +17,7 @@
         </button>
       </div>
 
-      <i class="fas fa-shopping-cart cart-icon"></i>
+      <i class="fas fa-shopping-cart cart-icon" @click="goToCart"></i>
 
       <div class="user-menu">
         <i class="fas fa-user user-icon"></i>
@@ -35,7 +35,11 @@
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class Navbar extends Vue {}
+export default class Navbar extends Vue {
+  goToCart() {
+    this.$router.push("/cart");
+  }
+}
 </script>
 
 <style scoped lang="scss">

@@ -33,7 +33,9 @@
         </div>
         <div class="buttons">
           <button class="buy-now">Kup teraz</button>
-          <button class="add-to-cart">Dodaj do koszyka</button>
+          <button class="add-to-cart" @click="addToCart">
+            Dodaj do koszyka
+          </button>
           <button class="back-btn" @click="goBack">Wróć</button>
         </div>
       </div>
@@ -51,6 +53,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import TechnicalDetails from "@/components/TechnicalDetails.vue";
+import { productAPI } from "@/plugins/axios";
 
 @Component({
   components: {
@@ -59,43 +62,69 @@ import TechnicalDetails from "@/components/TechnicalDetails.vue";
 })
 export default class ProductDetails extends Vue {
   product = {
-    name: "Smartfon XYZ (128 GB)",
-    price: 1000,
+    id: 0,
+    name: "",
+    price: 0,
     images: [
-      "https://placehold.co/400/abb7e7/7b8277", // Główne zdjęcie
-      "https://placehold.co/400/abd4c7/7b8277", // Miniaturka 1
-      "https://placehold.co/400/e6dcae/7b8277", // Miniaturka 2
-      "https://placehold.co/400", // Miniaturka 3
-    ],
+      "https://placehold.co/400/abb7e7/7b8277",
+      "https://placehold.co/400/abd4c7/7b8277",
+      "https://placehold.co/400/e6dcae/7b8277",
+      "https://placehold.co/400",
+    ] as string[],
   };
 
   mainImage = this.product.images[0];
   currentIndex = 0;
+
+  async created() {
+    const productId = Number(this.$route.params.id);
+    await this.fetchProduct(productId);
+  }
+
+  async fetchProduct(id: number) {
+    try {
+      const response = await productAPI.getProduct(id);
+      this.product = {
+        ...this.product,
+        id: response.data.id,
+        name: response.data.name,
+        price: response.data.price,
+      };
+      this.mainImage = this.product.images[0];
+    } catch (error) {
+      console.error("Błąd podczas pobierania danych produktu:", error);
+    }
+  }
 
   setMainImage(image: string) {
     this.mainImage = image;
   }
 
   nextImage() {
-    if (this.currentIndex < this.product.images.length - 1) {
-      this.currentIndex++;
-    } else {
-      this.currentIndex = 0;
-    }
-    this.mainImage = this.product.images[this.currentIndex];
+    const currentIndex = this.product.images.indexOf(this.mainImage);
+    const nextIndex = (currentIndex + 1) % this.product.images.length;
+    this.mainImage = this.product.images[nextIndex];
   }
 
   prevImage() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-    } else {
-      this.currentIndex = this.product.images.length - 1;
-    }
-    this.mainImage = this.product.images[this.currentIndex];
+    const currentIndex = this.product.images.indexOf(this.mainImage);
+    const prevIndex =
+      (currentIndex - 1 + this.product.images.length) %
+      this.product.images.length;
+    this.mainImage = this.product.images[prevIndex];
   }
 
   goBack() {
     this.$router.go(-1);
+  }
+
+  async addToCart() {
+    try {
+      await this.$store.dispatch("cart/addItem", this.product.id);
+      this.$router.push("/cart");
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+    }
   }
 }
 </script>
@@ -183,7 +212,7 @@ export default class ProductDetails extends Vue {
       margin-bottom: 1rem;
 
       .fas.fa-star {
-        color: #ffd700; /* Złoty kolor dla gwiazdek */
+        color: #ffd700;
         margin-right: 0.2rem;
       }
 
@@ -206,7 +235,7 @@ export default class ProductDetails extends Vue {
       margin-bottom: 1.5rem;
 
       .fas.fa-check-circle {
-        color: #28a745; /* Zielony kolor dla fajek */
+        color: #28a745;
         margin-right: 0.5rem;
       }
     }

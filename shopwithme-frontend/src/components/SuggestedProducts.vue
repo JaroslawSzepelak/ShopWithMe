@@ -23,7 +23,9 @@
                 {{ product.description || "Opis produktu" }}
               </p>
               <p class="product-price">{{ product.price || "100,00" }} zł</p>
-              <button class="add-to-cart">Dodaj do koszyka</button>
+              <button class="add-to-cart" @click="addToCart(product)">
+                Dodaj do koszyka
+              </button>
             </div>
           </div>
         </div>
@@ -42,7 +44,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
+import { productAPI } from "@/plugins/axios";
 
 @Component
 export default class SuggestedProducts extends Vue {
@@ -66,7 +68,7 @@ export default class SuggestedProducts extends Vue {
 
   async fetchProducts() {
     try {
-      const response = await axios.get("http://localhost:5000/api/Products");
+      const response = await productAPI.getProducts();
       this.products = response.data;
       this.updateVisibleProducts();
     } catch (error) {
@@ -120,6 +122,15 @@ export default class SuggestedProducts extends Vue {
 
   closeModal() {
     this.showModal = false;
+  }
+
+  async addToCart(product: any) {
+    try {
+      await this.$store.dispatch("cart/addItem", product.id);
+      this.$router.push("/cart");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
   }
 }
 </script>
@@ -208,7 +219,7 @@ export default class SuggestedProducts extends Vue {
         font-size: 1.2rem;
         font-weight: bold;
         color: #c70a0a;
-        margin-top: auto; /* Umieszcza cenę przy dolnej krawędzi */
+        margin-top: auto;
         margin-bottom: 15px;
       }
 
@@ -229,7 +240,6 @@ export default class SuggestedProducts extends Vue {
     }
   }
 
-  /* Responsywne dopasowanie liczby produktów w rzędzie */
   @media (max-width: 1640px) {
     .product-card {
       flex: 0 0 calc(100% / 3);
