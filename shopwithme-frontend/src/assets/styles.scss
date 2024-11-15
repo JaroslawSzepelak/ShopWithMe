@@ -1,0 +1,14 @@
+@import 'variables.scss';
+body {
+    background-color: white;
+    color: $dark-color;
+}
+
+.btn-primary {
+    background-color: $primary-color;
+    color: $light-color;
+    border: none;
+    &:hover {
+        background-color: darken($primary-color, 10%);
+    }
+}
