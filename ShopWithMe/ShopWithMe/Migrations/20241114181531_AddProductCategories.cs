@@ -9,7 +9,7 @@ namespace ShopWithMe.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ProductCategorys",
+                name: "ProductCategories",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -18,14 +18,14 @@ namespace ShopWithMe.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductCategorys", x => x.Id);
+                    table.PrimaryKey("PK_ProductCategories", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductCategorys");
+                name: "ProductCategories");
         }
     }
 }

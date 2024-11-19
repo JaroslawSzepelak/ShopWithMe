@@ -97,7 +97,7 @@ namespace ShopWithMe.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductCategorys");
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("ShopWithMe.Models.Products.Product", b =>

@@ -20,7 +20,7 @@
                 {{ product.name || "Nazwa produktu" }}
               </router-link>
               <p class="product-description">
-                {{ product.description || "Opis produktu" }}
+                {{ product.lead || "Opis wstępny produktu" }}
               </p>
               <p class="product-price">{{ product.price || "100,00" }} zł</p>
               <button class="add-to-cart" @click="addToCart(product)">

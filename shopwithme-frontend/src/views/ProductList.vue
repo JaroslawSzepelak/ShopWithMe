@@ -6,7 +6,7 @@
         <div class="card mb-4">
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text">{{ product.lead }}</p>
             <p><strong>Cena:</strong> {{ product.price }} PLN</p>
             <router-link
               :to="{ name: 'ProductDetails', params: { id: product.id } }"
@@ -30,6 +30,7 @@ export default class ProductList extends Vue {
   products: Array<{
     id: number;
     name: string;
+    lead: string;
     description: string;
     price: number;
   }> = [];
