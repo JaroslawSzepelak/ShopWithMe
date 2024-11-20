@@ -56,10 +56,17 @@ const cartModule: Module<CartState, any> = {
     async fetchCart({ commit }) {
       try {
         const response = await cartAPI.getCart();
-        console.log("Odpowiedź z fetchCart:", response.data);
         commit("SET_CART", response.data.lines || []);
       } catch (error) {
         console.error("Błąd podczas pobierania koszyka:", error);
+        commit("SET_CART", []);
+      }
+    },
+    async initializeCart({ dispatch }) {
+      try {
+        await dispatch("fetchCart");
+      } catch (error) {
+        console.error("Błąd podczas inicjalizacji koszyka:", error);
       }
     },
     async addItem({ dispatch }, productId: number) {

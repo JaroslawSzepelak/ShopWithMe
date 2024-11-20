@@ -98,15 +98,13 @@ export default class SuggestedProducts extends Vue {
 
   nextProducts() {
     const nextIndex = this.startIndex + this.productsToShow;
-    if (nextIndex < this.products.length) {
-      this.startIndex = nextIndex;
-      this.updateVisibleProducts();
-    } else if (this.startIndex < this.products.length - 1) {
-      this.startIndex = this.products.length - this.productsToShow;
-      this.updateVisibleProducts();
-    } else {
+
+    if (nextIndex >= this.products.length) {
       this.modalMessage = "Brak produktów w kolejce";
       this.showModal = true;
+    } else {
+      this.startIndex = nextIndex;
+      this.updateVisibleProducts();
     }
   }
 

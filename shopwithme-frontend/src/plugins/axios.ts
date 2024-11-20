@@ -100,4 +100,31 @@ export const categoryAPI = {
   },
 };
 
+export const contactDataAPI = {
+  getContactData() {
+    return apiClient.get("/ContactData");
+  },
+  updateContactData(data: any) {
+    return apiClient.put("/ContactData", data);
+  },
+  clearContactData() {
+    return apiClient.delete("/ContactData");
+  },
+};
+
+export const orderAPI = {
+  getOrders() {
+    return apiClient.get("/Orders");
+  },
+  createOrder() {
+    return apiClient.post("/Orders");
+  },
+  getOrderSummary() {
+    return apiClient.get("/Orders/summary");
+  },
+  deleteOrder(id: number) {
+    return apiClient.delete(`/Orders/${id}`);
+  },
+};
+
 export default apiClient;

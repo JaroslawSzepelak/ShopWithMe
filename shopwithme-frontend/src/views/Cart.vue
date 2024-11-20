@@ -82,7 +82,7 @@ export default class Cart extends Vue {
   }
 
   checkout() {
-    console.log("Przechodzenie do dostawy zamówienia");
+    this.$router.push("/delivery-form");
   }
 
   increaseQuantity(item: CartItem) {
