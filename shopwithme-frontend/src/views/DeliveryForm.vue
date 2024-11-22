@@ -1,163 +1,172 @@
 <template>
-  <div v-if="cartItems.length" class="delivery-form-container">
-    <div class="delivery-form">
-      <h1>Adres i dane kontaktowe</h1>
-      <form @submit.prevent="validateForm">
-        <div class="form-section">
-          <div class="form-group" :class="{ 'has-error': errors.firstname }">
-            <label>Imię</label>
-            <input
-              v-model="contactData.firstname"
-              type="text"
-              placeholder="Wprowadź imię"
-              required
-            />
-            <span v-if="errors.firstname" class="error-message">
-              {{ errors.firstname }}
-            </span>
+  <div v-if="cartItems.length" class="main-block">
+    <OrderProgress :currentStep="2" class="order-progress" />
+    <div class="delivery-form-container">
+      <div class="delivery-form">
+        <h1>Adres i dane kontaktowe</h1>
+        <form @submit.prevent="validateForm">
+          <div class="form-section">
+            <div class="form-group" :class="{ 'has-error': errors.firstname }">
+              <label>Imię</label>
+              <input
+                v-model="contactData.firstname"
+                type="text"
+                placeholder="Wprowadź imię"
+                required
+              />
+              <span v-if="errors.firstname" class="error-message">
+                {{ errors.firstname }}
+              </span>
+            </div>
+            <div class="form-group" :class="{ 'has-error': errors.lastname }">
+              <label>Nazwisko</label>
+              <input
+                v-model="contactData.lastname"
+                type="text"
+                placeholder="Wprowadź nazwisko"
+                required
+              />
+              <span v-if="errors.lastname" class="error-message">
+                {{ errors.lastname }}
+              </span>
+            </div>
           </div>
-          <div class="form-group" :class="{ 'has-error': errors.lastname }">
-            <label>Nazwisko</label>
-            <input
-              v-model="contactData.lastname"
-              type="text"
-              placeholder="Wprowadź nazwisko"
-              required
-            />
-            <span v-if="errors.lastname" class="error-message">
-              {{ errors.lastname }}
-            </span>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-group" :class="{ 'has-error': errors.email }">
-            <label>Email</label>
-            <input
-              v-model="contactData.email"
-              type="email"
-              placeholder="Wprowadź email"
-              required
-            />
-            <span v-if="errors.email" class="error-message">
-              {{ errors.email }}
-            </span>
+          <div class="form-section">
+            <div class="form-group" :class="{ 'has-error': errors.email }">
+              <label>Email</label>
+              <input
+                v-model="contactData.email"
+                type="email"
+                placeholder="Wprowadź email"
+                required
+              />
+              <span v-if="errors.email" class="error-message">
+                {{ errors.email }}
+              </span>
+            </div>
+            <div
+              class="form-group"
+              :class="{ 'has-error': errors.phoneNumber }"
+            >
+              <label>Telefon</label>
+              <input
+                v-model="contactData.phoneNumber"
+                type="tel"
+                placeholder="Wprowadź numer telefonu"
+                pattern="[0-9]{9}"
+                required
+              />
+              <span v-if="errors.phoneNumber" class="error-message">
+                {{ errors.phoneNumber }}
+              </span>
+            </div>
           </div>
-          <div class="form-group" :class="{ 'has-error': errors.phoneNumber }">
-            <label>Telefon</label>
-            <input
-              v-model="contactData.phoneNumber"
-              type="tel"
-              placeholder="Wprowadź numer telefonu"
-              pattern="[0-9]{9}"
-              required
-            />
-            <span v-if="errors.phoneNumber" class="error-message">
-              {{ errors.phoneNumber }}
-            </span>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-group" :class="{ 'has-error': errors.address }">
-            <label>Ulica</label>
-            <input
-              v-model="contactData.address"
-              type="text"
-              placeholder="Wprowadź adres"
-              required
-            />
-            <span v-if="errors.address" class="error-message">
-              {{ errors.address }}
-            </span>
+          <div class="form-section">
+            <div class="form-group" :class="{ 'has-error': errors.address }">
+              <label>Ulica</label>
+              <input
+                v-model="contactData.address"
+                type="text"
+                placeholder="Wprowadź adres"
+                required
+              />
+              <span v-if="errors.address" class="error-message">
+                {{ errors.address }}
+              </span>
+            </div>
+            <div class="form-group" :class="{ 'has-error': errors.zip }">
+              <label>Kod pocztowy</label>
+              <input
+                v-model="contactData.zip"
+                type="text"
+                placeholder="00-000"
+                pattern="\\d{2}-\\d{3}"
+                required
+              />
+              <span v-if="errors.zip" class="error-message">
+                {{ errors.zip }}
+              </span>
+            </div>
+            <div class="form-group" :class="{ 'has-error': errors.city }">
+              <label>Miasto</label>
+              <input
+                v-model="contactData.city"
+                type="text"
+                placeholder="Wprowadź miasto"
+                required
+              />
+              <span v-if="errors.city" class="error-message">
+                {{ errors.city }}
+              </span>
+            </div>
           </div>
-          <div class="form-group" :class="{ 'has-error': errors.zip }">
-            <label>Kod pocztowy</label>
-            <input
-              v-model="contactData.zip"
-              type="text"
-              placeholder="00-000"
-              pattern="\\d{2}-\\d{3}"
-              required
-            />
-            <span v-if="errors.zip" class="error-message">
-              {{ errors.zip }}
-            </span>
-          </div>
-          <div class="form-group" :class="{ 'has-error': errors.city }">
-            <label>Miasto</label>
-            <input
-              v-model="contactData.city"
-              type="text"
-              placeholder="Wprowadź miasto"
-              required
-            />
-            <span v-if="errors.city" class="error-message">
-              {{ errors.city }}
-            </span>
-          </div>
-        </div>
 
-        <h2>Wybierz metodę dostawy</h2>
-        <div class="delivery-methods">
-          <label>
-            <input
-              type="radio"
-              value="poczta"
-              v-model="selectedDeliveryMethod"
-              @change="updateDeliveryCost"
-            />
-            Poczta - 15 zł
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="kurier"
-              v-model="selectedDeliveryMethod"
-              @change="updateDeliveryCost"
-            />
-            Kurier - 17 zł
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="odbior_osobisty"
-              v-model="selectedDeliveryMethod"
-              @change="updateDeliveryCost"
-            />
-            Odbiór osobisty - 0 zł
-          </label>
-        </div>
-      </form>
-    </div>
+          <h2>Wybierz metodę dostawy</h2>
+          <div class="delivery-methods">
+            <label>
+              <input
+                type="radio"
+                value="poczta"
+                v-model="selectedDeliveryMethod"
+                @change="updateDeliveryCost"
+              />
+              Poczta - 15 zł
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="kurier"
+                v-model="selectedDeliveryMethod"
+                @change="updateDeliveryCost"
+              />
+              Kurier - 17 zł
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="odbior_osobisty"
+                v-model="selectedDeliveryMethod"
+                @change="updateDeliveryCost"
+              />
+              Odbiór osobisty - 0 zł
+            </label>
+          </div>
+        </form>
+      </div>
 
-    <div class="summary">
-      <h2>Podsumowanie</h2>
-      <p>Wartość koszyka: {{ cartTotal }} zł</p>
-      <p>Koszt dostawy: {{ deliveryCost }} zł</p>
-      <p>
-        <strong>Razem: {{ totalCost }} zł</strong>
-      </p>
-      <div class="buttons">
-        <button type="button" @click="goBack" class="back-btn">Wróć</button>
-        <button type="submit" @click="validateForm" class="next-btn">
-          Przejdź do płatności
-        </button>
+      <div class="summary">
+        <h2>Podsumowanie</h2>
+        <p>Wartość koszyka: {{ cartTotal }} zł</p>
+        <p>Koszt dostawy: {{ deliveryCost }} zł</p>
+        <p>
+          <strong>Razem: {{ totalCost }} zł</strong>
+        </p>
+        <div class="buttons">
+          <button type="button" @click="goBack" class="back-btn">Wróć</button>
+          <button type="submit" @click="validateForm" class="next-btn">
+            Przejdź do płatności
+          </button>
+        </div>
       </div>
     </div>
   </div>
-  <div v-else class="empty-cart-message">
-    <h2>Twój koszyk jest pusty</h2>
-    <p>Dodaj produkty do koszyka, aby złożyć zamówienie.</p>
-    <button @click="goToShop" class="shop-btn">Przejdź do sklepu</button>
-  </div>
+  <EmptyCartMessage v-else />
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { CartItem } from "@/store/modules/cart";
+import OrderProgress from "@/components/OrderProgress.vue";
+import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
 
-@Component
+@Component({
+  components: {
+    OrderProgress,
+    EmptyCartMessage,
+  },
+})
 export default class DeliveryForm extends Vue {
   isLoading = true;
 
@@ -198,9 +207,24 @@ export default class DeliveryForm extends Vue {
 
   async mounted() {
     try {
-      await this.$store.dispatch("cart/fetchCart");
+      await this.$store.dispatch("contactData/fetchContactData");
+      const contactData = this.$store.state.contactData.contactData;
+      this.contactData = {
+        firstname: contactData.firstname || "",
+        lastname: contactData.lastname || "",
+        email: contactData.email || "",
+        phoneNumber: contactData.phoneNumber || "",
+        address: contactData.address || "",
+        city: contactData.city || "",
+        zip: contactData.zip || "",
+      };
+
+      await this.$store.dispatch("deliveryMethods/fetchDeliveryMethod");
+      this.selectedDeliveryMethod =
+        this.$store.state.deliveryMethods.deliveryMethod || "poczta";
+      this.deliveryCost = this.$store.state.deliveryMethods.deliveryCost || 15;
     } catch (error) {
-      console.error("Błąd podczas pobierania koszyka:", error);
+      console.error("Błąd podczas ładowania danych:", error);
     } finally {
       this.isLoading = false;
     }
@@ -244,19 +268,26 @@ export default class DeliveryForm extends Vue {
     }
   }
 
-  goBack() {
-    this.$router.go(-1);
+  async goToPayment() {
+    try {
+      await this.$store.dispatch(
+        "contactData/updateContactData",
+        this.contactData
+      );
+
+      await this.$store.dispatch("deliveryMethods/setDeliveryMethod", {
+        method: this.selectedDeliveryMethod,
+        cost: this.deliveryCost,
+      });
+
+      this.$router.push("/payment-method");
+    } catch (error) {
+      console.error("Błąd podczas zapisu danych:", error);
+    }
   }
 
-  goToPayment() {
-    this.$store
-      .dispatch("contactData/updateContactData", this.contactData)
-      .then(() => {
-        this.$router.push("/payment-method");
-      })
-      .catch((error) => {
-        console.error("Błąd podczas zapisu danych kontaktowych:", error);
-      });
+  goBack() {
+    this.$router.go(-1);
   }
 
   goToShop() {
@@ -266,11 +297,14 @@ export default class DeliveryForm extends Vue {
 </script>
 
 <style scoped>
+.main-block {
+  background-color: #f2f2f2;
+}
+
 .delivery-form-container {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  background-color: #f2f2f2;
   padding: 40px 400px 200px;
 }
 
@@ -362,6 +396,14 @@ input {
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.next-btn:hover {
+  background-color: #a80808;
+}
+
+.back-btn:hover {
+  background-color: #4a4a4a;
 }
 
 .empty-cart-message {

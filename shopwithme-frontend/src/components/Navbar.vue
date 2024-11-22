@@ -36,8 +36,10 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class Navbar extends Vue {
-  goToCart() {
-    this.$router.push("/cart");
+  goToCart(): void {
+    if (this.$route.path !== "/cart") {
+      this.$router.push("/cart");
+    }
   }
 }
 </script>

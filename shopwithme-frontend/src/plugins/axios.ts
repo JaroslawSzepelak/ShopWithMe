@@ -27,7 +27,6 @@ export const cartAPI = {
     return apiClient
       .post("/Cart", productId)
       .then((response) => {
-        console.log("Odpowiedź na żądanie POST /Cart:", response);
         return response;
       })
       .catch((error) => {
@@ -35,17 +34,14 @@ export const cartAPI = {
       });
   },
   removeItemFromCart(productId: number) {
-    console.log("Wysyłanie żądania DELETE do /Cart z productId:", productId);
     return apiClient
       .delete("/Cart", {
         data: productId,
       })
       .then((response) => {
-        console.log("Odpowiedź na żądanie DELETE /Cart:", response);
         return response;
       })
       .catch((error) => {
-        console.error("Błąd podczas wysyłania żądania DELETE /Cart:", error);
         throw error;
       });
   },
@@ -63,7 +59,6 @@ export const categoryAPI = {
     return apiClient
       .post("/ProductCategories", { name })
       .then((response) => {
-        console.log("Odpowiedź na żądanie POST /ProductCategories:", response);
         return response;
       })
       .catch((error) => {

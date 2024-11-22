@@ -125,7 +125,9 @@ export default class SuggestedProducts extends Vue {
   async addToCart(product: any) {
     try {
       await this.$store.dispatch("cart/addItem", product.id);
-      this.$router.push("/cart");
+      this.$router.push("/cart").then(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     } catch (error) {
       console.error("Error adding to cart:", error);
     }

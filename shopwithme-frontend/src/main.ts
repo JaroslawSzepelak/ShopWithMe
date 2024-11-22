@@ -9,6 +9,7 @@ import "./assets/styles.scss";
 import { BootstrapVue } from "bootstrap-vue";
 
 Vue.use(BootstrapVue);
+store.dispatch("cart/initializeCart");
 
 new Vue({
   router,

@@ -1,182 +1,287 @@
 <template>
-  <div class="summary-view">
-    <div class="order-summary-container">
-      <h1>Podsumowanie zamówienia</h1>
-
-      <div class="summary-section">
-        <h2>Adres i dane kontaktowe</h2>
-        <div class="address-details">
-          <p>
-            <strong>Imię i nazwisko:</strong> {{ contactData.firstname }}
-            {{ contactData.lastname }}
-          </p>
-          <p>
-            <strong>Adres:</strong> {{ contactData.address }},
-            {{ contactData.city }}, {{ contactData.zip }}
-          </p>
-          <p><strong>Telefon:</strong> {{ contactData.phoneNumber }}</p>
-          <p><strong>Email:</strong> {{ contactData.email }}</p>
-        </div>
-        <button class="change-btn" @click="editAddress">Zmień</button>
-      </div>
-
-      <div class="summary-section">
-        <h2>Metoda dostawy</h2>
-        <p>{{ selectedDeliveryMethodLabel }} - {{ deliveryCost }} zł</p>
-        <button class="change-btn" @click="editDeliveryMethod">Zmień</button>
-      </div>
-
-      <div class="summary-section">
-        <h2>Metoda płatności</h2>
+  <div>
+    <!-- Modal o nieprawidłowych danych kontaktowych -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Dane kontaktowe wygasły</h2>
         <p>
-          <template v-if="selectedPaymentMethod === 'card'">
-            Płatność kartą (**** **** **** {{ cardNumber.slice(-4) }})
-          </template>
-          <template v-else-if="selectedPaymentMethod === 'bank_transfer'">
-            Przelew internetowy (Numer konta: {{ accountNumber }})
-          </template>
-          <template v-else> Za pobraniem </template>
+          Twoje dane kontaktowe są niekompletne lub wygasły. Proszę je uzupełnić
+          ponownie.
         </p>
-        <button class="change-btn" @click="editPaymentMethod">Zmień</button>
-      </div>
-
-      <div class="summary-section">
-        <h2>Zawartość koszyka</h2>
-        <div v-for="item in cartItems" :key="item.productId" class="cart-item">
-          <img :src="item.image || placeholderImage" alt="Zdjęcie produktu" />
-          <div class="item-details">
-            <p>
-              <strong>{{ item.name }}</strong>
-            </p>
-            <p>
-              {{ item.quantity }} szt. - {{ item.price * item.quantity }} zł
-            </p>
-          </div>
-        </div>
-        <button class="change-btn" @click="editCart">Zmień</button>
-      </div>
-
-      <div class="summary-total">
-        <h2>Podsumowanie</h2>
-        <p><strong>Wartość produktów:</strong> {{ cartTotal }} zł</p>
-        <p><strong>Koszt dostawy:</strong> {{ deliveryCost }} zł</p>
-        <p><strong>Razem:</strong> {{ totalCost }} zł</p>
-        <button class="confirm-btn" @click="confirmOrder">
-          Kupuję i płacę
-        </button>
+        <button @click="goToContactForm">Wróć do edycji danych</button>
       </div>
     </div>
+
+    <!-- Modal o potwierdzeniu zamówienia -->
+    <div v-if="orderModalVisible" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Zamówienie zostało złożone!</h2>
+        <p>
+          Dziękujemy za złożenie zamówienia. Numer Twojego zamówienia to:
+          <strong>{{ orderId }}</strong
+          >.
+        </p>
+        <p>Otrzymasz szczegóły zamówienia na podany adres e-mail.</p>
+        <button @click="goToHomePage">Powrót do strony głównej</button>
+      </div>
+    </div>
+
+    <div v-if="cartItems.length" class="summary-container">
+      <OrderProgress :currentStep="4" class="order-progress" />
+      <div class="summary-content">
+        <!-- Zawartość koszyka -->
+        <div class="cart-section">
+          <h1>Zawartość koszyka</h1>
+          <div
+            v-for="item in cartItems"
+            :key="item.productId"
+            class="cart-item"
+          >
+            <img :src="item.image || placeholderImage" alt="Zdjęcie produktu" />
+            <div class="item-details">
+              <p>
+                <strong>{{ item.name }}</strong>
+              </p>
+              <p>
+                {{ item.quantity }} szt. - {{ item.price * item.quantity }} zł
+              </p>
+            </div>
+          </div>
+          <button class="change-btn" @click="editCart">Zmień koszyk</button>
+        </div>
+
+        <!-- Pozostałe sekcje -->
+        <div class="details-section">
+          <div class="details-block">
+            <h2>Adres i dane kontaktowe</h2>
+            <div class="address-details">
+              <p>
+                <strong>Imię i nazwisko:</strong> {{ contactData.firstname }}
+                {{ contactData.lastname }}
+              </p>
+              <p>
+                <strong>Adres:</strong> {{ contactData.address }} -
+                {{ contactData.city }}, {{ contactData.zip }}
+              </p>
+              <p><strong>Telefon:</strong> {{ contactData.phoneNumber }}</p>
+              <p><strong>Email:</strong> {{ contactData.email }}</p>
+              <p>
+                <strong>Metoda dostawy:</strong>
+                {{ selectedDeliveryMethodLabel }} - {{ deliveryCost }} zł
+              </p>
+            </div>
+            <button class="change-btn" @click="editAddress">Zmień</button>
+          </div>
+
+          <div class="details-block">
+            <h2>Metoda płatności</h2>
+            <p>
+              <template v-if="selectedPaymentMethod === 'card'">
+                Płatność kartą (**** **** **** {{ cardNumber.slice(-4) }})
+              </template>
+              <template v-else-if="selectedPaymentMethod === 'bank_transfer'">
+                Przelew internetowy (Numer konta: {{ accountNumber }})
+              </template>
+              <template v-else> Za pobraniem </template>
+            </p>
+            <button class="change-btn" @click="editPaymentMethod">Zmień</button>
+          </div>
+        </div>
+
+        <!-- Podsumowanie -->
+        <div class="summary-total">
+          <h2>Podsumowanie</h2>
+          <p><strong>Wartość produktów:</strong> {{ cartTotal }} zł</p>
+          <p><strong>Koszt dostawy:</strong> {{ deliveryCost }} zł</p>
+          <p><strong>Razem:</strong> {{ totalCost }} zł</p>
+          <button class="confirm-btn" @click="confirmOrder">
+            Kupuję i płacę
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <EmptyCartMessage v-else-if="!isLoading" />
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      placeholderImage: "https://placehold.co/100x100",
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { CartItem } from "@/store/modules/cart";
+import OrderProgress from "@/components/OrderProgress.vue";
+import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
+import { orderAPI } from "@/plugins/axios";
+
+@Component({
+  components: {
+    OrderProgress,
+    EmptyCartMessage,
+  },
+})
+export default class SummaryView extends Vue {
+  placeholderImage = "https://placehold.co/100x100";
+  isLoading = true;
+  showModal = false;
+  orderModalVisible = false;
+  orderId: string | null = null;
+
+  async mounted() {
+    await this.loadData();
+    this.checkContactData();
+  }
+
+  async loadData() {
+    try {
+      await this.$store.dispatch("contactData/fetchContactData");
+      await this.$store.dispatch("deliveryMethods/fetchDeliveryMethod");
+    } catch (error) {
+      console.error("Błąd podczas ładowania danych:", error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  get contactData(): Record<string, string | null> {
+    return this.$store.state.contactData.contactData || {};
+  }
+
+  get selectedDeliveryMethodLabel(): string {
+    const methodMap: Record<string, string> = {
+      poczta: "Poczta",
+      kurier: "Kurier",
+      odbior_osobisty: "Odbiór osobisty",
     };
-  },
-  computed: {
-    contactData() {
-      return this.$store.state.contactData.contactData || {};
-    },
-    selectedDeliveryMethodLabel() {
-      const methodMap = {
-        poczta: "Poczta",
-        kurier: "Kurier",
-        odbior_osobisty: "Odbiór osobisty",
-      };
-      return methodMap[this.$store.state.deliveryMethods.deliveryMethod];
-    },
-    deliveryCost() {
-      return this.$store.state.deliveryMethods.deliveryCost || 0;
-    },
-    selectedPaymentMethod() {
-      return this.$store.state.paymentMethod.selectedMethod;
-    },
-    cardNumber() {
-      return this.$store.state.paymentMethod.cardNumber || "";
-    },
-    accountNumber() {
-      return this.$store.state.paymentMethod.accountNumber || "";
-    },
-    cartItems() {
-      return this.$store.state.cart.cartItems || [];
-    },
-    cartTotal() {
-      return this.$store.getters["cart/cartTotal"] || 0;
-    },
-    totalCost() {
-      return (
-        this.cartTotal +
-        this.deliveryCost +
-        (this.selectedPaymentMethod === "cash_on_delivery" ? 5 : 0)
-      );
-    },
-  },
-  methods: {
-    editAddress() {
-      this.$router.push("/delivery-form");
-    },
-    editDeliveryMethod() {
-      this.$router.push("/delivery-form");
-    },
-    editPaymentMethod() {
-      this.$router.push("/payment-method");
-    },
-    editCart() {
-      this.$router.push("/cart");
-    },
-    confirmOrder() {
-      // Implementacja zatwierdzenia zamówienia
-      alert("Zamówienie zostało zatwierdzone!");
-    },
-  },
-};
+    return methodMap[this.$store.state.deliveryMethods.deliveryMethod] || "";
+  }
+
+  get deliveryCost(): number {
+    return this.$store.state.deliveryMethods.deliveryCost || 0;
+  }
+
+  get selectedPaymentMethod(): string {
+    return this.$store.state.paymentMethod.selectedMethod || "";
+  }
+
+  get cardNumber(): string {
+    return this.$store.state.paymentMethod.cardNumber || "";
+  }
+
+  get accountNumber(): string {
+    return this.$store.state.paymentMethod.accountNumber || "";
+  }
+
+  get cartItems(): CartItem[] {
+    return this.$store.getters["cart/cartItems"] || [];
+  }
+
+  get cartTotal(): number {
+    return this.$store.getters["cart/cartTotal"] || 0;
+  }
+
+  get totalCost(): number {
+    return (
+      this.cartTotal +
+      this.deliveryCost +
+      (this.selectedPaymentMethod === "cash_on_delivery" ? 5 : 0)
+    );
+  }
+
+  checkContactData(): void {
+    const { firstname, lastname, email, phoneNumber, address, city, zip } =
+      this.contactData;
+
+    if (
+      !firstname ||
+      !lastname ||
+      !email ||
+      !phoneNumber ||
+      !address ||
+      !city ||
+      !zip
+    ) {
+      this.showModal = true;
+    }
+  }
+
+  async confirmOrder(): Promise<void> {
+    try {
+      const response = await orderAPI.createOrder();
+      this.orderId = response.data.orderId;
+
+      await this.$store.dispatch("cart/fetchCart", []);
+
+      this.orderModalVisible = true;
+    } catch (error) {
+      console.error("Błąd podczas składania zamówienia:", error);
+      alert("Nie udało się złożyć zamówienia. Spróbuj ponownie później.");
+    }
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.orderModalVisible = false;
+  }
+
+  goToContactForm(): void {
+    this.$router.push("/delivery-form");
+  }
+
+  editAddress(): void {
+    this.$router.push("/delivery-form");
+  }
+
+  editPaymentMethod(): void {
+    this.$router.push("/payment-method");
+  }
+
+  editCart(): void {
+    this.$router.push("/cart");
+  }
+
+  goToHomePage(): void {
+    this.orderModalVisible = false;
+    this.$router.push("/");
+  }
+}
 </script>
 
 <style scoped lang="scss">
-.summary-view {
-  background-color: #f2f2f2;
-  padding: 40px;
+.summary-container {
   display: flex;
-  justify-content: center;
-  min-height: 100vh;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  padding: 40px;
+  gap: 20px;
 }
 
-.order-summary-container {
-  background-color: #fff;
+.summary-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cart-section {
+  flex: 2;
+  background: #fff;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 900px;
-  width: 100%;
-}
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
-h1,
-h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-}
-
-.summary-section {
-  margin-bottom: 20px;
-
-  .address-details,
-  .cart-item {
-    margin-bottom: 10px;
+  h1 {
+    margin-bottom: 20px;
   }
 
   .cart-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    margin-bottom: 15px;
 
     img {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       object-fit: cover;
-      border-radius: 5px;
+      border-radius: 8px;
     }
 
     .item-details {
@@ -185,36 +290,105 @@ h2 {
   }
 }
 
-.summary-total {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.details-section {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
-  p {
-    margin: 5px 0;
+  .details-block {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.summary-total {
+  flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+
+  h2 {
+    margin-bottom: 20px;
   }
 
   .confirm-btn {
     background-color: #c70a0a;
-    color: #fff;
+    color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
-    font-size: 1rem;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 1rem;
+
+    &:hover {
+      background-color: #a50e0e;
+    }
   }
 }
 
 .change-btn {
-  background-color: #666;
-  color: #fff;
+  background: none;
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
+  color: #c70a0a;
   font-size: 0.9rem;
   cursor: pointer;
-  margin-top: 10px;
+
+  &:hover {
+    color: #a50e0e;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    background-color: #c70a0a;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #a50e0e;
+    }
+  }
 }
 </style>

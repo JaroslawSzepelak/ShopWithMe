@@ -28,7 +28,6 @@ const cartModule: Module<CartState, any> = {
 
   mutations: {
     SET_CART(state, lines) {
-      console.log("Przetwarzanie odpowiedzi lines:", lines);
       state.items = lines.map((line: any) => ({
         productId: line.product.id,
         name: line.product.name,
@@ -71,10 +70,6 @@ const cartModule: Module<CartState, any> = {
     },
     async addItem({ dispatch }, productId: number) {
       try {
-        console.log(
-          "Dodawanie produktu do koszyka z przekazanym productId:",
-          productId
-        );
         await cartAPI.addItemToCart(productId);
         await dispatch("fetchCart");
       } catch (error) {

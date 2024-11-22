@@ -1,156 +1,186 @@
 <template>
-  <div class="payment-method-container">
-    <div class="payment-method">
-      <h1>Wybierz metodę płatności</h1>
-      <div class="method-container">
-        <div class="radio-group">
-          <label>
-            <input
-              type="radio"
-              value="card"
-              v-model="selectedMethod"
-              @change="handleMethodChange"
-            />
-            <span class="custom-radio"></span>
-            Płatność kartą
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="bank_transfer"
-              v-model="selectedMethod"
-              @change="handleMethodChange"
-            />
-            <span class="custom-radio"></span>
-            Przelew internetowy
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="cash_on_delivery"
-              v-model="selectedMethod"
-              @change="handleMethodChange"
-            />
-            <span class="custom-radio"></span>
-            Za pobraniem
-          </label>
-        </div>
+  <div v-if="cartItems.length" class="main-block">
+    <OrderProgress :currentStep="3" class="order-progress" />
+    <div class="delivery-form-container">
+      <div class="payment-method-container">
+        <div class="payment-method">
+          <h1>Wybierz metodę płatności</h1>
+          <div class="method-container">
+            <div class="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  value="card"
+                  v-model="selectedMethod"
+                  @change="handleMethodChange"
+                />
+                <span class="custom-radio"></span>
+                Płatność kartą
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="bank_transfer"
+                  v-model="selectedMethod"
+                  @change="handleMethodChange"
+                />
+                <span class="custom-radio"></span>
+                Przelew internetowy
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="cash_on_delivery"
+                  v-model="selectedMethod"
+                  @change="handleMethodChange"
+                />
+                <span class="custom-radio"></span>
+                Za pobraniem
+              </label>
+            </div>
 
-        <!-- Dynamiczne wyświetlanie dodatkowych pól -->
-        <div class="details" v-if="selectedMethod">
-          <div v-if="selectedMethod === 'card'">
-            <h2>Podaj dane karty:</h2>
-            <label for="cardNumber">Numer karty:</label>
-            <input
-              id="cardNumber"
-              type="text"
-              placeholder="1234 5678 9101 1121"
-              v-model="cardNumber"
-              @input="filterNumericInput('cardNumber')"
-            />
-          </div>
-          <div v-if="selectedMethod === 'bank_transfer'">
-            <h2>Podaj numer konta bankowego:</h2>
-            <label for="accountNumber">Numer konta:</label>
-            <input
-              id="accountNumber"
-              type="text"
-              placeholder="12345678901234567890123456"
-              v-model="accountNumber"
-              @input="filterNumericInput('accountNumber')"
-            />
-          </div>
-          <div v-if="selectedMethod === 'cash_on_delivery'">
-            <h2>Informacja:</h2>
-            <p>Płatność za pobraniem kosztuje dodatkowo 5 zł.</p>
-          </div>
-        </div>
+            <div class="details" v-if="selectedMethod">
+              <div v-if="selectedMethod === 'card'">
+                <h2>Podaj dane karty:</h2>
+                <label for="cardNumber">Numer karty:</label>
+                <input
+                  id="cardNumber"
+                  type="text"
+                  placeholder="1234 5678 9101 1121"
+                  v-model="cardNumber"
+                />
+              </div>
+              <div v-if="selectedMethod === 'bank_transfer'">
+                <h2>Podaj numer konta bankowego:</h2>
+                <label for="accountNumber">Numer konta:</label>
+                <input
+                  id="accountNumber"
+                  type="text"
+                  placeholder="12345678901234567890123456"
+                  v-model="accountNumber"
+                />
+              </div>
+              <div v-if="selectedMethod === 'cash_on_delivery'">
+                <h2>Informacja:</h2>
+                <p>Płatność za pobraniem kosztuje dodatkowo 5 zł.</p>
+              </div>
+            </div>
 
-        <div class="summary">
-          <h2>Podsumowanie</h2>
-          <p>Wartość koszyka: {{ cartTotal }} zł</p>
-          <p>Koszt dostawy: {{ deliveryCost }} zł</p>
-          <p>Opłata dodatkowa za pobraniem: {{ extraCost }} zł</p>
-          <p>
-            <strong>Razem: {{ totalCost }} zł</strong>
-          </p>
-        </div>
+            <div class="summary">
+              <h2>Podsumowanie</h2>
+              <p>Wartość koszyka: {{ cartTotal }} zł</p>
+              <p>Koszt dostawy: {{ deliveryCost }} zł</p>
+              <p>Opłata dodatkowa za pobraniem: {{ extraCost }} zł</p>
+              <p>
+                <strong>Razem: {{ totalCost }} zł</strong>
+              </p>
+            </div>
 
-        <div class="buttons">
-          <button class="back-btn" @click="goBack">Wróć</button>
-          <button class="confirm-btn" @click="confirmPaymentMethod">
-            Potwierdź
-          </button>
+            <div class="buttons">
+              <button class="back-btn" @click="goBack">Wróć</button>
+              <button class="confirm-btn" @click="confirmPaymentMethod">
+                Potwierdź
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <EmptyCartMessage v-else />
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      selectedMethod: null,
-      cardNumber: "",
-      accountNumber: "",
-      extraCost: 0,
-    };
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+import { CartItem } from "@/store/modules/cart";
+import OrderProgress from "@/components/OrderProgress.vue";
+import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
+
+@Component({
+  components: {
+    OrderProgress,
+    EmptyCartMessage,
   },
-  computed: {
-    cartTotal() {
-      return this.$store.getters["cart/cartTotal"] || 0;
-    },
-    deliveryCost() {
-      return this.$store.getters["deliveryMethods/deliveryCost"] || 0;
-    },
-    totalCost() {
-      return this.cartTotal + this.deliveryCost + this.extraCost;
-    },
-  },
-  methods: {
-    handleMethodChange() {
-      this.cardNumber = "";
-      this.accountNumber = "";
+})
+export default class PaymentMethod extends Vue {
+  selectedMethod: string | null = null;
+  cardNumber = "";
+  accountNumber = "";
+  extraCost = 0;
+
+  get cartItems(): CartItem[] {
+    return this.$store.getters["cart/cartItems"] || [];
+  }
+
+  get cartTotal(): number {
+    return this.$store.getters["cart/cartTotal"] || 0;
+  }
+
+  get deliveryCost(): number {
+    return this.$store.getters["deliveryMethods/deliveryCost"] || 0;
+  }
+
+  get totalCost(): number {
+    return this.cartTotal + this.deliveryCost + this.extraCost;
+  }
+
+  async mounted() {
+    try {
+      await this.$store.dispatch("paymentMethod/fetchPaymentMethod");
+      const paymentMethod = this.$store.state.paymentMethod;
+      this.selectedMethod = paymentMethod.selectedMethod;
+      this.cardNumber = paymentMethod.cardNumber || "";
+      this.accountNumber = paymentMethod.accountNumber || "";
       this.extraCost = this.selectedMethod === "cash_on_delivery" ? 5 : 0;
-    },
-    filterNumericInput(field) {
-      this[field] = this[field].replace(/\D/g, ""); // Usuwa wszystkie znaki inne niż cyfry
-    },
-    goBack() {
-      this.$router.go(-1);
-    },
-    confirmPaymentMethod() {
-      if (this.selectedMethod === "card" && !this.cardNumber) {
-        alert("Wprowadź numer karty!");
-        return;
-      }
-      if (this.selectedMethod === "bank_transfer" && !this.accountNumber) {
-        alert("Wprowadź numer konta!");
-        return;
-      }
+    } catch (error) {
+      console.error("Błąd podczas ładowania danych metody płatności:", error);
+    }
+  }
 
-      // Zapisanie metody płatności do Vuex
-      this.$store.dispatch("paymentMethod/setPaymentMethod", {
-        method: this.selectedMethod,
-        cardNumber: this.cardNumber,
-        accountNumber: this.accountNumber,
-      });
+  handleMethodChange(): void {
+    this.cardNumber = "";
+    this.accountNumber = "";
+    this.extraCost = this.selectedMethod === "cash_on_delivery" ? 5 : 0;
+  }
 
-      // Nawigacja do podsumowania
-      this.$router.push("/summary");
-    },
-  },
-};
+  confirmPaymentMethod(): void {
+    if (this.selectedMethod === "card" && !this.cardNumber) {
+      alert("Wprowadź numer karty!");
+      return;
+    }
+    if (this.selectedMethod === "bank_transfer" && !this.accountNumber) {
+      alert("Wprowadź numer konta!");
+      return;
+    }
+
+    this.$store.dispatch("paymentMethod/setPaymentMethod", {
+      selectedMethod: this.selectedMethod,
+      cardNumber: this.cardNumber,
+      accountNumber: this.accountNumber,
+    });
+
+    this.$router.push("/summary");
+  }
+
+  goBack(): void {
+    this.$router.go(-1);
+  }
+}
 </script>
 
 <style scoped lang="scss">
+.main-block {
+  background-color: #f2f2f2;
+}
 .payment-method-container {
   display: flex;
   justify-content: center;
-  background-color: #f2f2f2;
   padding: 40px;
   padding-bottom: 230px;
+}
+
+.order-progress {
+  padding-top: 20px;
 }
 
 .payment-method {

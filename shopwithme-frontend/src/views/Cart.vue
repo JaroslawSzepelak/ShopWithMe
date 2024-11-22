@@ -1,59 +1,73 @@
 <template>
-  <div class="cart">
-    <h1>Twój koszyk</h1>
-    <div v-if="cartItems.length" class="cart-container">
-      <div class="cart-items">
-        <div v-for="item in cartItems" :key="item.productId" class="cart-item">
-          <img
-            :src="item.image || placeholderImage"
-            alt="Product image"
-            class="product-image"
-          />
-          <div class="item-details">
-            <h3 class="product-name">{{ item.name }}</h3>
-            <p class="availability">Dostępny</p>
-            <p class="price-per-unit">{{ item.price }} zł za sztukę</p>
-            <div class="quantity-control">
-              <button @click="decreaseQuantity(item)" class="quantity-btn">
-                -
-              </button>
-              <input
-                type="number"
-                class="quantity-input"
-                v-model.number="item.quantity"
-                @input="updateQuantity(item)"
-                min="1"
-              />
-              <button @click="increaseQuantity(item)" class="quantity-btn">
-                +
-              </button>
+  <div v-if="cartItems.length" class="main-block">
+    <OrderProgress :currentStep="1" class="order-progress" />
+    <div class="cart">
+      <h1>Twój koszyk</h1>
+      <div class="cart-container">
+        <div class="cart-items">
+          <div
+            v-for="item in cartItems"
+            :key="item.productId"
+            class="cart-item"
+          >
+            <img
+              :src="item.image || placeholderImage"
+              alt="Product image"
+              class="product-image"
+            />
+            <div class="item-details">
+              <h3 class="product-name">{{ item.name }}</h3>
+              <p class="availability">Dostępny</p>
+              <p class="price-per-unit">{{ item.price }} zł za sztukę</p>
+              <div class="quantity-control">
+                <button @click="decreaseQuantity(item)" class="quantity-btn">
+                  -
+                </button>
+                <input
+                  type="number"
+                  class="quantity-input"
+                  v-model.number="item.quantity"
+                  @input="updateQuantity(item)"
+                  min="1"
+                />
+                <button @click="increaseQuantity(item)" class="quantity-btn">
+                  +
+                </button>
+              </div>
+              <p class="total-price">{{ item.quantity * item.price }} zł</p>
             </div>
-            <p class="total-price">{{ item.quantity * item.price }} zł</p>
+            <button @click="removeFromCart(item.productId)" class="remove-btn">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
-          <button @click="removeFromCart(item.productId)" class="remove-btn">
-            <i class="fas fa-trash"></i>
-          </button>
         </div>
-      </div>
-      <div class="cart-summary">
-        <h2>Łączna wartość: {{ cartTotal }} PLN</h2>
-        <div class="summary-buttons">
-          <button @click="checkout" class="checkout-btn">
-            Dostawa zamówienia
-          </button>
-          <button @click="goBack" class="back-btn">Wróć</button>
+        <div class="cart-summary">
+          <h2>Łączna wartość: {{ cartTotal }} PLN</h2>
+          <div class="summary-buttons">
+            <button @click="checkout" class="checkout-btn">
+              Dostawa zamówienia
+            </button>
+            <button @click="goBack" class="back-btn">Wróć</button>
+          </div>
         </div>
       </div>
     </div>
-    <p v-else>Koszyk jest pusty.</p>
   </div>
+  <EmptyCartMessage v-else />
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { CartItem } from "@/store/modules/cart";
+import OrderProgress from "@/components/OrderProgress.vue";
+import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
 
-@Component
+@Component({
+  components: {
+    OrderProgress,
+    EmptyCartMessage,
+  },
+})
 export default class Cart extends Vue {
   placeholderImage = "https://placehold.co/100x100";
 
@@ -106,10 +120,17 @@ export default class Cart extends Vue {
       quantity: item.quantity,
     });
   }
+
+  goToShop() {
+    this.$router.push("/");
+  }
 }
 </script>
 
 <style scoped lang="scss">
+.main-block {
+  background-color: #f2f2f2;
+}
 .cart {
   background-color: #f2f2f2;
   display: flex;
@@ -264,6 +285,15 @@ export default class Cart extends Vue {
       font-size: 1rem;
       cursor: pointer;
     }
+  }
+  .shop-btn {
+    background-color: #c70a0a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
   }
 }
 </style>
