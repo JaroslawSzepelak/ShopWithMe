@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopWithMe.Models;
 using ShopWithMe.Models.Cart;
+using ShopWithMe.Models.Cart.FormModels;
 
 namespace ShopWithMe.Controllers
 {
@@ -27,6 +28,21 @@ namespace ShopWithMe.Controllers
         }
         #endregion
 
+        #region UpdateCartLine()
+        [HttpPut]
+        public IActionResult UpdateCartLine([FromBody] CartLineUpdateMOdel model)
+        {
+            var cartLine = _cart.Lines.First(c1 => c1.Product.Id == model.ProductId);
+
+            if (cartLine == null)
+                return NotFound();
+
+            cartLine.Quantity = model.Quantity;
+
+            return Ok(_cart);
+        }
+        #endregion
+
         #region OnPost()
         [HttpPost]
         public IActionResult AddItem([FromBody] long productId)
@@ -45,7 +61,12 @@ namespace ShopWithMe.Controllers
         [HttpDelete]
         public IActionResult RemoveLine([FromBody] long productId)
         {
-            _cart.RemoveLine(_cart.Lines.First(c1 => c1.Product.Id == productId).Product);
+            var product = _cart.Lines.FirstOrDefault(c1 => c1.Product.Id == productId)?.Product;
+
+            if (product == null)
+                return NotFound();
+
+            _cart.RemoveLine(product);
             return Ok(_cart);
         }
         #endregion
