@@ -1,59 +1,91 @@
 <template>
-  <div v-if="cartItems.length" class="main-block">
-    <OrderProgress :currentStep="1" class="order-progress" />
-    <div class="cart">
-      <h1>Twój koszyk</h1>
-      <div class="cart-container">
-        <div class="cart-items">
-          <div
-            v-for="item in cartItems"
-            :key="item.productId"
-            class="cart-item"
-          >
-            <img
-              :src="item.image || placeholderImage"
-              alt="Product image"
-              class="product-image"
-            />
-            <div class="item-details">
-              <h3 class="product-name">{{ item.name }}</h3>
-              <p class="availability">Dostępny</p>
-              <p class="price-per-unit">{{ item.price }} zł za sztukę</p>
-              <div class="quantity-control">
-                <button @click="decreaseQuantity(item)" class="quantity-btn">
-                  -
-                </button>
-                <input
-                  type="number"
-                  class="quantity-input"
-                  v-model.number="item.quantity"
-                  @input="updateQuantity(item)"
-                  min="1"
-                />
-                <button @click="increaseQuantity(item)" class="quantity-btn">
-                  +
-                </button>
+  <div>
+    <div v-if="cartItems.length" class="main-block">
+      <OrderProgress :currentStep="1" class="order-progress" />
+      <div class="cart">
+        <h1>Twój koszyk</h1>
+        <div class="cart-container">
+          <div class="cart-items">
+            <div
+              v-for="item in cartItems"
+              :key="item.productId"
+              class="cart-item"
+            >
+              <img
+                :src="item.image || placeholderImage"
+                alt="Product image"
+                class="product-image"
+              />
+              <div class="item-details">
+                <h3 class="product-name">{{ item.name }}</h3>
+                <p class="availability">Dostępny</p>
+                <p class="price-per-unit">{{ item.price }} zł za sztukę</p>
+                <div class="quantity-control">
+                  <button @click="decreaseQuantity(item)" class="quantity-btn">
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    class="quantity-input"
+                    v-model.number="item.quantity"
+                    @input="updateQuantity(item)"
+                    min="1"
+                  />
+                  <button @click="increaseQuantity(item)" class="quantity-btn">
+                    +
+                  </button>
+                </div>
+                <p class="total-price">{{ item.quantity * item.price }} zł</p>
               </div>
-              <p class="total-price">{{ item.quantity * item.price }} zł</p>
+              <button @click="showDeleteConfirmation(item)" class="remove-btn">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
-            <button @click="removeFromCart(item.productId)" class="remove-btn">
-              <i class="fas fa-trash"></i>
-            </button>
           </div>
-        </div>
-        <div class="cart-summary">
-          <h2>Łączna wartość: {{ cartTotal }} PLN</h2>
-          <div class="summary-buttons">
-            <button @click="checkout" class="checkout-btn">
-              Dostawa zamówienia
-            </button>
-            <button @click="goBack" class="back-btn">Wróć</button>
+          <div class="cart-summary">
+            <h2>Łączna wartość: {{ cartTotal }} PLN</h2>
+            <div class="summary-buttons">
+              <button @click="checkout" class="checkout-btn">
+                Dostawa zamówienia
+              </button>
+              <button @click="goBack" class="back-btn">Wróć</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Modal potwierdzenia usunięcia -->
+    <div v-if="showConfirmModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Czy na pewno chcesz usunąć produkt?</h2>
+        <p>{{ currentProduct?.name }}</p>
+        <div class="modal-buttons">
+          <button @click="confirmDelete" class="modal-btn">Tak</button>
+          <button @click="closeModal" class="modal-btn cancel">Nie</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal informacyjny o usunięciu -->
+    <div v-if="showInfoModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Produkt został usunięty!</h2>
+        <p>{{ currentProduct?.name }}</p>
+        <div class="modal-buttons">
+          <button @click="closeModal" class="modal-btn">Ok</button>
+          <button @click="restoreProduct" class="modal-btn restore">
+            Przywróć produkt
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Widok pustego koszyka -->
+    <EmptyCartMessage
+      v-if="!cartItems.length && !showConfirmModal && !showInfoModal"
+    />
   </div>
-  <EmptyCartMessage v-else />
 </template>
 
 <script lang="ts">
@@ -70,6 +102,11 @@ import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
 })
 export default class Cart extends Vue {
   placeholderImage = "https://placehold.co/100x100";
+  showConfirmModal = false;
+  showInfoModal = false;
+  currentProduct: CartItem | null = null;
+
+  removedProduct: CartItem | null = null;
 
   get cartItems(): CartItem[] {
     return this.$store.getters["cart/cartItems"] || [];
@@ -85,10 +122,41 @@ export default class Cart extends Vue {
     });
   }
 
-  removeFromCart(productId: number) {
-    this.$store.dispatch("cart/removeItem", productId).catch((error) => {
+  async removeFromCart(productId: number) {
+    try {
+      await this.$store.dispatch("cart/removeItem", productId);
+    } catch (error) {
       console.error("Błąd podczas usuwania produktu z koszyka:", error);
-    });
+    }
+  }
+
+  showDeleteConfirmation(product: CartItem) {
+    this.currentProduct = product;
+    this.showConfirmModal = true;
+  }
+
+  async confirmDelete() {
+    if (this.currentProduct) {
+      this.removedProduct = { ...this.currentProduct };
+      await this.removeFromCart(this.currentProduct.productId);
+      this.currentProduct = null;
+
+      this.showConfirmModal = false;
+      this.showInfoModal = true;
+    }
+  }
+
+  restoreProduct() {
+    if (this.removedProduct) {
+      this.$store.dispatch("cart/addItem", this.removedProduct.productId);
+      this.removedProduct = null;
+    }
+    this.showInfoModal = false;
+  }
+
+  closeModal() {
+    this.showConfirmModal = false;
+    this.showInfoModal = false;
   }
 
   goBack() {
@@ -294,6 +362,65 @@ export default class Cart extends Vue {
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+
+    .modal-btn {
+      background-color: #c70a0a;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &.cancel {
+        background-color: #666;
+      }
+
+      &.restore {
+        background-color: #4caf50;
+      }
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
   }
 }
 </style>
