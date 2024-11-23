@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models;
+using ShopWithMe.Models.Admin;
+using ShopWithMe.Models.Admin.Seed;
 using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
@@ -17,10 +20,19 @@ namespace ShopWithMe
             // Add services to the container.
             builder.Services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
             builder.Services.AddDbContext<DefaultContext>(opts =>
             {
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddDbContext<AppIdentityDbContext>(opts =>
+            {
+                opts.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
+
+            // Dodanie obsługi Identity Core
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
             // Configure session with appropriate settings
             builder.Services.AddDistributedMemoryCache();
@@ -66,7 +78,9 @@ namespace ShopWithMe
             // Enable CORS with the specified policy
             app.UseCors("AllowFrontend");
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseSession(); // Musi by� po `UseCors` i przed `MapControllers`
 
             app.MapControllers();
@@ -77,6 +91,8 @@ namespace ShopWithMe
                 var services = scope.ServiceProvider;
                 SeedData.EnsurePopulated(services); // Przekazujemy IServiceProvider do SeedData
             }
+
+            IdentitySeedData.EnsurePopulated(app); // Przekazujemy IServiceProvider do IdentitySeedData
 
             app.Run();
         }
