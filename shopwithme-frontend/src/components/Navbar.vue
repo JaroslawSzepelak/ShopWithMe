@@ -4,11 +4,8 @@
       <router-link to="/" class="navbar-logo">
         <img src="@/assets/logo.svg" alt="ShopWithMe Logo" class="logo-image" />
       </router-link>
-      <button class="navbar-category btn btn-dark">
-        <i class="fas fa-bars"></i> Kategorie
-      </button>
+      <CategoryDropdown @clicked="toggleDropdown" />
     </div>
-
     <div class="navbar-right">
       <div class="navbar-search">
         <input type="text" placeholder="Szukaj" class="form-control" />
@@ -16,9 +13,7 @@
           <i class="fas fa-search"></i>
         </button>
       </div>
-
       <i class="fas fa-shopping-cart cart-icon" @click="goToCart"></i>
-
       <div class="user-menu">
         <i class="fas fa-user user-icon"></i>
         <div class="user-dropdown">
@@ -33,10 +28,21 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import CategoryDropdown from "@/components/CategoryDropdown.vue";
 
-@Component
+@Component({
+  components: {
+    CategoryDropdown,
+  },
+})
 export default class Navbar extends Vue {
-  goToCart(): void {
+  isDropdownVisible = false;
+
+  toggleDropdown(isOpen: boolean) {
+    this.isDropdownVisible = isOpen;
+  }
+
+  goToCart() {
     if (this.$route.path !== "/cart") {
       this.$router.push("/cart");
     }

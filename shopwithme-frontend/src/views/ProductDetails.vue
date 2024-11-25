@@ -1,5 +1,5 @@
 <template>
-  <div class="product-details">
+  <div class="product-details" :key="$route.params.id">
     <div class="product-container">
       <div class="image-section">
         <img :src="mainImage" alt="Product image" class="main-image" />
@@ -74,7 +74,6 @@ export default class ProductDetails extends Vue {
   };
 
   mainImage = this.product.images[0];
-  currentIndex = 0;
 
   async created() {
     const productId = Number(this.$route.params.id);
@@ -92,7 +91,7 @@ export default class ProductDetails extends Vue {
       };
       this.mainImage = this.product.images[0];
     } catch (error) {
-      console.error("Błąd podczas pobierania danych produktu:", error);
+      console.error("Error fetching product details:", error);
     }
   }
 
