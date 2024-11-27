@@ -4,6 +4,8 @@ import { Module } from "vuex";
 interface OrderState {
   orders: any[];
   orderSummary: any | null;
+  error: string | null;
+  loading: boolean;
 }
 
 const orderModule: Module<OrderState, any> = {
@@ -12,6 +14,8 @@ const orderModule: Module<OrderState, any> = {
   state: {
     orders: [],
     orderSummary: null,
+    error: null,
+    loading: false,
   },
 
   mutations: {
@@ -21,23 +25,82 @@ const orderModule: Module<OrderState, any> = {
     SET_ORDER_SUMMARY(state, summary) {
       state.orderSummary = summary;
     },
+    SET_ERROR(state, error: string | null) {
+      state.error = error;
+    },
+    SET_LOADING(state, loading: boolean) {
+      state.loading = loading;
+    },
   },
 
   actions: {
     async fetchOrders({ commit }) {
-      const response = await orderAPI.getOrders();
-      commit("SET_ORDERS", response.data);
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        const response = await orderAPI.getOrders();
+        commit("SET_ORDERS", response.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        commit("SET_ERROR", "Failed to fetch orders.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
     },
     async fetchOrderSummary({ commit }) {
-      const response = await orderAPI.getOrderSummary();
-      commit("SET_ORDER_SUMMARY", response.data);
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        const response = await orderAPI.getOrderSummary();
+        commit("SET_ORDER_SUMMARY", response.data);
+      } catch (error) {
+        console.error("Error fetching order summary:", error);
+        commit("SET_ERROR", "Failed to fetch order summary.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
     },
-    async createOrder() {
-      await orderAPI.createOrder();
+    async createOrder({ commit }) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        const response = await orderAPI.createOrder();
+        commit("SET_ORDER_SUMMARY", response.data); // Zakładamy, że backend zwraca dane zamówienia
+      } catch (error) {
+        console.error("Error creating order:", error);
+        commit("SET_ERROR", "Failed to create order.");
+        throw error; // Przekazuje błąd dalej do widoku
+      } finally {
+        commit("SET_LOADING", false);
+      }
     },
-    async deleteOrder({ dispatch }, id: number) {
-      await orderAPI.deleteOrder(id);
-      dispatch("fetchOrders");
+    async deleteOrder({ dispatch, commit }, id: number) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        await orderAPI.deleteOrder(id);
+        await dispatch("fetchOrders"); // Odśwież listę zamówień
+      } catch (error) {
+        console.error("Error deleting order:", error);
+        commit("SET_ERROR", "Failed to delete order.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+  },
+
+  getters: {
+    allOrders(state) {
+      return state.orders;
+    },
+    orderSummary(state) {
+      return state.orderSummary;
+    },
+    orderError(state) {
+      return state.error;
+    },
+    isOrderLoading(state) {
+      return state.loading;
     },
   },
 };

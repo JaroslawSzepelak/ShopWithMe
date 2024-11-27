@@ -1,60 +1,145 @@
 <template>
-  <div class="container mt-5">
+  <div class="product-list">
     <h1>Produkty</h1>
-    <div class="row">
-      <div class="col-md-4" v-for="product in products" :key="product.id">
-        <div class="card mb-4">
-          <div class="card-body">
-            <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">{{ product.lead }}</p>
-            <p><strong>Cena:</strong> {{ product.price }} PLN</p>
-            <router-link
-              :to="{ name: 'ProductDetails', params: { id: product.id } }"
-              class="btn btn-primary"
-            >
-              Zobacz szczegóły
-            </router-link>
-          </div>
-        </div>
+    <div class="product-list-container">
+      <ProductCard
+        v-for="product in paginatedProducts"
+        :key="product.id"
+        :product="product"
+      />
+    </div>
+    <div class="pagination-container">
+      <div class="page-size-selector">
+        <label for="pageSize">Ilość produktów na stronę:</label>
+        <select
+          id="pageSize"
+          class="page-size-select"
+          v-model="pageSize"
+          @change="updatePageSize"
+        >
+          <option value="10">10 na stronę</option>
+          <option value="20">20 na stronę</option>
+          <option value="30">30 na stronę</option>
+        </select>
       </div>
+      <Pagination
+        :currentPage="currentPage"
+        :pageCount="pageCount"
+        @changePage="changePage"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { productAPI } from "@/plugins/axios";
+import ProductCard from "@/components/ProductCard.vue";
+import Pagination from "@/components/Pagination.vue";
+import { mapGetters } from "vuex";
 
-@Component
+@Component({
+  components: {
+    ProductCard,
+    Pagination,
+  },
+  computed: {
+    ...mapGetters("products", ["paginatedProducts", "pageCount"]),
+  },
+})
 export default class ProductList extends Vue {
-  products: Array<{
-    id: number;
-    name: string;
-    lead: string;
-    description: string;
-    price: number;
-  }> = [];
+  currentPage: number = this.$store.getters["products/currentPage"];
+  pageSize: number = this.$store.getters["products/pageSize"];
+
+  get paginatedProducts() {
+    return this.$store.getters["products/paginatedProducts"];
+  }
+
+  get pageCount() {
+    return this.$store.getters["products/pageCount"];
+  }
 
   async created() {
     try {
-      const response = await productAPI.getProducts();
-      this.products = response.data;
+      const savedPageSize = Number(sessionStorage.getItem("pageSize")) || 10;
+      const savedCurrentPage =
+        Number(sessionStorage.getItem("currentPage")) || 1;
+
+      this.$store.dispatch("products/setPageSize", savedPageSize);
+      this.$store.dispatch("products/setCurrentPage", savedCurrentPage);
+
+      await this.$store.dispatch("products/fetchProducts");
+
+      console.log("Initial Page Size:", this.pageSize);
+      console.log("Initial Current Page:", this.currentPage);
     } catch (error) {
-      console.error("Błąd podczas pobierania produktów:", error);
+      console.error(
+        "Błąd podczas inicjalizacji komponentu ProductList:",
+        error
+      );
     }
+  }
+
+  updatePageSize() {
+    this.currentPage = 1;
+    this.$store.dispatch("products/setPageSize", this.pageSize);
+    this.$store.dispatch("products/setCurrentPage", this.currentPage);
+
+    console.log("Page Size Updated:", this.pageSize);
+    console.log("Current Page Reset to:", this.currentPage);
+  }
+
+  changePage(newPage: number) {
+    this.currentPage = newPage;
+    this.$store.dispatch("products/setCurrentPage", newPage);
+
+    console.log("Page Changed to:", newPage);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
 </script>
 
 <style scoped lang="scss">
-.container {
-  margin-top: 20px;
-}
+.product-list {
+  padding: 20px;
 
-.card {
-  transition: transform 0.3s;
-  &:hover {
-    transform: scale(1.05);
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+  }
+
+  .product-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      label {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+
+      .page-size-select {
+        padding: 5px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+    }
   }
 }
 </style>

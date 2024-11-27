@@ -47,25 +47,24 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { categoryAPI } from "@/plugins/axios";
 
 @Component
 export default class CategoryDropdown extends Vue {
   isOpen = false;
-  categories: Array<{ id: number; name: string }> = [];
-  products: Array<{
-    id: number;
-    name: string;
-    lead: string;
-    price: number;
-    image?: string;
-  }> = [];
   placeholderImage = "https://placehold.co/100x100";
+
+  get categories() {
+    return this.$store.getters["categories/allCategories"];
+  }
+
+  get products() {
+    const selectedCategory = this.$store.getters["categories/selectedCategory"];
+    return selectedCategory?.products || [];
+  }
 
   async mounted() {
     try {
-      const response = await categoryAPI.getCategories();
-      this.categories = response.data;
+      await this.$store.dispatch("categories/fetchCategories");
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -81,15 +80,14 @@ export default class CategoryDropdown extends Vue {
   }
 
   async fetchProducts(category: { id: number; name: string }) {
+    console.log(`Fetching products for category: ${category.name}`);
     try {
-      const response = await categoryAPI.getCategory(category.id);
-      this.products = response.data.products || [];
+      await this.$store.dispatch("categories/fetchCategory", category.id);
     } catch (error) {
       console.error(
         `Error fetching products for category ${category.name}:`,
         error
       );
-      this.products = [];
     }
   }
 

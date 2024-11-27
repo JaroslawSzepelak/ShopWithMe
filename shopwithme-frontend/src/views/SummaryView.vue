@@ -77,10 +77,10 @@
             <h2>Metoda płatności</h2>
             <p>
               <template v-if="selectedPaymentMethod === 'card'">
-                Płatność kartą (**** **** **** {{ cardNumber.slice(-4) }})
+                Płatność kartą (**** **** **** {{ cardNumber.slice(-4) }} )
               </template>
               <template v-else-if="selectedPaymentMethod === 'bank_transfer'">
-                Przelew internetowy (Numer konta: {{ accountNumber }})
+                Przelew internetowy (Numer konta: {{ accountNumber }} )
               </template>
               <template v-else> Za pobraniem </template>
             </p>
@@ -110,7 +110,6 @@ import { Component, Vue } from "vue-property-decorator";
 import { CartItem } from "@/store/modules/cart";
 import OrderProgress from "@/components/OrderProgress.vue";
 import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
-import { orderAPI } from "@/plugins/axios";
 
 @Component({
   components: {
@@ -205,11 +204,14 @@ export default class SummaryView extends Vue {
 
   async confirmOrder(): Promise<void> {
     try {
-      const response = await orderAPI.createOrder();
-      this.orderId = response.data.orderId;
+      await this.$store.dispatch("order/createOrder");
+      this.orderId = this.$store.getters["order/orderSummary"]?.id;
+
+      if (!this.orderId) {
+        throw new Error("Brak ID zamówienia w odpowiedzi API.");
+      }
 
       await this.$store.dispatch("cart/fetchCart", []);
-
       this.orderModalVisible = true;
     } catch (error) {
       console.error("Błąd podczas składania zamówienia:", error);

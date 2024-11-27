@@ -53,7 +53,6 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import TechnicalDetails from "@/components/TechnicalDetails.vue";
-import { productAPI } from "@/plugins/axios";
 
 @Component({
   components: {
@@ -61,35 +60,35 @@ import { productAPI } from "@/plugins/axios";
   },
 })
 export default class ProductDetails extends Vue {
-  product = {
-    id: 0,
-    name: "",
-    price: 0,
-    images: [
-      "https://placehold.co/400/abb7e7/7b8277",
-      "https://placehold.co/400/abd4c7/7b8277",
-      "https://placehold.co/400/e6dcae/7b8277",
-      "https://placehold.co/400",
-    ] as string[],
-  };
+  mainImage = ""; // Główne zdjęcie produktu
 
-  mainImage = this.product.images[0];
+  // Getter do pobrania szczegółów produktu z Vuex
+  get product() {
+    return this.$store.getters["products/selectedProduct"];
+  }
+
+  // Getter do zdjęć produktu
+  get images() {
+    return this.product.images || [];
+  }
 
   async created() {
     const productId = Number(this.$route.params.id);
     await this.fetchProduct(productId);
   }
 
-  async fetchProduct(id: number) {
+  async beforeRouteUpdate(to: any, from: any, next: any) {
+    const productId = Number(to.params.id);
+    if (productId !== this.product.id) {
+      await this.fetchProduct(productId);
+    }
+    next();
+  }
+
+  async fetchProduct(productId: number) {
     try {
-      const response = await productAPI.getProduct(id);
-      this.product = {
-        ...this.product,
-        id: response.data.id,
-        name: response.data.name,
-        price: response.data.price,
-      };
-      this.mainImage = this.product.images[0];
+      await this.$store.dispatch("products/fetchProduct", productId);
+      this.mainImage = this.images[0] || ""; // Ustawienie głównego obrazu
     } catch (error) {
       console.error("Error fetching product details:", error);
     }
@@ -100,17 +99,16 @@ export default class ProductDetails extends Vue {
   }
 
   nextImage() {
-    const currentIndex = this.product.images.indexOf(this.mainImage);
-    const nextIndex = (currentIndex + 1) % this.product.images.length;
-    this.mainImage = this.product.images[nextIndex];
+    const currentIndex = this.images.indexOf(this.mainImage);
+    const nextIndex = (currentIndex + 1) % this.images.length;
+    this.mainImage = this.images[nextIndex];
   }
 
   prevImage() {
-    const currentIndex = this.product.images.indexOf(this.mainImage);
+    const currentIndex = this.images.indexOf(this.mainImage);
     const prevIndex =
-      (currentIndex - 1 + this.product.images.length) %
-      this.product.images.length;
-    this.mainImage = this.product.images[prevIndex];
+      (currentIndex - 1 + this.images.length) % this.images.length;
+    this.mainImage = this.images[prevIndex];
   }
 
   goBack() {

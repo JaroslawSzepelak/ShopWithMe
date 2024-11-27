@@ -16,6 +16,28 @@ export const productAPI = {
   getProducts() {
     return apiClient.get("/Products");
   },
+  createProduct(product: {
+    name: string;
+    price: number;
+    categoryId: number;
+    description?: string;
+    image?: string;
+  }) {
+    return apiClient.post("/Products", product);
+  },
+  updateProduct(product: {
+    id: number;
+    name: string;
+    price: number;
+    categoryId: number;
+    description?: string;
+    image?: string;
+  }) {
+    return apiClient.put("/Products", product);
+  },
+  deleteProduct(id: number) {
+    return apiClient.delete(`/Products/${id}`);
+  },
 };
 
 // API dla koszyka

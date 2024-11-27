@@ -44,36 +44,40 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { productAPI } from "@/plugins/axios";
 
 @Component
 export default class SuggestedProducts extends Vue {
-  products: any[] = [];
-  visibleProducts: any[] = [];
   placeholderImage = "https://placehold.co/200x200";
   productsToShow = 5;
   startIndex = 0;
   showModal = false;
   modalMessage = "";
 
+  get products() {
+    return this.$store.getters["products/allProducts"];
+  }
+
+  get visibleProducts() {
+    return this.products.slice(
+      this.startIndex,
+      this.startIndex + this.productsToShow
+    );
+  }
+
   async mounted() {
-    await this.fetchProducts();
-    this.updateProductsToShow();
-    window.addEventListener("resize", this.updateProductsToShow);
+    try {
+      if (!this.products.length) {
+        await this.$store.dispatch("products/fetchProducts");
+      }
+      this.updateProductsToShow();
+      window.addEventListener("resize", this.updateProductsToShow);
+    } catch (error) {
+      console.error("Błąd podczas ładowania produktów:", error);
+    }
   }
 
   beforeDestroy() {
     window.removeEventListener("resize", this.updateProductsToShow);
-  }
-
-  async fetchProducts() {
-    try {
-      const response = await productAPI.getProducts();
-      this.products = response.data;
-      this.updateVisibleProducts();
-    } catch (error) {
-      console.error("Błąd podczas pobierania produktów:", error);
-    }
   }
 
   updateProductsToShow() {
@@ -86,14 +90,6 @@ export default class SuggestedProducts extends Vue {
       this.productsToShow = 5;
     }
     this.startIndex = 0;
-    this.updateVisibleProducts();
-  }
-
-  updateVisibleProducts() {
-    this.visibleProducts = this.products.slice(
-      this.startIndex,
-      this.startIndex + this.productsToShow
-    );
   }
 
   nextProducts() {
@@ -104,14 +100,12 @@ export default class SuggestedProducts extends Vue {
       this.showModal = true;
     } else {
       this.startIndex = nextIndex;
-      this.updateVisibleProducts();
     }
   }
 
   prevProducts() {
     if (this.startIndex > 0) {
       this.startIndex = Math.max(0, this.startIndex - this.productsToShow);
-      this.updateVisibleProducts();
     } else {
       this.modalMessage = "Początek kolejki produktów";
       this.showModal = true;
@@ -129,7 +123,7 @@ export default class SuggestedProducts extends Vue {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      console.error("Błąd podczas dodawania produktu do koszyka:", error);
     }
   }
 }
