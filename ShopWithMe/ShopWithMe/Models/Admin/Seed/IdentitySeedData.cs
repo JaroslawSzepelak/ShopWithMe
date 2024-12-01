@@ -52,7 +52,7 @@ namespace ShopWithMe.Models.Admin.Seed
                 UserManager<IdentityUser> userManager = scope.ServiceProvider
                 .GetRequiredService<UserManager<IdentityUser>>();
 
-                IdentityUser user = await userManager.FindByIdAsync(adminUser);
+                IdentityUser user = await userManager.FindByNameAsync(adminUser);
 
                 if (user == null)
                 {
@@ -60,7 +60,7 @@ namespace ShopWithMe.Models.Admin.Seed
                     await userManager.CreateAsync(user, adminPassword);
                 }
 
-                if (await userManager.IsInRoleAsync(user, Roles.Administrator))
+                if (!await userManager.IsInRoleAsync(user, Roles.Administrator))
                 {
                     await userManager.AddToRoleAsync(user, Roles.Administrator);
                 }

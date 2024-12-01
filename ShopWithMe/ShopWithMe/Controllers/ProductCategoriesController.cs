@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopWithMe.Models;
+using ShopWithMe.Managers;
 using ShopWithMe.Models.ProductCategories;
 
 namespace ShopWithMe.Controllers
@@ -9,20 +8,20 @@ namespace ShopWithMe.Controllers
     [ApiController]
     public class ProductCategoriesController : ControllerBase
     {
-        protected DefaultContext _context;
+        protected ProductCategoriesManager _manager;
 
         #region ProductCategoriesController()
-        public ProductCategoriesController(DefaultContext context) 
+        public ProductCategoriesController(ProductCategoriesManager manager)
         {
-            _context = context;
+            _manager = manager;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public IAsyncEnumerable<ProductCategory> GetList()
+        public async Task<List<ProductCategory>> GetList()
         {
-            return _context.ProductCategories.AsAsyncEnumerable();
+            return await _manager.GetListAsync();
         }
         #endregion
 
@@ -30,60 +29,12 @@ namespace ShopWithMe.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var entity = await _context.ProductCategories
-                .Include(x => x.Products)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _manager.GetAsync(id);
 
             if (entity == null)
-            {
                 return NotFound();
-            }
 
             return Ok(entity);
-        }
-        #endregion
-
-        #region Create()
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProductCategory product)
-        {
-            var entity = product;
-
-            await _context.ProductCategories.AddAsync(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Update()
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] ProductCategory product)
-        {
-            var entity = product;
-
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Delete()
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            var entity = await _context.ProductCategories.FirstOrDefaultAsync(p => p.Id == id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            _context.ProductCategories.Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
         #endregion
     }

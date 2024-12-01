@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ShopWithMe.Managers;
 using ShopWithMe.Models;
 using ShopWithMe.Models.Admin;
 using ShopWithMe.Models.Admin.Seed;
+using ShopWithMe.Models.Common;
 using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
@@ -49,6 +51,8 @@ namespace ShopWithMe
             builder.Services.AddScoped(sp => SessionContactData.GetContactData(sp));
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
+            builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddManagers();
 
             // Configure CORS policy to allow frontend access
             builder.Services.AddCors(options =>

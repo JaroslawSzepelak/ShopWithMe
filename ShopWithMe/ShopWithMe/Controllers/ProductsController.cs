@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopWithMe.Models;
+using ShopWithMe.Managers;
 using ShopWithMe.Models.Products;
 
 namespace ShopWithMe.Controllers
@@ -9,20 +8,20 @@ namespace ShopWithMe.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        protected DefaultContext _context;
+        protected ProductsManager _manager;
 
         #region ProductsController()
-        public ProductsController(DefaultContext context) 
+        public ProductsController(ProductsManager manager)
         {
-            _context = context;
+            _manager = manager;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public IAsyncEnumerable<Product> GetList()
+        public async Task<List<Product>> GetList()
         {
-            return _context.Products.AsAsyncEnumerable();
+            return await _manager.GetListAsync();
         }
         #endregion
 
@@ -30,60 +29,12 @@ namespace ShopWithMe.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var entity = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _manager.GetAsync(id, true);
 
             if (entity == null)
-            {
                 return NotFound();
-            }
 
             return Ok(entity);
-        }
-        #endregion
-
-        #region Create()
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
-        {
-            var entity = product;
-
-            await _context.Products.AddAsync(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Update()
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Product product)
-        {
-            var entity = product;
-
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Delete()
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok();
         }
         #endregion
     }
