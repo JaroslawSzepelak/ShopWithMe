@@ -2,12 +2,31 @@
 using ShopWithMe.Models.Common;
 using ShopWithMe.Models.Products;
 
-namespace ShopWithMe.Managers
+namespace ShopWithMe.Managers.Products
 {
     public class ProductsManager : BaseManager<Product>
     {
         #region ProductsManagers()
         public ProductsManager(IBaseRepository<Product> repository) : base(repository) { }
+        #endregion
+
+        #region GetListAsync()
+        public override async Task<List<Product>> GetListAsync()
+        {
+            return await GetListAsync(false);
+        }
+        
+        public async Task<List<Product>> GetListAsync(bool loadLinkedData)
+        {
+            var query = _repository.Entities.AsQueryable();
+
+            if (loadLinkedData)
+            {
+                query = query.Include(q => q.Category);
+            }
+
+            return await query.ToListAsync();
+        }
         #endregion
 
         #region GetAsync()

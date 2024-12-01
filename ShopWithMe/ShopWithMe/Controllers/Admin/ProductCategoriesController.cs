@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ShopWithMe.Managers;
+using ShopWithMe.Managers.ProductCategories;
 using ShopWithMe.Models.Admin;
 using ShopWithMe.Models.ProductCategories;
+using ShopWithMe.Models.ProductCategories.Admin;
 
 namespace ShopWithMe.Controllers.Admin
 {
@@ -12,19 +13,23 @@ namespace ShopWithMe.Controllers.Admin
     public class ProductCategoriesController : ControllerBase
     {
         protected ProductCategoriesManager _manager;
+        protected ProductCategoryModelsMapper _mapper;
 
         #region ProductCategoriesController()
-        public ProductCategoriesController(ProductCategoriesManager manager) 
+        public ProductCategoriesController(ProductCategoriesManager manager, ProductCategoryModelsMapper mapper) 
         {
             _manager = manager;
+            _mapper = mapper;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public async Task<List<ProductCategory>> GetList()
+        public async Task<List<ProductCategoryListModel>> GetList()
         {
-            return await _manager.GetListAsync();
+            var entries = await _manager.GetListAsync();
+
+            return _mapper.MapToAdminListModel(entries);
         }
         #endregion
 
@@ -37,15 +42,17 @@ namespace ShopWithMe.Controllers.Admin
             if (entity == null)
                 return NotFound();
 
-            return Ok(entity);
+            return Ok(_mapper.MapToFormModel(entity));
         }
         #endregion
 
         #region Create()
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ProductCategory product)
+        public async Task<IActionResult> Create([FromBody] ProductCategoryFormModel model)
         {
-            var entity = product;
+            var entity = new ProductCategory();
+
+            _mapper.Map(model, entity);
 
             await _manager.CreateAsync(entity);
 
@@ -55,9 +62,14 @@ namespace ShopWithMe.Controllers.Admin
 
         #region Update()
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] ProductCategory product)
+        public async Task<IActionResult> Update([FromBody] ProductCategoryFormModel model)
         {
-            var entity = product;
+            var entity = await _manager.GetAsync(model.Id);
+
+            if (entity == null)
+                return NotFound();
+
+            _mapper.Map(model, entity);
 
             await _manager.UpdateAsync(entity);
 

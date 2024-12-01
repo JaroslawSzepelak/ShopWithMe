@@ -55,14 +55,7 @@ namespace ShopWithMe.Controllers
             if (product == null)
                 return NotFound();
 
-            var quantity = 1;
-
-            if (model.Quantity.HasValue)
-            {
-                quantity = model.Quantity.Value;
-            }
-
-            _cart.AddItem(product, quantity);
+            _cart.AddItem(product, model.Quantity ?? 1);
             return Ok(_cart);
         }
         #endregion

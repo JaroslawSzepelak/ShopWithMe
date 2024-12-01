@@ -53,6 +53,7 @@ namespace ShopWithMe
             builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddManagers();
+            builder.Services.AddMappers();
 
             // Configure CORS policy to allow frontend access
             builder.Services.AddCors(options =>
@@ -68,7 +69,10 @@ namespace ShopWithMe
             });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.CustomSchemaIds(x => x.FullName);
+            });
 
             var app = builder.Build();
 

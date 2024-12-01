@@ -2,7 +2,8 @@
 using ShopWithMe.Models.Products;
 using Microsoft.AspNetCore.Authorization;
 using ShopWithMe.Models.Admin;
-using ShopWithMe.Managers;
+using ShopWithMe.Managers.Products;
+using ShopWithMe.Models.Products.Admin;
 
 namespace ShopWithMe.Controllers.Admin
 {
@@ -12,19 +13,23 @@ namespace ShopWithMe.Controllers.Admin
     public class ProductsController : ControllerBase
     {
         protected ProductsManager _manager;
+        protected ProductModelsMapper _mapper;
 
         #region ProductsController()
-        public ProductsController(ProductsManager manager)
+        public ProductsController(ProductsManager manager, ProductModelsMapper mapper)
         {
             _manager = manager;
+            _mapper = mapper;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public async Task<List<Product>> GetList()
+        public async Task<List<ProductListModel>> GetList()
         {
-            return await _manager.GetListAsync();
+            var entries = await _manager.GetListAsync(true);
+
+            return _mapper.MapToAdminListModel(entries);
         }
         #endregion
 
@@ -37,15 +42,17 @@ namespace ShopWithMe.Controllers.Admin
             if (entity == null)
                 return NotFound();
 
-            return Ok(entity);
+            return Ok(_mapper.MapToFormModel(entity));
         }
         #endregion
 
         #region Create()
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<IActionResult> Create([FromBody] ProductFormModel model)
         {
-            var entity = product;
+            var entity = new Product();
+
+            _mapper.Map(model, entity);
 
             await _manager.CreateAsync(entity);
 
@@ -55,9 +62,14 @@ namespace ShopWithMe.Controllers.Admin
 
         #region Update()
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Product product)
+        public async Task<IActionResult> Update([FromBody] ProductFormModel model)
         {
-            var entity = product;
+            var entity = await _manager.GetAsync(model.Id);
+
+            if (entity == null)
+                return NotFound();
+
+            _mapper.Map(model, entity);
 
             await _manager.UpdateAsync(entity);
 

@@ -1,4 +1,7 @@
-﻿namespace ShopWithMe.Managers
+﻿using ShopWithMe.Managers.ProductCategories;
+using ShopWithMe.Managers.Products;
+
+namespace ShopWithMe.Managers
 {
     public static class DependencyInjection
     {

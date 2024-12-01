@@ -1,7 +1,7 @@
 ﻿using ShopWithMe.Models.Common;
 using ShopWithMe.Models.ProductCategories;
 
-namespace ShopWithMe.Managers
+namespace ShopWithMe.Managers.ProductCategories
 {
     public class ProductCategoriesManager : BaseManager<ProductCategory>
     {

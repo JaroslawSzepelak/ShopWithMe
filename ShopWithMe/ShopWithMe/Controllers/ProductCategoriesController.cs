@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShopWithMe.Managers;
+using ShopWithMe.Managers.ProductCategories;
 using ShopWithMe.Models.ProductCategories;
+using ShopWithMe.Models.ProductCategories.Public;
 
 namespace ShopWithMe.Controllers
 {
@@ -9,19 +10,23 @@ namespace ShopWithMe.Controllers
     public class ProductCategoriesController : ControllerBase
     {
         protected ProductCategoriesManager _manager;
+        protected ProductCategoryModelsMapper _mapper;
 
         #region ProductCategoriesController()
-        public ProductCategoriesController(ProductCategoriesManager manager)
+        public ProductCategoriesController(ProductCategoriesManager manager, ProductCategoryModelsMapper mapper)
         {
             _manager = manager;
+            _mapper = mapper;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public async Task<List<ProductCategory>> GetList()
+        public async Task<List<ProductCategoryListModel>> GetList()
         {
-            return await _manager.GetListAsync();
+            var entries = await _manager.GetListAsync();
+
+            return _mapper.MapToPublicListModel(entries);
         }
         #endregion
 
@@ -34,7 +39,7 @@ namespace ShopWithMe.Controllers
             if (entity == null)
                 return NotFound();
 
-            return Ok(entity);
+            return Ok(_mapper.MapToDetailsModel(entity));
         }
         #endregion
     }
