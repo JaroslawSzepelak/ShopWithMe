@@ -37,22 +37,32 @@ namespace ShopWithMe.Controllers
             if (cartLine == null)
                 return NotFound();
 
-            cartLine.Quantity = model.Quantity;
+            if (model.Quantity.HasValue)
+            {
+                cartLine.Quantity = model.Quantity.Value;
+            }
 
             return Ok(_cart);
         }
         #endregion
 
-        #region OnPost()
+        #region AddItem()
         [HttpPost]
-        public IActionResult AddItem([FromBody] long productId)
+        public IActionResult AddItem([FromBody] CartLineUpdateMOdel model)
         {
-            var product = _context.Products.FirstOrDefault(p => p.Id == productId);
+            var product = _context.Products.FirstOrDefault(p => p.Id == model.ProductId);
 
             if (product == null)
                 return NotFound();
 
-            _cart.AddItem(product, 1);
+            var quantity = 1;
+
+            if (model.Quantity.HasValue)
+            {
+                quantity = model.Quantity.Value;
+            }
+
+            _cart.AddItem(product, quantity);
             return Ok(_cart);
         }
         #endregion
