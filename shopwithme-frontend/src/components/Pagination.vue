@@ -8,30 +8,22 @@
       >
         Poprzednia
       </button>
-      <span v-if="currentPage > 4">
-        <button @click="goToPage(1)" class="btn btn-secondary">1</button>
-        <span class="dots">...</span>
-      </span>
-      <span>
+
+      <span v-for="page in visiblePages" :key="page">
         <button
-          v-for="i in visiblePages"
-          :key="i"
+          v-if="page !== -1"
           class="btn"
           :class="{
-            'btn-primary': i === currentPage,
-            'btn-secondary': i !== currentPage,
+            'btn-primary': page === currentPage,
+            'btn-secondary': page !== currentPage,
           }"
-          @click="goToPage(i)"
+          @click="goToPage(page)"
         >
-          {{ i }}
+          {{ page }}
         </button>
+        <span v-else class="dots">...</span>
       </span>
-      <span v-if="currentPage <= pageCount - 4">
-        <span class="dots">...</span>
-        <button @click="goToPage(pageCount)" class="btn btn-secondary">
-          {{ pageCount }}
-        </button>
-      </span>
+
       <button
         :disabled="currentPage === pageCount"
         @click="goToPage(currentPage + 1)"
@@ -52,26 +44,35 @@ export default class Pagination extends Vue {
   @Prop({ required: true }) pageCount!: number;
 
   get visiblePages(): number[] {
-    if (this.pageCount <= 5) {
-      return Array.from({ length: this.pageCount }, (_, i) => i + 1);
-    } else if (this.currentPage <= 3) {
-      return [1, 2, 3, 4, 5];
-    } else if (this.currentPage > this.pageCount - 3) {
-      return Array.from({ length: 5 }, (_, i) => this.pageCount - 4 + i);
+    const maxVisible = 5;
+    const pages: number[] = [];
+
+    pages.push(1);
+
+    if (this.pageCount <= maxVisible) {
+      for (let i = 2; i <= this.pageCount; i++) {
+        pages.push(i);
+      }
     } else {
-      return [
-        this.currentPage - 2,
-        this.currentPage - 1,
-        this.currentPage,
-        this.currentPage + 1,
-        this.currentPage + 2,
-      ];
+      const minPage = Math.max(2, this.currentPage - 2);
+      const maxPage = Math.min(this.pageCount - 1, this.currentPage + 2);
+
+      if (minPage > 2) pages.push(-1);
+
+      for (let i = minPage; i <= maxPage; i++) {
+        pages.push(i);
+      }
+
+      if (maxPage < this.pageCount - 1) pages.push(-1);
+
+      pages.push(this.pageCount);
     }
+
+    return pages;
   }
 
   goToPage(page: number) {
-    if (page !== this.currentPage) {
-      console.log("Emitting page change:", page);
+    if (page > 0 && page !== this.currentPage) {
       this.$emit("changePage", page);
     }
   }
@@ -83,8 +84,7 @@ export default class Pagination extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-top: 20px;
+  margin: 20px 0;
 
   .page-controls {
     display: flex;
@@ -92,30 +92,32 @@ export default class Pagination extends Vue {
 
     .btn {
       padding: 10px 15px;
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
+      background-color: #555;
+      color: #fff;
       border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
 
       &:hover {
-        background-color: #e9e9e9;
+        background-color: #333;
       }
 
       &.btn-primary {
-        background-color: #333;
-        color: #fff;
-        font-weight: bold;
+        background-color: #111;
+        border-color: #000;
       }
 
       &:disabled {
-        background-color: #ddd;
+        background-color: #888;
         cursor: not-allowed;
       }
     }
 
     .dots {
-      margin: 0 10px;
-      font-size: 1.2rem;
+      padding: 10px 15px;
+      color: #777;
+      font-weight: bold;
+      cursor: default;
     }
   }
 }

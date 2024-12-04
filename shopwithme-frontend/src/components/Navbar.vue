@@ -17,10 +17,20 @@
       <div class="user-menu">
         <i class="fas fa-user user-icon"></i>
         <div class="user-dropdown">
-          <router-link to="/login">Zaloguj się</router-link>
-          <router-link to="/profile">Profil</router-link>
-          <router-link to="/logout">Wyloguj się</router-link>
+          <router-link v-if="!isLoggedIn" to="/login">Zaloguj się</router-link>
+          <router-link v-else to="/profile">Profil</router-link>
+          <button v-if="isLoggedIn" class="logout-button" @click="handleLogout">
+            Wyloguj się
+          </button>
         </div>
+      </div>
+    </div>
+    <!-- Modal po wylogowaniu -->
+    <div v-if="showLogoutModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>Wylogowano pomyślnie</h2>
+        <p>Twoja sesja została zakończona.</p>
+        <button @click="closeModal" class="btn btn-primary">Zamknij</button>
       </div>
     </div>
   </nav>
@@ -29,14 +39,26 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import CategoryDropdown from "@/components/CategoryDropdown.vue";
+import { mapGetters, mapActions } from "vuex";
 
 @Component({
   components: {
     CategoryDropdown,
   },
+  computed: {
+    ...mapGetters("admin/adminAccount", ["isLoggedIn"]),
+  },
+  methods: {
+    ...mapActions("admin/adminAccount", ["logout"]),
+  },
 })
 export default class Navbar extends Vue {
   isDropdownVisible = false;
+  showLogoutModal = false;
+
+  get isLoggedIn(): boolean {
+    return this.$store.getters["admin/adminAccount/isLoggedIn"];
+  }
 
   toggleDropdown(isOpen: boolean) {
     this.isDropdownVisible = isOpen;
@@ -46,6 +68,21 @@ export default class Navbar extends Vue {
     if (this.$route.path !== "/cart") {
       this.$router.push("/cart");
     }
+  }
+
+  async handleLogout() {
+    console.log("Kliknięto przycisk wylogowania.");
+    try {
+      await this.$store.dispatch("admin/adminAccount/logout");
+      console.log("Wylogowanie zakończone sukcesem.");
+      this.showLogoutModal = true;
+    } catch (error) {
+      console.error("Błąd podczas wylogowywania:", error);
+    }
+  }
+
+  closeModal() {
+    this.showLogoutModal = false;
   }
 }
 </script>
@@ -75,14 +112,6 @@ export default class Navbar extends Vue {
     .logo-image {
       height: 50px;
     }
-  }
-
-  .navbar-category {
-    background-color: #333;
-    color: #fff;
-    border: none;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
   }
 
   .navbar-search {
@@ -146,7 +175,9 @@ export default class Navbar extends Vue {
       padding: 0.5rem;
       border: 1px solid #ddd;
 
-      a {
+      a,
+      button {
+        width: 100%;
         color: #333;
         text-decoration: none;
         display: block;
@@ -155,6 +186,10 @@ export default class Navbar extends Vue {
         border-radius: 4px;
         font-weight: 500;
         transition: background-color 0.3s, color 0.3s;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
 
         &:hover {
           background-color: #f0f0f0;
@@ -165,6 +200,53 @@ export default class Navbar extends Vue {
 
     &:hover .user-dropdown {
       display: block;
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    background-color: #c70a0a;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #a50e0e;
     }
   }
 }

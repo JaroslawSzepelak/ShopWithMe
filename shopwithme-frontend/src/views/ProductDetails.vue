@@ -60,14 +60,12 @@ import TechnicalDetails from "@/components/TechnicalDetails.vue";
   },
 })
 export default class ProductDetails extends Vue {
-  mainImage = ""; // Główne zdjęcie produktu
+  mainImage = "";
 
-  // Getter do pobrania szczegółów produktu z Vuex
   get product() {
     return this.$store.getters["products/selectedProduct"];
   }
 
-  // Getter do zdjęć produktu
   get images() {
     return this.product.images || [];
   }
@@ -88,7 +86,7 @@ export default class ProductDetails extends Vue {
   async fetchProduct(productId: number) {
     try {
       await this.$store.dispatch("products/fetchProduct", productId);
-      this.mainImage = this.images[0] || ""; // Ustawienie głównego obrazu
+      this.mainImage = this.images[0] || "";
     } catch (error) {
       console.error("Error fetching product details:", error);
     }
