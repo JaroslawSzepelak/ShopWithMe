@@ -36,13 +36,12 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
   actions: {
     async fetchCategories({ commit }) {
       commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
       try {
         const response = await categoryAPI.getCategories();
         commit("SET_CATEGORIES", response.data);
       } catch (error) {
-        console.error("Error fetching categories:", error);
-        commit("SET_ERROR", "Failed to fetch categories.");
+        console.error("Błąd podczas pobierania kategorii:", error);
+        commit("SET_ERROR", "Nie udało się pobrać kategorii");
       } finally {
         commit("SET_LOADING", false);
       }

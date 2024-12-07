@@ -24,6 +24,8 @@ const cartModule: Module<CartState, any> = {
   getters: {
     cartItems: (state) => state.items,
     cartTotal: (state) => state.total,
+    isProductInCart: (state) => (productId: number) =>
+      state.items.some((item) => item.productId === productId),
   },
 
   mutations: {
@@ -55,9 +57,14 @@ const cartModule: Module<CartState, any> = {
     async fetchCart({ commit }) {
       try {
         const response = await cartAPI.getCart();
-        commit("SET_CART", response.data.lines || []);
+        if (response.data && response.data.lines) {
+          commit("SET_CART", response.data.lines);
+        } else {
+          console.warn("API zwróciło pusty lub nieoczekiwany format danych.");
+          commit("SET_CART", []);
+        }
       } catch (error) {
-        console.error("Błąd podczas pobierania koszyka:", error);
+        console.error("Błąd podczas pobierania koszyka z API:", error);
         commit("SET_CART", []);
       }
     },
@@ -68,9 +75,12 @@ const cartModule: Module<CartState, any> = {
         console.error("Błąd podczas inicjalizacji koszyka:", error);
       }
     },
-    async addItem({ dispatch }, productId: number) {
+    async addItem(
+      { dispatch },
+      { productId, quantity }: { productId: number; quantity: number }
+    ) {
       try {
-        await cartAPI.addItemToCart(productId);
+        await cartAPI.addItemToCart({ productId, quantity });
         await dispatch("fetchCart");
       } catch (error) {
         console.error("Błąd podczas dodawania do koszyka:", error);
@@ -78,24 +88,18 @@ const cartModule: Module<CartState, any> = {
     },
     async removeItem({ dispatch }, productId: number) {
       try {
-        console.log(
-          "Usuwanie produktu z koszyka o przekazanym productId:",
-          productId
-        );
         await cartAPI.removeItemFromCart(productId);
         await dispatch("fetchCart");
       } catch (error) {
         console.error("Błąd podczas usuwania z koszyka:", error);
       }
     },
-    async updateItem({ commit }, { productId, quantity }) {
+    async updateItem(
+      { commit, dispatch },
+      { productId, quantity }: { productId: number; quantity: number }
+    ) {
       try {
-        console.log(
-          "Aktualizacja ilości produktu:",
-          productId,
-          "do ilości:",
-          quantity
-        );
+        await cartAPI.updateItemInCart({ productId, quantity });
         commit("UPDATE_ITEM_QUANTITY", { productId, quantity });
       } catch (error) {
         console.error("Błąd podczas aktualizacji ilości w koszyku:", error);

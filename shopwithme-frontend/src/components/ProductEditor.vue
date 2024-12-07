@@ -1,59 +1,65 @@
 <template>
-  <div>
-    <h4 class="text-center text-white p-2" :class="themeClass">
+  <div class="product-editor">
+    <h4 class="editor-header text-center">
       {{ editMode ? "Edytuj produkt" : "Utwórz nowy produkt" }}
     </h4>
-    <h4 v-if="$v.product.$error" class="bg-danger text-white text-center p-2">
-      Wszystkie pola są wymagane.
-    </h4>
-    <div class="form-group" v-if="editMode">
-      <label>ID (Tylko do odczytu)</label>
-      <input class="form-control" disabled v-model="product.id" />
+    <div v-if="errorMessages.length" class="error-messages">
+      <ul>
+        <li v-for="(error, index) in errorMessages" :key="index">
+          {{ error }}
+        </li>
+      </ul>
     </div>
-    <div class="form-group">
-      <label>Nazwa</label>
-      <input class="form-control" v-model.trim="product.name" />
+    <div class="form-container">
+      <div class="form-group" v-if="editMode">
+        <label>ID (Tylko do odczytu)</label>
+        <input
+          class="form-control readonly-input"
+          disabled
+          v-model="product.id"
+        />
+      </div>
+      <div class="form-group">
+        <label>Nazwa</label>
+        <input class="form-control" v-model.trim="product.name" />
+      </div>
+      <div class="form-group">
+        <label>Lead</label>
+        <input class="form-control" v-model.trim="product.lead" />
+      </div>
+      <div class="form-group">
+        <label>Opis</label>
+        <textarea
+          class="form-control"
+          v-model.trim="product.description"
+        ></textarea>
+      </div>
+      <div class="form-group">
+        <label>Kategoria</label>
+        <select class="form-control" v-model="product.categoryId">
+          <option
+            v-for="category in categories"
+            :key="category.id"
+            :value="category.id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cena (PLN)</label>
+        <input
+          type="number"
+          class="form-control"
+          v-model.number="product.price"
+        />
+      </div>
     </div>
-    <div class="form-group">
-      <label>Opis</label>
-      <textarea
-        class="form-control"
-        v-model.trim="product.description"
-      ></textarea>
-    </div>
-    <div class="form-group">
-      <label>Kategoria</label>
-      <select class="form-control" v-model="product.categoryId">
-        <option
-          v-for="category in categories"
-          :key="category.id"
-          :value="category.id"
-        >
-          {{ category.name }}
-        </option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Cena (PLN)</label>
-      <input
-        type="number"
-        class="form-control"
-        v-model.number="product.price"
-      />
-    </div>
-    <div class="form-group">
-      <label>Obrazki (URL)</label>
-      <textarea
-        class="form-control"
-        v-model.trim="product.images"
-        placeholder="Podaj URL obrazków oddzielone przecinkami"
-      ></textarea>
-    </div>
-    <div class="text-center">
-      <router-link to="/admin/products" class="btn btn-secondary m-1">
-        Anuluj
-      </router-link>
-      <button class="btn m-1" :class="themeClassButton" @click="handleSave">
+    <div class="button-group">
+      <router-link to="/admin/products" class="btn back-btn"
+        >Anuluj</router-link
+      >
+      <button class="btn save-btn" @click="handleSave">
         {{ editMode ? "Zapisz zmiany" : "Utwórz produkt" }}
       </button>
     </div>
@@ -62,104 +68,209 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Vuelidate from "vuelidate";
-import { required, minValue } from "vuelidate/lib/validators";
-
-Vue.use(Vuelidate);
 
 @Component
 export default class ProductEditor extends Vue {
   product = {
     id: null,
     name: "",
+    lead: "",
     description: "",
     categoryId: null,
     price: 0,
-    images: "",
   };
+
+  errorMessages: string[] = [];
 
   get editMode(): boolean {
     return this.$route.params.op === "edit";
   }
 
-  get themeClass(): string {
-    return this.editMode ? "bg-info" : "bg-primary";
-  }
-
-  get themeClassButton(): string {
-    return this.editMode ? "btn-info" : "btn-primary";
-  }
-
   get categories(): Array<any> {
-    return this.$store.getters["categories/allCategories"] || [];
+    return this.$store.getters["admin/adminCategories/allCategories"] || [];
   }
 
-  validations() {
-    return {
-      product: {
-        name: { required },
-        description: { required },
-        categoryId: { required },
-        price: { required, minValue: minValue(0) },
-        images: { required },
-      },
-    };
-  }
+  async created() {
+    if (!this.categories.length) {
+      try {
+        await this.$store.dispatch("admin/adminCategories/fetchCategories");
+      } catch (error) {
+        console.error("Błąd podczas pobierania kategorii:", error);
+      }
+    }
 
-  created() {
-    this.$v.$touch();
     if (this.editMode) {
       const productId = this.$route.params.id;
-      const product = this.$store.getters["products/productById"](productId);
-      if (product) {
-        this.product = { ...product, images: product.images.join(", ") };
+      try {
+        await this.$store.dispatch(
+          "admin/adminProducts/fetchProduct",
+          productId
+        );
+        const product =
+          this.$store.getters["admin/adminProducts/selectedProduct"];
+        if (product) {
+          this.product = { ...product };
+        }
+      } catch (error) {
+        console.error("Błąd podczas pobierania produktu:", error);
+        this.errorMessages.push("Nie udało się załadować danych produktu.");
       }
     }
   }
 
+  validateForm(): boolean {
+    this.errorMessages = [];
+
+    if (!this.product.name)
+      this.errorMessages.push("Pole 'Nazwa' jest wymagane.");
+    if (!this.product.lead)
+      this.errorMessages.push("Pole 'Lead' jest wymagane.");
+    if (!this.product.description)
+      this.errorMessages.push("Pole 'Opis' jest wymagane.");
+    if (!this.product.categoryId)
+      this.errorMessages.push("Pole 'Kategoria' jest wymagane.");
+    if (this.product.price <= 0)
+      this.errorMessages.push("Cena musi być większa niż 0.");
+
+    return this.errorMessages.length === 0;
+  }
+
   async handleSave() {
-    this.$v.$touch();
-    if (!this.$v.$invalid) {
-      const productToSave = {
-        ...this.product,
-        images: this.product.images.split(",").map((img: string) => img.trim()),
-      };
-      if (this.editMode) {
-        await this.$store.dispatch("products/updateProduct", productToSave);
-      } else {
-        await this.$store.dispatch("products/createProduct", productToSave);
-      }
-      this.$router.push("/admin/products");
+    if (!this.validateForm()) return;
+
+    const action = this.editMode ? "updateProduct" : "createProduct";
+    const payload = {
+      name: this.product.name,
+      lead: this.product.lead,
+      description: this.product.description,
+      price: this.product.price,
+      categoryId: this.product.categoryId,
+    };
+
+    console.log("Dane wysyłane do backendu:", payload);
+
+    try {
+      await this.$store.dispatch(`admin/adminProducts/${action}`, payload);
+      this.$router.push({
+        name: "ProductAdmin",
+        query: {
+          modalMessage: this.editMode
+            ? "Produkt zaktualizowany"
+            : "Produkt utworzony",
+        },
+      });
+    } catch (error) {
+      console.error("Błąd podczas zapisywania produktu:", error);
+      this.errorMessages.push("Wystąpił błąd podczas zapisywania produktu.");
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-.bg-primary {
-  background-color: #007bff !important;
-}
+.product-editor {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
 
-.bg-info {
-  background-color: #17a2b8 !important;
-}
+  .editor-header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #c70a0a;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+  }
 
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+  }
 
-.btn-info {
-  background-color: #17a2b8;
-  border-color: #17a2b8;
-}
+  .form-group {
+    display: flex;
+    flex-direction: column;
 
-.bg-danger {
-  background-color: #dc3545 !important;
-}
+    label {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
 
-textarea {
-  resize: none;
-  height: 100px;
+    .form-control {
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .readonly-input {
+      background-color: #e9ecef;
+      border-color: #ced4da;
+      cursor: not-allowed;
+    }
+  }
+
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .back-btn {
+      background-color: #666;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #555;
+      }
+    }
+
+    .save-btn {
+      background-color: #c70a0a;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #a60a0a;
+      }
+    }
+  }
+
+  .error-messages {
+    background-color: #ffefef;
+    border: 1px solid #ff4d4d;
+    color: #c70a0a;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        font-size: 0.9rem;
+      }
+    }
+  }
 }
 </style>

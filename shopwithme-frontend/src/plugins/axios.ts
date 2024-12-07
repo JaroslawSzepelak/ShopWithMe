@@ -45,9 +45,9 @@ export const cartAPI = {
   getCart() {
     return apiClient.get("/Cart");
   },
-  addItemToCart(productId: number) {
+  addItemToCart(item: { productId: number; quantity: number }) {
     return apiClient
-      .post("/Cart", productId)
+      .post("/Cart", item)
       .then((response) => {
         return response;
       })
@@ -57,9 +57,17 @@ export const cartAPI = {
   },
   removeItemFromCart(productId: number) {
     return apiClient
-      .delete("/Cart", {
-        data: productId,
+      .delete(`/Cart/${productId}`)
+      .then((response) => {
+        return response;
       })
+      .catch((error) => {
+        throw error;
+      });
+  },
+  updateItemInCart(item: { productId: number; quantity: number }) {
+    return apiClient
+      .put("/Cart", item)
       .then((response) => {
         return response;
       })
@@ -92,7 +100,6 @@ export const categoryAPI = {
     return apiClient
       .put("/ProductCategories", { id, name })
       .then((response) => {
-        console.log("Odpowiedź na żądanie PUT /ProductCategories:", response);
         return response;
       })
       .catch((error) => {

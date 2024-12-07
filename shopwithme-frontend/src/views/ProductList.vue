@@ -68,9 +68,6 @@ export default class ProductList extends Vue {
       this.$store.dispatch("products/setCurrentPage", savedCurrentPage);
 
       await this.$store.dispatch("products/fetchProducts");
-
-      console.log("Initial Page Size:", this.pageSize);
-      console.log("Initial Current Page:", this.currentPage);
     } catch (error) {
       console.error(
         "Błąd podczas inicjalizacji komponentu ProductList:",
@@ -83,16 +80,11 @@ export default class ProductList extends Vue {
     this.currentPage = 1;
     this.$store.dispatch("products/setPageSize", this.pageSize);
     this.$store.dispatch("products/setCurrentPage", this.currentPage);
-
-    console.log("Page Size Updated:", this.pageSize);
-    console.log("Current Page Reset to:", this.currentPage);
   }
 
   changePage(newPage: number) {
     this.currentPage = newPage;
     this.$store.dispatch("products/setCurrentPage", newPage);
-
-    console.log("Page Changed to:", newPage);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

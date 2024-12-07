@@ -1,12 +1,12 @@
 <template>
   <div class="product-details" :key="$route.params.id">
-    <div class="product-container">
+    <div v-if="product" class="product-container">
       <div class="image-section">
         <img :src="mainImage" alt="Product image" class="main-image" />
         <div class="image-thumbnails">
           <button class="arrow-btn" @click="prevImage">❮</button>
           <img
-            v-for="(image, index) in product.images"
+            v-for="(image, index) in images"
             :key="index"
             :src="image"
             alt="Thumbnail"
@@ -31,10 +31,22 @@
           <p><i class="fas fa-check-circle"></i> Darmowy zwrot</p>
           <p><i class="fas fa-check-circle"></i> Kontakt 24/7</p>
         </div>
+        <div class="quantity-control">
+          <button @click="decreaseQuantity" class="quantity-btn">-</button>
+          <input
+            type="number"
+            class="quantity-input"
+            v-model.number="quantity"
+            min="1"
+          />
+          <button @click="increaseQuantity" class="quantity-btn">+</button>
+        </div>
         <div class="buttons">
-          <button class="buy-now">Kup teraz</button>
-          <button class="add-to-cart" @click="addToCart">
-            Dodaj do koszyka
+          <button
+            :class="['cart-btn', { 'in-cart': isProductInCart }]"
+            @click="isProductInCart ? goToCart() : addToCart()"
+          >
+            {{ isProductInCart ? "W Koszyku" : "Dodaj do koszyka" }}
           </button>
           <button class="back-btn" @click="goBack">Wróć</button>
         </div>
@@ -45,6 +57,10 @@
       <button>NAJCZĘŚCIEJ KUPOWANE RAZEM</button>
       <button>OPINIE</button>
       <button>PYTANIA I ODPOWIEDZI</button>
+    </div>
+    <div class="description-section">
+      <h3>Opis produktu</h3>
+      <p>{{ product.description || "Brak opisu produktu." }}</p>
     </div>
     <TechnicalDetails />
   </div>
@@ -61,13 +77,35 @@ import TechnicalDetails from "@/components/TechnicalDetails.vue";
 })
 export default class ProductDetails extends Vue {
   mainImage = "";
+  quantity = 1; // Domyślnie ilość ustawiona na 1
 
   get product() {
-    return this.$store.getters["products/selectedProduct"];
+    return (
+      this.$store.getters["products/selectedProduct"] || {
+        id: null,
+        name: "Produkt zastępczy",
+        price: 0,
+        images: this.defaultImages,
+        description: "Brak dostępnych szczegółów dla tego produktu.",
+      }
+    );
   }
 
   get images() {
-    return this.product.images || [];
+    return this.product.images || this.defaultImages;
+  }
+
+  get defaultImages() {
+    return [
+      "https://placehold.co/400/abb7e7/7b8277",
+      "https://placehold.co/400/abd4c7/7b8277",
+      "https://placehold.co/400/e6dcae/7b8277",
+      "https://placehold.co/400",
+    ];
+  }
+
+  get isProductInCart(): boolean {
+    return this.$store.getters["cart/isProductInCart"](this.product.id);
   }
 
   async created() {
@@ -115,10 +153,26 @@ export default class ProductDetails extends Vue {
 
   async addToCart() {
     try {
-      await this.$store.dispatch("cart/addItem", this.product.id);
+      const cartItem = { productId: this.product.id, quantity: this.quantity };
+      await this.$store.dispatch("cart/addItem", cartItem);
       this.$router.push("/cart");
     } catch (error) {
       console.error("Error adding product to cart:", error);
+    }
+  }
+
+  goToCart() {
+    this.$router.push("/cart");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  increaseQuantity() {
+    this.quantity++;
+  }
+
+  decreaseQuantity() {
+    if (this.quantity > 1) {
+      this.quantity--;
     }
   }
 }
@@ -235,34 +289,60 @@ export default class ProductDetails extends Vue {
       }
     }
 
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .quantity-btn {
+        width: 35px;
+        height: 35px;
+        background-color: #e0e0e0;
+        border: none;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #333;
+      }
+
+      .quantity-input {
+        width: 50px;
+        height: 35px;
+        text-align: center;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    }
+
     .buttons {
       display: flex;
       gap: 1rem;
       margin-top: 1.5rem;
 
-      .buy-now {
+      .cart-btn {
         padding: 0.8rem 1.5rem;
-        border: none;
         font-size: 1rem;
-        background-color: #c70a0a;
-        color: #fff;
         border-radius: 5px;
         cursor: pointer;
-        &:hover {
-          background-color: darken(#c70a0a, 10%);
-        }
-      }
 
-      .add-to-cart {
-        padding: 0.8rem 1.5rem;
-        border: 2px solid #c70a0a;
-        font-size: 1rem;
-        color: #c70a0a;
-        background-color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
+        &.in-cart {
+          background-color: #fff;
+          color: #c70a0a;
+          border: 1px solid #c70a0a;
+        }
+
+        &:not(.in-cart) {
+          background-color: #c70a0a;
+          color: #fff;
+          border: none;
+        }
+
         &:hover {
-          background-color: #f9f9f9;
+          opacity: 0.9;
+          &.in-cart {
+            background-color: #ffecec;
+          }
         }
       }
 
@@ -285,20 +365,38 @@ export default class ProductDetails extends Vue {
     gap: 1rem;
     margin-top: 3rem;
     width: 100%;
-    background-color: #c70a0a;
 
     button {
       flex: 1;
       padding: 1rem;
       font-size: 1rem;
-      color: #fff;
-      background-color: #c70a0a;
+      color: #c70a0a;
+      background-color: #fff;
       text-transform: uppercase;
       font-weight: bold;
-      border: none;
+      border: 2px solid #c70a0a;
+      border-radius: 5px;
+      cursor: pointer;
       &:hover {
-        background-color: darken(#c70a0a, 10%);
+        background-color: #f9f9f9;
       }
+    }
+  }
+
+  .description-section {
+    margin-top: 2rem;
+    text-align: left;
+    max-width: 800px;
+
+    h3 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #666;
     }
   }
 }

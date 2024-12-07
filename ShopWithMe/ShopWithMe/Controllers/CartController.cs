@@ -32,15 +32,12 @@ namespace ShopWithMe.Controllers
         [HttpPut]
         public IActionResult UpdateCartLine([FromBody] CartLineUpdateMOdel model)
         {
-            var cartLine = _cart.Lines.First(c1 => c1.Product.Id == model.ProductId);
+            var cartLine = _cart.Lines.FirstOrDefault(c1 => c1.Product.Id == model.ProductId);
 
             if (cartLine == null)
                 return NotFound();
 
-            if (model.Quantity.HasValue)
-            {
-                cartLine.Quantity = model.Quantity.Value;
-            }
+            _cart.UpdateItem(cartLine, model.Quantity);
 
             return Ok(_cart);
         }

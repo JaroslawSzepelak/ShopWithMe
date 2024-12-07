@@ -11,19 +11,25 @@ const adminAxios = axios.create({
 // API dla produktów
 export const productAPI = {
   getProduct(id: number) {
-    return adminAxios.get(`/products/${id}`);
+    return adminAxios.get(`/Products/${id}`);
   },
   getProducts() {
-    return adminAxios.get("/products");
+    return adminAxios.get("/Products");
   },
   createProduct(product: {
     name: string;
+    lead: string;
+    description: string;
     price: number;
     categoryId: number;
-    description?: string;
-    image?: string;
   }) {
-    return adminAxios.post("/products", product);
+    return adminAxios.post("/Products", {
+      name: product.name,
+      lead: product.lead,
+      description: product.description,
+      price: product.price,
+      categoryId: product.categoryId,
+    });
   },
   updateProduct(product: {
     id: number;
@@ -33,36 +39,35 @@ export const productAPI = {
     description?: string;
     image?: string;
   }) {
-    return adminAxios.put("/products", product);
+    return adminAxios.put("/Products", product);
   },
   deleteProduct(id: number) {
-    return adminAxios.delete(`/products/${id}`);
+    return adminAxios.delete(`/Products/${id}`);
   },
 };
 
 // API dla kategorii produktów
 export const categoryAPI = {
   getCategories() {
-    return adminAxios.get("/productcategories");
+    return adminAxios.get("/Productcategories");
   },
   getCategory(id: number) {
-    return adminAxios.get(`/productcategories/${id}`);
+    return adminAxios.get(`/Productcategories/${id}`);
   },
   createCategory(name: string) {
-    return adminAxios.post("/productcategories", { name });
+    return adminAxios.post("/Productcategories", { name });
   },
   updateCategory(id: number, name: string) {
-    return adminAxios.put("/productcategories", { id, name });
+    return adminAxios.put("/Productcategories", { id, name });
   },
   deleteCategory(id: number) {
-    return adminAxios.delete(`/productcategories/${id}`);
+    return adminAxios.delete(`/Productcategories/${id}`);
   },
 };
 
 // API dla kont administratora
 export const accountAPI = {
   login(credentials: { name: string; password: string }) {
-    console.log("Próba logowania z danymi:", credentials);
     return adminAxios.post("/Account/login", credentials);
   },
   logout() {

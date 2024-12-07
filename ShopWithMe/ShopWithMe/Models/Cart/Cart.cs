@@ -30,6 +30,16 @@ namespace ShopWithMe.Models.Cart
         }
         #endregion
 
+        #region AddItem()
+        public virtual void UpdateItem(CartLine line, int? quantity)
+        {
+            if (quantity.HasValue)
+            {
+                line.Quantity = quantity.Value;
+            }
+        }
+        #endregion
+
         #region RemoveLine()
         public virtual void RemoveLine(Product product) => Lines.RemoveAll(l => l.Product.Id == product.Id);
         #endregion

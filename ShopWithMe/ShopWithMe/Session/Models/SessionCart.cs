@@ -31,6 +31,14 @@ namespace SportsStore.Models
         }
         #endregion
 
+        #region UpdateItem()
+        public override void UpdateItem(CartLine line, int? quantity)
+        {
+            base.UpdateItem(line, quantity);
+            Session.SetJson(SessionKey, this);
+        }
+        #endregion
+
         #region RemoveLine()
         public override void RemoveLine(Product product)
         {

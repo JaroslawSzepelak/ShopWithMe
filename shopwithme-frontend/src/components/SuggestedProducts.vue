@@ -23,8 +23,18 @@
                 {{ product.lead || "Opis wstępny produktu" }}
               </p>
               <p class="product-price">{{ product.price || "100,00" }} zł</p>
-              <button class="add-to-cart" @click="addToCart(product)">
-                Dodaj do koszyka
+              <button
+                :class="[
+                  'cart-btn',
+                  { 'in-cart': isProductInCart(product.id) },
+                ]"
+                @click="
+                  isProductInCart(product.id) ? goToCart() : addToCart(product)
+                "
+              >
+                {{
+                  isProductInCart(product.id) ? "W Koszyku" : "Dodaj do koszyka"
+                }}
               </button>
             </div>
           </div>
@@ -62,6 +72,10 @@ export default class SuggestedProducts extends Vue {
       this.startIndex,
       this.startIndex + this.productsToShow
     );
+  }
+
+  isProductInCart(productId: number): boolean {
+    return this.$store.getters["cart/isProductInCart"](productId);
   }
 
   async mounted() {
@@ -118,13 +132,21 @@ export default class SuggestedProducts extends Vue {
 
   async addToCart(product: any) {
     try {
-      await this.$store.dispatch("cart/addItem", product.id);
-      this.$router.push("/cart").then(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
+      const cartItem = { productId: product.id, quantity: 1 };
+      await this.$store.dispatch("cart/addItem", cartItem);
+      this.modalMessage = `${product.name} został dodany do koszyka.`;
+      this.showModal = true;
     } catch (error) {
       console.error("Błąd podczas dodawania produktu do koszyka:", error);
+      this.modalMessage =
+        "Wystąpił błąd podczas dodawania produktu do koszyka.";
+      this.showModal = true;
     }
+  }
+
+  goToCart() {
+    this.$router.push("/cart");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
 </script>
@@ -217,7 +239,7 @@ export default class SuggestedProducts extends Vue {
         margin-bottom: 15px;
       }
 
-      .add-to-cart {
+      .cart-btn {
         background-color: #c70a0a;
         color: #fff;
         border: none;
@@ -227,8 +249,17 @@ export default class SuggestedProducts extends Vue {
         margin-top: auto;
         cursor: pointer;
 
+        &.in-cart {
+          background-color: #fff;
+          color: #c70a0a;
+          border: 1px solid #c70a0a;
+        }
+
         &:hover {
           background-color: darken(#c70a0a, 10%);
+          &.in-cart {
+            background-color: #ffecec;
+          }
         }
       }
     }

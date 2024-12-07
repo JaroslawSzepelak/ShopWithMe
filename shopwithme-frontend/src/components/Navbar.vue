@@ -71,10 +71,8 @@ export default class Navbar extends Vue {
   }
 
   async handleLogout() {
-    console.log("Kliknięto przycisk wylogowania.");
     try {
       await this.$store.dispatch("admin/adminAccount/logout");
-      console.log("Wylogowanie zakończone sukcesem.");
       this.showLogoutModal = true;
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);

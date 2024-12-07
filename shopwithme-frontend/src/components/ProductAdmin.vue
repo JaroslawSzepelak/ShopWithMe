@@ -17,7 +17,7 @@
         <tr v-for="product in paginatedProducts" :key="product.id">
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
-          <td>{{ product.categoryId }}</td>
+          <td>{{ product.category }}</td>
           <td class="text-right">{{ product.price.toFixed(2) }} PLN</td>
           <td class="text-center">
             <button
@@ -26,12 +26,12 @@
             >
               Usuń
             </button>
-            <button
+            <router-link
+              :to="{ name: 'ProductEdit', params: { id: product.id } }"
               class="btn btn-sm btn-warning mx-1"
-              @click="handleEdit(product)"
             >
               Edytuj
-            </button>
+            </router-link>
           </td>
         </tr>
         <tr v-if="paginatedProducts.length === 0">
@@ -59,6 +59,14 @@
         @changePage="changePage"
       />
     </div>
+
+    <!-- Modal -->
+    <div v-if="modalMessage" class="modal-overlay">
+      <div class="modal-content">
+        <p class="modal-message">{{ modalMessage }}</p>
+        <button @click="closeModal" class="btn modal-btn">OK</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -74,6 +82,14 @@ import Pagination from "@/components/Pagination.vue";
 export default class ProductAdmin extends Vue {
   currentPage = 1;
   pageSize = 10;
+
+  get modalMessage() {
+    return this.$route.query.modalMessage || null;
+  }
+
+  closeModal() {
+    this.$router.replace({ query: {} });
+  }
 
   get paginatedProducts() {
     const allProducts = this.$store.getters["admin/adminProducts/allProducts"];
@@ -94,38 +110,24 @@ export default class ProductAdmin extends Vue {
     try {
       await this.$store.dispatch("admin/adminProducts/fetchProducts");
     } catch (error: any) {
-      if (error.response?.status === 404) {
-        this.$router.push("/not-found");
-      } else {
-        console.error("Błąd podczas pobierania produktów:", error);
-      }
+      console.error("Błąd podczas pobierania produktów:", error);
     }
   }
 
   async removeProduct(id: number) {
     try {
       await this.$store.dispatch("admin/adminProducts/deleteProduct", id);
-    } catch (error: any) {
-      if (error.response?.status === 404) {
-        this.$router.push("/not-found");
-      } else {
-        console.error("Błąd podczas usuwania produktu:", error);
-      }
+    } catch (error) {
+      console.error("Błąd podczas usuwania produktu:", error);
     }
-  }
-
-  handleEdit(product: { id: number }) {
-    this.$router.push(`/admin/products/edit/${product.id}`);
   }
 
   updatePageSize() {
     this.currentPage = 1;
-    console.log("Page Size Updated:", this.pageSize);
   }
 
   changePage(newPage: number) {
     this.currentPage = newPage;
-    console.log("Page Changed to:", newPage);
   }
 }
 </script>
@@ -177,6 +179,50 @@ export default class ProductAdmin extends Vue {
         border-radius: 5px;
       }
     }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.modal-message {
+  font-size: 1.2rem;
+  color: #333333;
+  margin-bottom: 15px;
+}
+
+.modal-btn {
+  background-color: #c70a0a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #a60a0a;
   }
 }
 </style>

@@ -36,6 +36,18 @@
                   </button>
                 </div>
                 <p class="total-price">{{ item.quantity * item.price }} zł</p>
+                <p
+                  v-if="loadingProductId === item.productId"
+                  class="loading-message"
+                >
+                  Aktualizuję ilość...
+                </p>
+                <p
+                  v-if="updatedProductId === item.productId"
+                  class="success-message"
+                >
+                  Ilość zaktualizowana!
+                </p>
               </div>
               <button @click="showDeleteConfirmation(item)" class="remove-btn">
                 <i class="fas fa-trash"></i>
@@ -55,7 +67,6 @@
       </div>
     </div>
 
-    <!-- Modal potwierdzenia usunięcia -->
     <div v-if="showConfirmModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <h2>Czy na pewno chcesz usunąć produkt?</h2>
@@ -67,7 +78,6 @@
       </div>
     </div>
 
-    <!-- Modal informacyjny o usunięciu -->
     <div v-if="showInfoModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <h2>Produkt został usunięty!</h2>
@@ -81,7 +91,6 @@
       </div>
     </div>
 
-    <!-- Widok pustego koszyka -->
     <EmptyCartMessage
       v-if="!cartItems.length && !showConfirmModal && !showInfoModal"
     />
@@ -105,8 +114,10 @@ export default class Cart extends Vue {
   showConfirmModal = false;
   showInfoModal = false;
   currentProduct: CartItem | null = null;
-
   removedProduct: CartItem | null = null;
+  loadingProductId: number | null = null;
+  updatedProductId: number | null = null;
+  updateTimer: { [key: number]: number | undefined } = {};
 
   get cartItems(): CartItem[] {
     return this.$store.getters["cart/cartItems"] || [];
@@ -148,7 +159,10 @@ export default class Cart extends Vue {
 
   restoreProduct() {
     if (this.removedProduct) {
-      this.$store.dispatch("cart/addItem", this.removedProduct.productId);
+      this.$store.dispatch("cart/addItem", {
+        productId: this.removedProduct.productId,
+        quantity: this.removedProduct.quantity,
+      });
       this.removedProduct = null;
     }
     this.showInfoModal = false;
@@ -183,14 +197,31 @@ export default class Cart extends Vue {
     if (item.quantity < 1) {
       item.quantity = 1;
     }
-    this.$store.dispatch("cart/updateItem", {
-      productId: item.productId,
-      quantity: item.quantity,
-    });
-  }
 
-  goToShop() {
-    this.$router.push("/");
+    if (this.updateTimer[item.productId]) {
+      clearTimeout(this.updateTimer[item.productId]);
+    }
+
+    this.updateTimer[item.productId] = window.setTimeout(async () => {
+      try {
+        this.loadingProductId = item.productId;
+        await this.$store.dispatch("cart/updateItem", {
+          productId: item.productId,
+          quantity: item.quantity,
+        });
+
+        this.updatedProductId = item.productId;
+
+        setTimeout(() => {
+          this.updatedProductId = null;
+        }, 3000);
+
+        this.loadingProductId = null;
+      } catch (error) {
+        console.error("Błąd podczas aktualizacji ilości w koszyku:", error);
+        this.loadingProductId = null;
+      }
+    }, 3000);
   }
 }
 </script>
@@ -422,5 +453,16 @@ export default class Cart extends Vue {
       }
     }
   }
+}
+
+.loading-message {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 5px;
+}
+.success-message {
+  font-size: 0.9rem;
+  color: green;
+  margin-top: 5px;
 }
 </style>

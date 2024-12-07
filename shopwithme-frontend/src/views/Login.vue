@@ -68,10 +68,6 @@ export default class Login extends Vue {
 
   async login() {
     try {
-      console.log("Dane wprowadzane przez użytkownika:", {
-        username: this.username,
-        password: this.password,
-      });
       await this.$store.dispatch("admin/adminAccount/login", {
         username: this.username,
         password: this.password,
