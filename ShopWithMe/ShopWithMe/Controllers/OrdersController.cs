@@ -47,6 +47,9 @@ namespace ShopWithMe.Controllers
 
             await _repository.SaveOrder(entity);
 
+            _cart.Clear();
+            _contactData.ClearContactData();
+
             return Ok(entity);
         }
         #endregion

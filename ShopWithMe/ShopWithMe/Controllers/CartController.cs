@@ -57,7 +57,7 @@ namespace ShopWithMe.Controllers
         }
         #endregion
 
-        #region OnPostRemove()
+        #region RemoveLine()
         [HttpDelete]
         public IActionResult RemoveLine([FromBody] long productId)
         {
@@ -67,6 +67,16 @@ namespace ShopWithMe.Controllers
                 return NotFound();
 
             _cart.RemoveLine(product);
+            return Ok(_cart);
+        }
+        #endregion
+
+        #region Clear()
+        [HttpDelete("clear")]
+        public IActionResult Clear()
+        {
+            _cart.Clear();
+
             return Ok(_cart);
         }
         #endregion
