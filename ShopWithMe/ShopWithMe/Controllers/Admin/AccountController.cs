@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ShopWithMe.Models.Admin.Accounts.FormModels;
+using ShopWithMe.Models.IdentityModels.Accounts;
+using ShopWithMe.Models.IdentityModels.Accounts.Admin;
 
 namespace ShopWithMe.Controllers.Admin
 {
@@ -9,15 +10,33 @@ namespace ShopWithMe.Controllers.Admin
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private UserManager<IdentityUser> userManager;
-        private SignInManager<IdentityUser> signInManager;
+        protected UserManager<IdentityUser> userManager;
+        protected SignInManager<IdentityUser> signInManager;
+        protected UserModelsMapper _mapper;
 
-        public AccountController(UserManager<IdentityUser> userMgr, SignInManager<IdentityUser> signInMgr)
+        #region AccountController()
+        public AccountController(UserManager<IdentityUser> userMgr, SignInManager<IdentityUser> signInMgr, UserModelsMapper mapper)
         {
             userManager = userMgr;
             signInManager = signInMgr;
+            _mapper = mapper;
         }
+        #endregion
 
+        #region GetUser()
+        [HttpGet("get-user")]
+        [Authorize]
+        public async Task<User> GetUser()
+        {
+            var user = new User();
+
+            _mapper.Map(await userManager.GetUserAsync(User), user);
+
+            return user;
+        }
+        #endregion
+
+        #region Login()
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
@@ -38,7 +57,9 @@ namespace ShopWithMe.Controllers.Admin
             ModelState.AddModelError("", "Nieprawidłowa nazwa użytkownika lub hasło");
             return BadRequest();
         }
+        #endregion
 
+        #region logout()
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
@@ -46,5 +67,6 @@ namespace ShopWithMe.Controllers.Admin
             await signInManager.SignOutAsync();
             return Ok();
         }
+        #endregion
     }
 }

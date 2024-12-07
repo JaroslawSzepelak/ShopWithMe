@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopWithMe.Models.Admin.Accounts.FormModels
+namespace ShopWithMe.Models.IdentityModels.Accounts.Admin
 {
     public class LoginModel
     {

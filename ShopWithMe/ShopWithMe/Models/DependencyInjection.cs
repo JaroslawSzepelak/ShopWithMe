@@ -1,4 +1,5 @@
-﻿using ShopWithMe.Models.ProductCategories;
+﻿using ShopWithMe.Models.IdentityModels.Accounts;
+using ShopWithMe.Models.ProductCategories;
 using ShopWithMe.Models.Products;
 
 namespace ShopWithMe.Models
@@ -10,6 +11,7 @@ namespace ShopWithMe.Models
         {
             services = services.AddScoped<ProductModelsMapper>();
             services = services.AddScoped<ProductCategoryModelsMapper>();
+            services = services.AddScoped<UserModelsMapper>();
 
             return services;
         }
