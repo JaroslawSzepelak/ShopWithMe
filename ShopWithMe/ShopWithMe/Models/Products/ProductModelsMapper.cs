@@ -13,6 +13,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Description = mapFrom.Description;
             mapTo.Price = mapFrom.Price;
             mapTo.CategoryId = mapFrom.CategoryId;
+            mapTo.TechnicalData = mapFrom.TechnicalData;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductFormModel mapTo)
@@ -23,6 +24,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Description = mapFrom.Description;
             mapTo.Price = mapFrom.Price;
             mapTo.CategoryId = mapFrom.CategoryId;
+            mapTo.TechnicalData = mapFrom.TechnicalData;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductListModel mapTo)
@@ -41,6 +43,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Description = mapFrom.Description;
             mapTo.Price = mapFrom.Price;
             mapTo.Category = mapFrom.Category?.Name;
+            mapTo.TechnicalData = mapFrom.TechnicalData;
         }
 
         public void Map(Product mapFrom, PublicModel.ProductListModel mapTo)

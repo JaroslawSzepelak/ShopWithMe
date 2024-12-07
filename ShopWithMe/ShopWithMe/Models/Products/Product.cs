@@ -15,6 +15,7 @@ namespace ShopWithMe.Models.Products
         public decimal Price { get; set; }
         [ForeignKey("ProductCategory")]
         public long? CategoryId { get; set; }
+        public string TechnicalData { get; set; }
 
 
         public virtual ProductCategory Category { get; set; }

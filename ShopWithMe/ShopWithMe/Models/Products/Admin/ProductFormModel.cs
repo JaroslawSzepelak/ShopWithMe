@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopWithMe.Models.Products.Admin
 {
@@ -15,5 +14,6 @@ namespace ShopWithMe.Models.Products.Admin
         [RegularExpression("[0-9]?[0-9]?[0-9?]?[0-9]?[0-9]?[0-9]((,|.)[0-9][0-9]?)?", ErrorMessage = "Podano nieprawidłową cenę.")]
         public decimal Price { get; set; }
         public long? CategoryId { get; set; }
+        public string TechnicalData  { get; set; }
     }
 }
