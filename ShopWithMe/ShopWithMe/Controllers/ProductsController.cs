@@ -2,6 +2,7 @@
 using ShopWithMe.Managers.Products;
 using ShopWithMe.Models.Products;
 using ShopWithMe.Models.Products.Public;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Controllers
 {
@@ -22,11 +23,17 @@ namespace ShopWithMe.Controllers
 
         #region GetList()
         [HttpGet]
-        public async Task<List<ProductListModel>> GetList()
+        public async Task<ResultModel<ProductListModel>> GetList([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
-            var entries = await _manager.GetListAsync(true);
+            var pager = new Pager()
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
 
-            return _mapper.MapToPublicListModel(entries);
+            var entries = await _manager.GetListAsync(true, pager);
+
+            return new ResultModel<ProductListModel>(_mapper.MapToPublicListModel(entries), pager);
         }
         #endregion
 

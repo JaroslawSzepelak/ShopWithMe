@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using ShopWithMe.Models.Admin;
 using ShopWithMe.Managers.Products;
 using ShopWithMe.Models.Products.Admin;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Controllers.Admin
 {
@@ -25,11 +26,17 @@ namespace ShopWithMe.Controllers.Admin
 
         #region GetList()
         [HttpGet]
-        public async Task<List<ProductListModel>> GetList()
+        public async Task<ResultModel<ProductListModel>> GetList([FromQuery] int pageIndex, [FromQuery] int pageSize)
         {
-            var entries = await _manager.GetListAsync(true);
+            var pager = new Pager()
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
 
-            return _mapper.MapToAdminListModel(entries);
+            var entries = await _manager.GetListAsync(true, pager);
+
+            return new ResultModel<ProductListModel>(_mapper.MapToAdminListModel(entries), pager);
         }
         #endregion
 

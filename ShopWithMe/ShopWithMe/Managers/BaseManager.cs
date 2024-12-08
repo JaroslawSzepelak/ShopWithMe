@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models.Common;
 using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers
 {
@@ -18,7 +19,23 @@ namespace ShopWithMe.Managers
         #region GetListAsync()
         public virtual async Task<List<TEntity>> GetListAsync()
         {
-            return await _repository.Entities.ToListAsync();
+            return await GetListAsync((Pager)null);
+        }
+
+        public virtual async Task<List<TEntity>> GetListAsync(Pager pager)
+        {
+            var query = _repository.Entities.AsQueryable();
+
+            if (pager != null)
+            {
+                pager.TotalRows = query.Count();
+
+                query = query
+                    .Skip(pager.Skip)
+                    .Take(pager.PageSize);
+            }
+
+            return await query.ToListAsync();
         }
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models.Common;
 using ShopWithMe.Models.Products;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers.Products
 {
@@ -23,6 +24,32 @@ namespace ShopWithMe.Managers.Products
             if (loadLinkedData)
             {
                 query = query.Include(q => q.Category);
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public override async Task<List<Product>> GetListAsync(Pager pager)
+        {
+            return await GetListAsync(false, pager);
+        }
+
+        public async Task<List<Product>> GetListAsync(bool loadLinkedData, Pager pager)
+        {
+            var query = _repository.Entities.AsQueryable();
+
+            if (loadLinkedData)
+            {
+                query = query.Include(q => q.Category);
+            }
+
+            if (pager != null)
+            {
+                pager.TotalRows = query.Count();
+
+                query = query
+                    .Skip(pager.Skip)
+                    .Take(pager.PageSize);
             }
 
             return await query.ToListAsync();
