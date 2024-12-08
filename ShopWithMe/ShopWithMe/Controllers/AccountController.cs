@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ShopWithMe.Models.IdentityModels.Accounts;
 using ShopWithMe.Models.IdentityModels.Accounts.Admin;
+using ShopWithMe.Models.IdentityModels.Accounts.Public;
 
-namespace ShopWithMe.Controllers.Admin
+namespace ShopWithMe.Controllers
 {
-    [Route("api/admin/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -66,6 +68,53 @@ namespace ShopWithMe.Controllers.Admin
         {
             await signInManager.SignOutAsync();
             return Ok();
+        }
+        #endregion
+
+        #region Register()
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterModel loginModel)
+        {
+            if (loginModel.Password != loginModel.RepeatPassword)
+            {
+                ModelState.AddModelError("RepeatPassword", "Hasła są różne.");
+                return UnprocessableEntity(ModelState);
+            }
+
+            var user = await userManager.FindByNameAsync(loginModel.UserName);
+
+            if (user != null)
+            {
+                ModelState.AddModelError("UserName", "Użytkownik o takiej nazwie już istnieje.");
+                return UnprocessableEntity(ModelState);
+            }
+
+            user = await userManager.FindByEmailAsync(loginModel.Email);
+
+            if (user != null)
+            {
+                ModelState.AddModelError("Email", "Podany adres e-mail jest już zajęty.");
+                return UnprocessableEntity(ModelState);
+            }
+
+            user = new IdentityUser(loginModel.UserName)
+            {
+                Email = loginModel.Email
+            };
+
+            var result = await userManager.CreateAsync(user, loginModel.Password);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", $"Wystąpił problem podczas tworzenia konta: {error}");
+            }
+
+            return UnprocessableEntity(ModelState);
         }
         #endregion
     }
