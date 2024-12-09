@@ -3,7 +3,7 @@
     <h1>Produkty</h1>
     <div class="product-list-container">
       <ProductCard
-        v-for="product in paginatedProducts"
+        v-for="product in products"
         :key="product.id"
         :product="product"
       />
@@ -14,19 +14,44 @@
         <select
           id="pageSize"
           class="page-size-select"
-          v-model="pageSize"
-          @change="updatePageSize"
+          :value="pageSize"
+          @change="changePageSize($event.target.value)"
         >
           <option value="10">10 na stronę</option>
           <option value="20">20 na stronę</option>
           <option value="30">30 na stronę</option>
         </select>
       </div>
-      <Pagination
-        :currentPage="currentPage"
-        :pageCount="pageCount"
-        @changePage="changePage"
-      />
+      <div class="pagination-controls">
+        <button
+          :disabled="pageIndex === 1"
+          @click="changePage(pageIndex - 1)"
+          class="btn btn-secondary"
+        >
+          Poprzednia
+        </button>
+        <span v-for="page in visiblePages" :key="page">
+          <button
+            v-if="page !== -1"
+            class="btn"
+            :class="{
+              'btn-primary': page === pageIndex,
+              'btn-secondary': page !== pageIndex,
+            }"
+            @click="changePage(page)"
+          >
+            {{ page }}
+          </button>
+          <span v-else class="dots">...</span>
+        </span>
+        <button
+          :disabled="pageIndex === totalPages"
+          @click="changePage(pageIndex + 1)"
+          class="btn btn-secondary"
+        >
+          Następna
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -34,59 +59,110 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import ProductCard from "@/components/ProductCard.vue";
-import Pagination from "@/components/Pagination.vue";
-import { mapGetters } from "vuex";
 
 @Component({
   components: {
     ProductCard,
-    Pagination,
-  },
-  computed: {
-    ...mapGetters("products", ["paginatedProducts", "pageCount"]),
   },
 })
 export default class ProductList extends Vue {
-  currentPage: number = this.$store.getters["products/currentPage"];
-  pageSize: number = this.$store.getters["products/pageSize"];
-
-  get paginatedProducts() {
-    return this.$store.getters["products/paginatedProducts"];
+  get products() {
+    return this.$store.state.products.paginatedProducts || [];
   }
 
-  get pageCount() {
-    return this.$store.getters["products/pageCount"];
+  get pageIndex() {
+    return this.$store.state.products.currentPage || 1;
+  }
+
+  get pageSize() {
+    return this.$store.state.products.pageSize || 10;
+  }
+
+  get totalPages() {
+    return this.$store.state.products.totalPages || 1;
   }
 
   async created() {
     try {
       const savedPageSize = Number(sessionStorage.getItem("pageSize")) || 10;
-      const savedCurrentPage =
-        Number(sessionStorage.getItem("currentPage")) || 1;
+      const savedPageIndex = Number(sessionStorage.getItem("currentPage")) || 1;
 
-      this.$store.dispatch("products/setPageSize", savedPageSize);
-      this.$store.dispatch("products/setCurrentPage", savedCurrentPage);
+      this.$store.commit("products/SET_PAGE_SIZE", savedPageSize);
+      this.$store.commit("products/SET_CURRENT_PAGE", savedPageIndex);
 
-      await this.$store.dispatch("products/fetchProducts");
+      await this.fetchProducts(savedPageIndex, savedPageSize);
     } catch (error) {
-      console.error(
-        "Błąd podczas inicjalizacji komponentu ProductList:",
-        error
-      );
+      console.error("Błąd podczas inicjalizacji widoku ProductList:", error);
     }
   }
 
-  updatePageSize() {
-    this.currentPage = 1;
-    this.$store.dispatch("products/setPageSize", this.pageSize);
-    this.$store.dispatch("products/setCurrentPage", this.currentPage);
+  async fetchProducts(pageIndex: number, pageSize: number) {
+    try {
+      await this.$store.dispatch("products/fetchProducts", {
+        pageIndex,
+        pageSize,
+      });
+    } catch (error) {
+      console.error("Błąd podczas pobierania produktów:", error);
+    }
   }
 
-  changePage(newPage: number) {
-    this.currentPage = newPage;
-    this.$store.dispatch("products/setCurrentPage", newPage);
+  async changePage(newPageIndex: number) {
+    if (newPageIndex > 0 && newPageIndex <= this.totalPages) {
+      try {
+        this.$store.commit("products/SET_CURRENT_PAGE", newPageIndex);
+        sessionStorage.setItem("currentPage", String(newPageIndex));
+        await this.fetchProducts(newPageIndex, this.pageSize);
+        this.scrollToTop();
+      } catch (error) {
+        console.error("Błąd podczas zmiany strony:", error);
+      }
+    }
+  }
 
+  async changePageSize(newPageSize: number) {
+    try {
+      this.$store.commit("products/SET_PAGE_SIZE", Number(newPageSize));
+      sessionStorage.setItem("pageSize", String(newPageSize));
+      this.$store.commit("products/SET_CURRENT_PAGE", 1);
+      sessionStorage.setItem("currentPage", "1");
+      await this.fetchProducts(1, Number(newPageSize));
+      this.scrollToTop();
+    } catch (error) {
+      console.error("Błąd podczas zmiany rozmiaru strony:", error);
+    }
+  }
+
+  scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  get visiblePages(): number[] {
+    const maxVisible = 5;
+    const pages: number[] = [];
+
+    pages.push(1);
+
+    if (this.totalPages <= maxVisible) {
+      for (let i = 2; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const minPage = Math.max(2, this.pageIndex - 2);
+      const maxPage = Math.min(this.totalPages - 1, this.pageIndex + 2);
+
+      if (minPage > 2) pages.push(-1);
+
+      for (let i = minPage; i <= maxPage; i++) {
+        pages.push(i);
+      }
+
+      if (maxPage < this.totalPages - 1) pages.push(-1);
+
+      pages.push(this.totalPages);
+    }
+
+    return pages;
   }
 }
 </script>
@@ -130,6 +206,41 @@ export default class ProductList extends Vue {
         font-size: 1rem;
         border: 1px solid #ccc;
         border-radius: 5px;
+      }
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 10px;
+
+      .btn {
+        padding: 10px 15px;
+        background-color: #555;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          background-color: #333;
+        }
+
+        &.btn-primary {
+          background-color: #111;
+          border-color: #000;
+        }
+
+        &:disabled {
+          background-color: #888;
+          cursor: not-allowed;
+        }
+      }
+
+      .dots {
+        padding: 10px 15px;
+        color: #777;
+        font-weight: bold;
+        cursor: default;
       }
     }
   }

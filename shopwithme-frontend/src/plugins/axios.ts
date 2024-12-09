@@ -13,8 +13,13 @@ export const productAPI = {
   getProduct(id: number) {
     return apiClient.get(`/Products/${id}`);
   },
-  getProducts() {
-    return apiClient.get("/Products");
+  getProducts(pageIndex: number, pageSize: number) {
+    return apiClient.get(`/Products`, {
+      params: {
+        pageIndex,
+        pageSize,
+      },
+    });
   },
   createProduct(product: {
     name: string;

@@ -56,7 +56,19 @@ const adminProductsModule: Module<AdminProductState, any> = {
       commit("SET_ERROR", null);
       try {
         const response = await productAPI.getProduct(id);
-        commit("SET_SELECTED_PRODUCT", response.data);
+        const product = response.data;
+
+        // Mapowanie danych zwracanych z backendu na format frontendu
+        const mappedProduct = {
+          id: product.id,
+          name: product.name,
+          lead: product.lead,
+          description: product.description,
+          price: product.price,
+          categoryId: product.categoryId,
+        };
+
+        commit("SET_SELECTED_PRODUCT", mappedProduct);
       } catch (error) {
         console.error(`Error fetching product with id ${id}:`, error);
         commit("SET_ERROR", "Failed to fetch product.");
@@ -113,7 +125,7 @@ const adminProductsModule: Module<AdminProductState, any> = {
       return state.products || [];
     },
     selectedProduct(state) {
-      return state.selectedProduct;
+      return state.selectedProduct || {};
     },
     isLoading(state) {
       return state.loading;

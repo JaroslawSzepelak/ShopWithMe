@@ -4,9 +4,11 @@ import { productAPI } from "@/plugins/axios";
 interface Product {
   id: number;
   name: string;
+  lead: string;
   price: number;
   categoryId: number;
   description?: string;
+  technicalDetails?: string;
   images: string[];
 }
 
@@ -16,9 +18,10 @@ interface ProductsState {
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
-  defaultImages: string[];
   currentPage: number;
   pageSize: number;
+  totalRows: number;
+  totalPages: number;
 }
 
 const productsModule: Module<ProductsState, any> = {
@@ -29,14 +32,10 @@ const productsModule: Module<ProductsState, any> = {
     selectedProduct: null,
     loading: false,
     error: null,
-    defaultImages: [
-      "https://placehold.co/400/abb7e7/7b8277",
-      "https://placehold.co/400/abd4c7/7b8277",
-      "https://placehold.co/400/e6dcae/7b8277",
-      "https://placehold.co/400",
-    ],
     currentPage: Number(sessionStorage.getItem("currentPage")) || 1,
     pageSize: Number(sessionStorage.getItem("pageSize")) || 10,
+    totalRows: 0,
+    totalPages: 0,
   },
   mutations: {
     SET_PRODUCTS(state, products: Product[]) {
@@ -55,23 +54,35 @@ const productsModule: Module<ProductsState, any> = {
       state.error = error;
     },
     SET_CURRENT_PAGE(state, page: number) {
-      state.currentPage = Number(page);
+      state.currentPage = page;
       sessionStorage.setItem("currentPage", String(page));
     },
     SET_PAGE_SIZE(state, size: number) {
-      state.pageSize = Number(size);
+      state.pageSize = size;
       sessionStorage.setItem("pageSize", String(size));
+    },
+    SET_PAGER_INFO(state, pager: { totalRows: number; totalPages: number }) {
+      state.totalRows = pager.totalRows;
+      state.totalPages = pager.totalPages;
     },
   },
   actions: {
-    async fetchProducts({ commit, dispatch }) {
+    async fetchProducts({ commit, state }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
-        const response = await productAPI.getProducts();
-        commit("SET_PRODUCTS", response.data);
-        dispatch("updatePaginatedProducts");
+        const response = await productAPI.getProducts(
+          state.currentPage,
+          state.pageSize
+        );
+        const { result, pager } = response.data;
+
+        commit("SET_PAGINATED_PRODUCTS", result);
+        commit("SET_PAGER_INFO", {
+          totalRows: pager.totalRows,
+          totalPages: pager.totalPages,
+        });
       } catch (error) {
         console.error("Error fetching products:", error);
         commit("SET_ERROR", "Failed to fetch products.");
@@ -96,12 +107,12 @@ const productsModule: Module<ProductsState, any> = {
     },
     setCurrentPage({ commit, dispatch }, page: number) {
       commit("SET_CURRENT_PAGE", page);
-      dispatch("updatePaginatedProducts");
+      dispatch("fetchProducts");
     },
     setPageSize({ commit, dispatch }, size: number) {
       commit("SET_PAGE_SIZE", size);
       commit("SET_CURRENT_PAGE", 1);
-      dispatch("updatePaginatedProducts");
+      dispatch("fetchProducts");
     },
     updatePaginatedProducts({ state, commit }) {
       const pageSize = Number(state.pageSize);
@@ -116,13 +127,8 @@ const productsModule: Module<ProductsState, any> = {
     },
   },
   getters: {
-    allProducts(state) {
-      return state.products;
-    },
     paginatedProducts(state): Product[] {
-      const start = (state.currentPage - 1) * state.pageSize;
-      const end = start + state.pageSize;
-      return state.products.slice(start, end);
+      return state.paginatedProducts;
     },
     selectedProduct(state): Product | null {
       return state.selectedProduct;
@@ -139,8 +145,11 @@ const productsModule: Module<ProductsState, any> = {
     pageSize(state) {
       return state.pageSize;
     },
-    pageCount(state) {
-      return Math.ceil(state.products.length / state.pageSize);
+    totalRows(state) {
+      return state.totalRows;
+    },
+    totalPages(state) {
+      return state.totalPages;
     },
   },
 };

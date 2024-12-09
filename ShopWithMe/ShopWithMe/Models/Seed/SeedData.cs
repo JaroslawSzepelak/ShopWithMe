@@ -58,7 +58,7 @@ namespace ShopWithMe.Models.Seed
                         Lead = "Nowoczesny smartfon z elastycznym ekranem.",
                         Description = "Smartfon Galaxy Z to rewolucyjny krok w technologii mobilnej, oferujący elastyczny ekran umożliwiający składanie urządzenia. Dzięki najnowszemu procesorowi, wytrzymałej baterii oraz niezwykle wydajnemu aparatowi fotograficznemu, jest to idealny wybór dla nowoczesnego użytkownika.",
                         Price = 3999.00m,
-                        CategoryId = categoryIds["Elektronika"]
+                        CategoryId = categoryIds["Elektronika"],
                     },
                     new Product
                     {

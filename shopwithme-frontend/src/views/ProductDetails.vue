@@ -59,7 +59,7 @@
       <button>PYTANIA I ODPOWIEDZI</button>
     </div>
     <div class="description-section">
-      <h3>Opis produktu</h3>
+      <h2>Opis produktu</h2>
       <p>{{ product.description || "Brak opisu produktu." }}</p>
     </div>
     <TechnicalDetails />
@@ -384,18 +384,18 @@ export default class ProductDetails extends Vue {
   }
 
   .description-section {
-    margin-top: 2rem;
-    text-align: left;
-    max-width: 800px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    text-align: center;
+    max-width: 1000px;
 
-    h3 {
-      font-size: 1.5rem;
-      color: #333;
-      margin-bottom: 1rem;
+    h2 {
+      margin-bottom: 20px;
     }
 
     p {
       font-size: 1rem;
+      text-align: left;
       color: #666;
     }
   }

@@ -83,7 +83,7 @@ export default class ProductEditor extends Vue {
   errorMessages: string[] = [];
 
   get editMode(): boolean {
-    return this.$route.params.op === "edit";
+    return this.$route.name === "ProductEdit";
   }
 
   get categories(): Array<any> {
@@ -94,6 +94,7 @@ export default class ProductEditor extends Vue {
     if (!this.categories.length) {
       try {
         await this.$store.dispatch("admin/adminCategories/fetchCategories");
+        console.log("Kategorie załadowane:", this.categories);
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
       }
@@ -109,7 +110,15 @@ export default class ProductEditor extends Vue {
         const product =
           this.$store.getters["admin/adminProducts/selectedProduct"];
         if (product) {
-          this.product = { ...product };
+          this.product = {
+            id: product.id || null,
+            name: product.name || "",
+            lead: product.lead || "",
+            description: product.description || "",
+            categoryId: product.categoryId || null,
+            price: product.price || 0,
+          };
+          console.log("Załadowano produkt:", this.product);
         }
       } catch (error) {
         console.error("Błąd podczas pobierania produktu:", error);
@@ -140,14 +149,13 @@ export default class ProductEditor extends Vue {
 
     const action = this.editMode ? "updateProduct" : "createProduct";
     const payload = {
+      id: this.editMode ? this.product.id : undefined,
       name: this.product.name,
       lead: this.product.lead,
       description: this.product.description,
       price: this.product.price,
       categoryId: this.product.categoryId,
     };
-
-    console.log("Dane wysyłane do backendu:", payload);
 
     try {
       await this.$store.dispatch(`admin/adminProducts/${action}`, payload);

@@ -22,7 +22,7 @@
           <td class="text-center">
             <button
               class="btn btn-sm btn-danger mx-1"
-              @click="removeProduct(product.id)"
+              @click="confirmRemoveProduct(product)"
             >
               Usuń
             </button>
@@ -61,10 +61,17 @@
     </div>
 
     <!-- Modal -->
-    <div v-if="modalMessage" class="modal-overlay">
+    <div v-if="showConfirmModal" class="modal-overlay">
       <div class="modal-content">
-        <p class="modal-message">{{ modalMessage }}</p>
-        <button @click="closeModal" class="btn modal-btn">OK</button>
+        <p class="modal-message">
+          Czy na pewno chcesz usunąć produkt: "{{ productToDelete?.name }}"?
+        </p>
+        <div class="modal-buttons">
+          <button @click="removeProduct" class="btn modal-btn">Tak</button>
+          <button @click="closeModal" class="btn modal-btn cancel-btn">
+            Nie
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -72,7 +79,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Pagination from "@/components/Pagination.vue";
+import Pagination from "@/components/ProductPagination.vue";
 
 @Component({
   components: {
@@ -83,12 +90,36 @@ export default class ProductAdmin extends Vue {
   currentPage = 1;
   pageSize = 10;
 
+  productToDelete: any = null;
+  showConfirmModal = false;
+
   get modalMessage() {
     return this.$route.query.modalMessage || null;
   }
 
   closeModal() {
-    this.$router.replace({ query: {} });
+    this.productToDelete = null;
+    this.showConfirmModal = false;
+  }
+
+  confirmRemoveProduct(product: any) {
+    this.productToDelete = product;
+    this.showConfirmModal = true;
+  }
+
+  async removeProduct() {
+    if (!this.productToDelete) return;
+
+    try {
+      await this.$store.dispatch(
+        "admin/adminProducts/deleteProduct",
+        this.productToDelete.id
+      );
+      this.closeModal();
+      this.$store.dispatch("admin/adminProducts/fetchProducts");
+    } catch (error) {
+      console.error("Błąd podczas usuwania produktu:", error);
+    }
   }
 
   get paginatedProducts() {
@@ -111,14 +142,6 @@ export default class ProductAdmin extends Vue {
       await this.$store.dispatch("admin/adminProducts/fetchProducts");
     } catch (error: any) {
       console.error("Błąd podczas pobierania produktów:", error);
-    }
-  }
-
-  async removeProduct(id: number) {
-    try {
-      await this.$store.dispatch("admin/adminProducts/deleteProduct", id);
-    } catch (error) {
-      console.error("Błąd podczas usuwania produktu:", error);
     }
   }
 
@@ -211,6 +234,12 @@ export default class ProductAdmin extends Vue {
   margin-bottom: 15px;
 }
 
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 .modal-btn {
   background-color: #c70a0a;
   color: white;
@@ -223,6 +252,14 @@ export default class ProductAdmin extends Vue {
 
   &:hover {
     background-color: #a60a0a;
+  }
+
+  &.cancel-btn {
+    background-color: #666666;
+
+    &:hover {
+      background-color: #555555;
+    }
   }
 }
 </style>
