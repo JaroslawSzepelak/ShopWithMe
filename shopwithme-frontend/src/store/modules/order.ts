@@ -6,6 +6,7 @@ interface OrderState {
   orderSummary: any | null;
   error: string | null;
   loading: boolean;
+  selectedOrder: any | null;
 }
 
 const orderModule: Module<OrderState, any> = {
@@ -16,6 +17,7 @@ const orderModule: Module<OrderState, any> = {
     orderSummary: null,
     error: null,
     loading: false,
+    selectedOrder: null,
   },
 
   mutations: {
@@ -31,6 +33,9 @@ const orderModule: Module<OrderState, any> = {
     SET_LOADING(state, loading: boolean) {
       state.loading = loading;
     },
+    SET_SELECTED_ORDER(state, order) {
+      state.selectedOrder = order;
+    },
   },
 
   actions: {
@@ -39,6 +44,7 @@ const orderModule: Module<OrderState, any> = {
       commit("SET_ERROR", null);
       try {
         const response = await orderAPI.getOrders();
+        console.log("Fetched orders from API:", response.data);
         commit("SET_ORDERS", response.data);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -47,6 +53,21 @@ const orderModule: Module<OrderState, any> = {
         commit("SET_LOADING", false);
       }
     },
+    /*
+    async fetchOrderById({ commit }, id: number) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        const response = await orderAPI.getOrderById(id);
+        commit("SET_SELECTED_ORDER", response.data);
+      } catch (error) {
+        console.error("Error fetching order by ID:", error);
+        commit("SET_ERROR", "Failed to fetch order by ID.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+    */
     async fetchOrderSummary({ commit }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
@@ -87,6 +108,9 @@ const orderModule: Module<OrderState, any> = {
         commit("SET_LOADING", false);
       }
     },
+    selectOrder({ commit }, order) {
+      commit("SET_SELECTED_ORDER", order);
+    },
   },
 
   getters: {
@@ -102,6 +126,7 @@ const orderModule: Module<OrderState, any> = {
     isOrderLoading(state) {
       return state.loading;
     },
+    selectedOrder: (state) => state.selectedOrder,
   },
 };
 

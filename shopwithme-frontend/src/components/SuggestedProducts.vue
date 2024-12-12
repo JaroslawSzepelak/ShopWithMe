@@ -48,20 +48,24 @@
       <p>Brak proponowanych produktów.</p>
     </div>
 
-    <!-- Modale -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content">
-        <p>{{ modalMessage }}</p>
-        <button @click="closeModal">Zamknij</button>
-      </div>
-    </div>
+    <!-- Update Modal usage -->
+    <AppModal
+      :visible="showModal"
+      :message="modalMessage"
+      @close="closeModal"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import AppModal from "./AppModal.vue";
 
-@Component
+@Component({
+  components: {
+    AppModal,
+  },
+})
 export default class SuggestedProducts extends Vue {
   placeholderImage = "https://placehold.co/200x200";
   pageIndex = 1;
@@ -118,10 +122,13 @@ export default class SuggestedProducts extends Vue {
     try {
       const cartItem = { productId: product.id, quantity: 1 };
       await this.$store.dispatch("cart/addItem", cartItem);
-      alert(`${product.name} został dodany do koszyka.`);
+      this.modalMessage = `${product.name} został dodany do koszyka.`;
+      this.showModal = true;
     } catch (error) {
       console.error("Błąd podczas dodawania produktu do koszyka:", error);
-      alert("Wystąpił błąd podczas dodawania produktu do koszyka.");
+      this.modalMessage =
+        "Wystąpił błąd podczas dodawania produktu do koszyka.";
+      this.showModal = true;
     }
   }
 
@@ -269,48 +276,6 @@ export default class SuggestedProducts extends Vue {
     &.next-btn {
       position: absolute;
       right: 0;
-    }
-  }
-
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .modal-content {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
-    max-width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
-    p {
-      font-size: 1.2rem;
-      color: #333;
-      margin-bottom: 1rem;
-    }
-
-    button {
-      background-color: #c70a0a;
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: darken(#c70a0a, 10%);
-      }
     }
   }
 }

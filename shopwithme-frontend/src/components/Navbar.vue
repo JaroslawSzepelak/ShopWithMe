@@ -26,24 +26,24 @@
       </div>
     </div>
     <!-- Modal po wylogowaniu -->
-    <div v-if="showLogoutModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content" @click.stop>
-        <h2>Wylogowano pomyślnie</h2>
-        <p>Twoja sesja została zakończona.</p>
-        <button @click="closeModal" class="btn btn-primary">Zamknij</button>
-      </div>
-    </div>
+    <AppModal
+      :visible="showLogoutModal"
+      message="Wylogowano pomyślnie. Twoja sesja została zakończona."
+      @close="closeModal"
+    />
   </nav>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import CategoryDropdown from "@/components/CategoryDropdown.vue";
+import AppModal from "@/components/AppModal.vue";
 import { mapGetters, mapActions } from "vuex";
 
 @Component({
   components: {
     CategoryDropdown,
+    AppModal,
   },
   computed: {
     ...mapGetters("admin/adminAccount", ["isLoggedIn"]),
@@ -202,53 +202,6 @@ export default class Navbar extends Vue {
 
     &:hover .user-dropdown {
       display: block;
-    }
-  }
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-  max-width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 1rem;
-  }
-
-  .btn {
-    background-color: #c70a0a;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #a50e0e;
     }
   }
 }

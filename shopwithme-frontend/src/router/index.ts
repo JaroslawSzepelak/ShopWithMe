@@ -14,6 +14,7 @@ import CategoryEditor from "@/components/CategoryEditor.vue";
 import ProductAdmin from "@/components/ProductAdmin.vue";
 import CategoryAdmin from "@/components/CategoryAdmin.vue";
 import OrderAdmin from "@/components/OrderAdmin.vue";
+import OrderDetailsAdmin from "@/components/OrderDetailsAdmin.vue";
 import NotFound from "@/views/NotFound.vue";
 
 Vue.use(Router);
@@ -60,6 +61,12 @@ const routes = [
         path: "orders",
         name: "OrderAdmin",
         component: OrderAdmin,
+      },
+      {
+        path: "orders/details/:id",
+        name: "OrderDetailsAdmin",
+        component: OrderDetailsAdmin,
+        props: true,
       },
       {
         path: "products/create",

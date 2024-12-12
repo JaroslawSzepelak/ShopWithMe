@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h1>Logowanie administratora</h1>
+      <h1>Logowanie</h1>
       <form @submit.prevent="validateForm">
         <div class="form-group" :class="{ 'has-error': errors.username }">
           <label for="username">Login</label>
@@ -29,32 +29,28 @@
             {{ errors.password }}
           </span>
         </div>
+        <div v-if="formError" class="form-error">{{ formError }}</div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Zaloguj się</button>
         </div>
+        <div class="form-links">
+          <router-link to="/register"
+            >Nie masz konta? Zarejestruj się!</router-link
+          >
+        </div>
       </form>
     </div>
-    <!-- Modal for error -->
-    <AppModal
-      :visible="showErrorModal"
-      :message="errorMessage"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import AppModal from "@/components/AppModal.vue";
 
-@Component({
-  components: { AppModal },
-})
-export default class AdminLogin extends Vue {
+@Component
+export default class Login extends Vue {
   username = "";
   password = "";
-  showErrorModal = false;
-  errorMessage = "";
+  formError: string | null = null;
 
   errors = {
     username: "",
@@ -79,15 +75,11 @@ export default class AdminLogin extends Vue {
       this.$router.push("/admin");
     } catch (error: any) {
       console.error("Błąd logowania:", error);
-      this.errorMessage =
+      alert(
         this.$store.getters["admin/adminAccount/accountError"] ||
-        "Niepoprawny login lub hasło.";
-      this.showErrorModal = true;
+          "Niepoprawny login lub hasło."
+      );
     }
-  }
-
-  closeModal() {
-    this.showErrorModal = false;
   }
 }
 </script>
@@ -148,6 +140,19 @@ h1 {
 
     &:hover {
       background-color: #c9302c;
+    }
+  }
+}
+
+.form-links {
+  margin-top: 1rem;
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
