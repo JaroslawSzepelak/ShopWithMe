@@ -1,4 +1,4 @@
-import { orderAPI } from "@/plugins/axios";
+import { orderAPI } from "@/plugins/shopAxios";
 import { Module } from "vuex";
 
 interface OrderState {
@@ -65,11 +65,11 @@ const orderModule: Module<OrderState, any> = {
       commit("SET_ERROR", null);
       try {
         const response = await orderAPI.createOrder();
-        commit("SET_ORDER_SUMMARY", response.data); // Zakładamy, że backend zwraca dane zamówienia
+        commit("SET_ORDER_SUMMARY", response.data);
       } catch (error) {
         console.error("Error creating order:", error);
         commit("SET_ERROR", "Failed to create order.");
-        throw error; // Przekazuje błąd dalej do widoku
+        throw error;
       } finally {
         commit("SET_LOADING", false);
       }
@@ -79,7 +79,7 @@ const orderModule: Module<OrderState, any> = {
       commit("SET_ERROR", null);
       try {
         await orderAPI.deleteOrder(id);
-        await dispatch("fetchOrders"); // Odśwież listę zamówień
+        await dispatch("fetchOrders");
       } catch (error) {
         console.error("Error deleting order:", error);
         commit("SET_ERROR", "Failed to delete order.");

@@ -31,13 +31,10 @@ export default class TechnicalDetails extends Vue {
         await this.$store.dispatch("products/fetchProduct", this.productId);
         const product = this.$store.getters["products/selectedProduct"];
 
-        console.log("Pobrane dane produktu:", product);
-
         if (product && product.technicalData) {
           this.technicalDetails = JSON.parse(
             product.technicalData.replace(/\\r\\n/g, "").trim()
           );
-          console.log("Pobrane dane techniczne:", this.technicalDetails);
         }
       } catch (error) {
         console.error("Błąd podczas pobierania danych technicznych:", error);

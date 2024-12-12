@@ -72,7 +72,7 @@ export default class Login extends Vue {
         username: this.username,
         password: this.password,
       });
-      this.$router.push("/");
+      this.$router.push("/admin");
     } catch (error: any) {
       console.error("Błąd logowania:", error);
       alert(

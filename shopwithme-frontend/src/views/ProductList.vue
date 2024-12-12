@@ -1,56 +1,79 @@
 <template>
   <div class="product-list">
     <h1>Produkty</h1>
-    <div class="product-list-container">
-      <ProductCard
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-      />
+
+    <!-- Ekranik ładowania -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Ładowanie produktów...</p>
     </div>
-    <div class="pagination-container">
-      <div class="page-size-selector">
-        <label for="pageSize">Ilość produktów na stronę:</label>
-        <select
-          id="pageSize"
-          class="page-size-select"
-          :value="pageSize"
-          @change="changePageSize($event.target.value)"
-        >
-          <option value="10">10 na stronę</option>
-          <option value="20">20 na stronę</option>
-          <option value="30">30 na stronę</option>
-        </select>
+
+    <!-- Komunikat o błędzie -->
+    <div v-else-if="error" class="error-message">
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Lista produktów -->
+    <div v-else>
+      <div v-if="products.length > 0" class="product-list-container">
+        <ProductCard
+          v-for="product in products"
+          :key="product.id"
+          :product="product"
+        />
       </div>
-      <div class="pagination-controls">
-        <button
-          :disabled="pageIndex === 1"
-          @click="changePage(pageIndex - 1)"
-          class="btn btn-secondary"
-        >
-          Poprzednia
+      <div v-else class="no-products">
+        <p>Brak produktów do wyświetlenia.</p>
+        <button @click="goToShop" class="shop-btn">
+          Przejdź do strony głównej skklepu
         </button>
-        <span v-for="page in visiblePages" :key="page">
-          <button
-            v-if="page !== -1"
-            class="btn"
-            :class="{
-              'btn-primary': page === pageIndex,
-              'btn-secondary': page !== pageIndex,
-            }"
-            @click="changePage(page)"
+      </div>
+
+      <!-- Paginacja -->
+      <div class="pagination-container">
+        <div class="page-size-selector">
+          <label for="pageSize">Ilość produktów na stronę:</label>
+          <select
+            id="pageSize"
+            class="page-size-select"
+            :value="pageSize"
+            @change="changePageSize($event.target.value)"
           >
-            {{ page }}
+            <option value="10">10 na stronę</option>
+            <option value="20">20 na stronę</option>
+            <option value="30">30 na stronę</option>
+          </select>
+        </div>
+        <div class="pagination-controls">
+          <button
+            :disabled="pageIndex === 1"
+            @click="changePage(pageIndex - 1)"
+            class="btn btn-secondary"
+          >
+            Poprzednia
           </button>
-          <span v-else class="dots">...</span>
-        </span>
-        <button
-          :disabled="pageIndex === totalPages"
-          @click="changePage(pageIndex + 1)"
-          class="btn btn-secondary"
-        >
-          Następna
-        </button>
+          <span v-for="page in visiblePages" :key="page">
+            <button
+              v-if="page !== -1"
+              class="btn"
+              :class="{
+                'btn-primary': page === pageIndex,
+                'btn-secondary': page !== pageIndex,
+              }"
+              @click="changePage(page)"
+            >
+              {{ page }}
+            </button>
+            <span v-else class="dots">...</span>
+          </span>
+          <button
+            :disabled="pageIndex === totalPages"
+            @click="changePage(pageIndex + 1)"
+            class="btn btn-secondary"
+          >
+            Następna
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -66,6 +89,9 @@ import ProductCard from "@/components/ProductCard.vue";
   },
 })
 export default class ProductList extends Vue {
+  isLoading = false;
+  error: string | null = null;
+
   get products() {
     return this.$store.state.products.paginatedProducts || [];
   }
@@ -92,18 +118,25 @@ export default class ProductList extends Vue {
 
       await this.fetchProducts(savedPageIndex, savedPageSize);
     } catch (error) {
+      this.error = "Nie udało się załadować listy produktów.";
       console.error("Błąd podczas inicjalizacji widoku ProductList:", error);
     }
   }
 
   async fetchProducts(pageIndex: number, pageSize: number) {
+    this.isLoading = true;
+    this.error = null;
+
     try {
       await this.$store.dispatch("products/fetchProducts", {
         pageIndex,
         pageSize,
       });
     } catch (error) {
+      this.error = "Wystąpił błąd podczas pobierania listy produktów.";
       console.error("Błąd podczas pobierania produktów:", error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -115,6 +148,7 @@ export default class ProductList extends Vue {
         await this.fetchProducts(newPageIndex, this.pageSize);
         this.scrollToTop();
       } catch (error) {
+        this.error = "Nie udało się zmienić strony.";
         console.error("Błąd podczas zmiany strony:", error);
       }
     }
@@ -129,6 +163,7 @@ export default class ProductList extends Vue {
       await this.fetchProducts(1, Number(newPageSize));
       this.scrollToTop();
     } catch (error) {
+      this.error = "Nie udało się zmienić ilości produktów na stronę.";
       console.error("Błąd podczas zmiany rozmiaru strony:", error);
     }
   }
@@ -164,6 +199,10 @@ export default class ProductList extends Vue {
 
     return pages;
   }
+
+  goToShop(): void {
+    this.$router.push("/");
+  }
 }
 </script>
 
@@ -176,6 +215,52 @@ export default class ProductList extends Vue {
     margin-bottom: 20px;
     text-align: center;
     color: #333;
+  }
+
+  .loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    p {
+      margin-top: 15px;
+      font-size: 1.2rem;
+      color: #555;
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .error-message {
+    text-align: center;
+    color: red;
+    font-size: 1.2rem;
+    margin-top: 20px;
+  }
+
+  .no-products {
+    text-align: center;
+    color: #555;
+    font-size: 1.2rem;
+    margin-top: 20px;
   }
 
   .product-list-container {
@@ -244,5 +329,16 @@ export default class ProductList extends Vue {
       }
     }
   }
+}
+
+.shop-btn {
+  background-color: #c70a0a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 20px;
 }
 </style>

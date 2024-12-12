@@ -13,8 +13,13 @@ export const productAPI = {
   getProduct(id: number) {
     return adminAxios.get(`/Products/${id}`);
   },
-  getProducts() {
-    return adminAxios.get("/Products");
+  getProducts(params: { pageIndex: number; pageSize: number }) {
+    return adminAxios.get("/Products", {
+      params: {
+        pageIndex: params.pageIndex,
+        pageSize: params.pageSize,
+      },
+    });
   },
   createProduct(product: {
     name: string;
@@ -22,24 +27,45 @@ export const productAPI = {
     description: string;
     price: number;
     categoryId: number;
+    technicalData?: string; // Uwzględniono dane techniczne
   }) {
+    // Konwersja danych technicznych do JSON string
+    const formattedTechnicalData = product.technicalData
+      ? JSON.stringify(JSON.parse(product.technicalData))
+      : null;
+
     return adminAxios.post("/Products", {
       name: product.name,
       lead: product.lead,
       description: product.description,
       price: product.price,
       categoryId: product.categoryId,
+      technicalData: formattedTechnicalData,
     });
   },
   updateProduct(product: {
     id: number;
     name: string;
+    lead: string;
     price: number;
     categoryId: number;
     description?: string;
-    image?: string;
+    technicalData?: string;
   }) {
-    return adminAxios.put("/Products", product);
+    // Konwersja danych technicznych do JSON string
+    const formattedTechnicalData = product.technicalData
+      ? JSON.stringify(JSON.parse(product.technicalData))
+      : null;
+
+    return adminAxios.put("/Products", {
+      id: product.id,
+      name: product.name,
+      lead: product.lead,
+      price: product.price,
+      categoryId: product.categoryId,
+      description: product.description,
+      technicalData: formattedTechnicalData,
+    });
   },
   deleteProduct(id: number) {
     return adminAxios.delete(`/Products/${id}`);
@@ -48,20 +74,44 @@ export const productAPI = {
 
 // API dla kategorii produktów
 export const categoryAPI = {
-  getCategories() {
-    return adminAxios.get("/Productcategories");
+  getCategories(params?: { pageIndex?: number; pageSize?: number }) {
+    if (params) {
+      return adminAxios.get("/ProductCategories", {
+        params: {
+          pageIndex: params.pageIndex || 1,
+          pageSize: params.pageSize || 10,
+        },
+      });
+    }
+    return adminAxios.get("/ProductCategories/all");
   },
   getCategory(id: number) {
-    return adminAxios.get(`/Productcategories/${id}`);
+    return adminAxios.get(`/ProductCategories/${id}`);
   },
-  createCategory(name: string) {
-    return adminAxios.post("/Productcategories", { name });
+  createCategory(category: { name: string }) {
+    console.log("Wysyłanie danych kategorii do API:", category);
+    return adminAxios
+      .post("/ProductCategories", { name: category.name })
+      .then((response) => {
+        console.log("Utworzono kategorię. Odpowiedź API:", response.data);
+        return response;
+      })
+      .catch((error) => {
+        console.error(
+          "Błąd podczas tworzenia kategorii:",
+          error.response?.data || error.message
+        );
+        throw error;
+      });
   },
-  updateCategory(id: number, name: string) {
-    return adminAxios.put("/Productcategories", { id, name });
+  updateCategory(category: { id: number; name: string }) {
+    return adminAxios.put("/ProductCategories", {
+      id: category.id,
+      name: category.name,
+    });
   },
   deleteCategory(id: number) {
-    return adminAxios.delete(`/Productcategories/${id}`);
+    return adminAxios.delete(`/ProductCategories/${id}`);
   },
 };
 

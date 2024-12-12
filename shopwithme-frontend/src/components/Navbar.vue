@@ -74,6 +74,10 @@ export default class Navbar extends Vue {
     try {
       await this.$store.dispatch("admin/adminAccount/logout");
       this.showLogoutModal = true;
+
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
     }

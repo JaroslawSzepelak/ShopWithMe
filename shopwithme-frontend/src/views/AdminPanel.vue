@@ -14,6 +14,13 @@
           Produkty
         </router-link>
         <router-link
+          to="/admin/categories"
+          class="btn btn-secondary btn-block mb-3"
+          active-class="active"
+        >
+          Kategorie
+        </router-link>
+        <router-link
           to="/admin/orders"
           class="btn btn-secondary btn-block"
           active-class="active"
@@ -30,13 +37,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 
 @Component
 export default class AdminPanel extends Vue {
+  get isAdminLoggedIn(): boolean {
+    return this.$store.getters["admin/adminProducts/isAdminLoggedIn"];
+  }
+
   created() {
     if (this.$route.path === "/admin") {
       this.$router.push("/admin/products");
+    }
+  }
+
+  @Watch("isAdminLoggedIn")
+  onAdminLoggedInChange(newVal: boolean) {
+    if (!newVal) {
+      this.$router.push("/admin/login");
     }
   }
 }

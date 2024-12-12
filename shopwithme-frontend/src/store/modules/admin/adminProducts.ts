@@ -6,6 +6,10 @@ export interface AdminProductState {
   selectedProduct: any | null;
   loading: boolean;
   error: string | null;
+  totalRows: number;
+  totalPages: number;
+  pageSize: number;
+  pageIndex: number;
 }
 
 const adminProductsModule: Module<AdminProductState, any> = {
@@ -16,6 +20,10 @@ const adminProductsModule: Module<AdminProductState, any> = {
     selectedProduct: null,
     loading: false,
     error: null,
+    totalRows: 0,
+    totalPages: 0,
+    pageSize: Number(sessionStorage.getItem("adminPageSize")) || 10,
+    pageIndex: Number(sessionStorage.getItem("adminPageIndex")) || 1,
   },
 
   mutations: {
@@ -31,15 +39,34 @@ const adminProductsModule: Module<AdminProductState, any> = {
     SET_ERROR(state, error: string | null) {
       state.error = error;
     },
+    SET_PAGER_INFO(state, pager: { totalRows: number; totalPages: number }) {
+      state.totalRows = pager.totalRows;
+      state.totalPages = pager.totalPages;
+    },
+    SET_PAGE_INDEX(state, pageIndex: number) {
+      state.pageIndex = pageIndex;
+      sessionStorage.setItem("adminPageIndex", String(pageIndex));
+    },
+    SET_PAGE_SIZE(state, pageSize: number) {
+      state.pageSize = pageSize;
+      sessionStorage.setItem("adminPageSize", String(pageSize));
+    },
   },
 
   actions: {
-    async fetchProducts({ commit }) {
+    async fetchProducts({ commit, state }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
+
       try {
-        const response = await productAPI.getProducts();
-        commit("SET_PRODUCTS", response.data);
+        const response = await productAPI.getProducts({
+          pageIndex: state.pageIndex,
+          pageSize: state.pageSize,
+        });
+        const { result, pager } = response.data;
+
+        commit("SET_PRODUCTS", result);
+        commit("SET_PAGER_INFO", pager);
       } catch (error: any) {
         if (error.response?.status === 404) {
           console.error("Lista produktów nie została znaleziona (404).");
@@ -58,17 +85,7 @@ const adminProductsModule: Module<AdminProductState, any> = {
         const response = await productAPI.getProduct(id);
         const product = response.data;
 
-        // Mapowanie danych zwracanych z backendu na format frontendu
-        const mappedProduct = {
-          id: product.id,
-          name: product.name,
-          lead: product.lead,
-          description: product.description,
-          price: product.price,
-          categoryId: product.categoryId,
-        };
-
-        commit("SET_SELECTED_PRODUCT", mappedProduct);
+        commit("SET_SELECTED_PRODUCT", product);
       } catch (error) {
         console.error(`Error fetching product with id ${id}:`, error);
         commit("SET_ERROR", "Failed to fetch product.");
@@ -118,6 +135,17 @@ const adminProductsModule: Module<AdminProductState, any> = {
         commit("SET_LOADING", false);
       }
     },
+
+    async changePage({ commit, dispatch }, pageIndex: number) {
+      commit("SET_PAGE_INDEX", pageIndex);
+      await dispatch("fetchProducts");
+    },
+
+    async changePageSize({ commit, dispatch }, pageSize: number) {
+      commit("SET_PAGE_SIZE", pageSize);
+      commit("SET_PAGE_INDEX", 1);
+      await dispatch("fetchProducts");
+    },
   },
 
   getters: {
@@ -132,6 +160,18 @@ const adminProductsModule: Module<AdminProductState, any> = {
     },
     error(state) {
       return state.error;
+    },
+    totalRows(state) {
+      return state.totalRows;
+    },
+    totalPages(state) {
+      return state.totalPages;
+    },
+    pageSize(state) {
+      return state.pageSize;
+    },
+    pageIndex(state) {
+      return state.pageIndex;
     },
   },
 };

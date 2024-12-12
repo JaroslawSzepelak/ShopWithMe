@@ -26,6 +26,7 @@ export const productAPI = {
     price: number;
     categoryId: number;
     description?: string;
+    technicalData?: string;
     image?: string;
   }) {
     return apiClient.post("/Products", product);
@@ -36,6 +37,7 @@ export const productAPI = {
     price: number;
     categoryId: number;
     description?: string;
+    technicalData?: string;
     image?: string;
   }) {
     return apiClient.put("/Products", product);
@@ -84,8 +86,16 @@ export const cartAPI = {
 
 // API dla kategorii produktów
 export const categoryAPI = {
-  getCategories() {
-    return apiClient.get("/ProductCategories");
+  getCategories(pageIndex: number, pageSize: number) {
+    return apiClient.get("/ProductCategories", {
+      params: {
+        pageIndex,
+        pageSize,
+      },
+    });
+  },
+  getAllCategories() {
+    return apiClient.get("/ProductCategories/all");
   },
   getCategory(id: number) {
     return apiClient.get(`/ProductCategories/${id}`);

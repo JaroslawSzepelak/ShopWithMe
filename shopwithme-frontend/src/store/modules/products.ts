@@ -1,5 +1,5 @@
 import { Module } from "vuex";
-import { productAPI } from "@/plugins/axios";
+import { productAPI } from "@/plugins/shopAxios";
 
 interface Product {
   id: number;
@@ -20,6 +20,7 @@ interface ProductsState {
   error: string | null;
   currentPage: number;
   pageSize: number;
+  suggestedPageSize: number;
   totalRows: number;
   totalPages: number;
 }
@@ -34,6 +35,7 @@ const productsModule: Module<ProductsState, any> = {
     error: null,
     currentPage: Number(sessionStorage.getItem("currentPage")) || 1,
     pageSize: Number(sessionStorage.getItem("pageSize")) || 10,
+    suggestedPageSize: 5,
     totalRows: 0,
     totalPages: 0,
   },
@@ -114,6 +116,25 @@ const productsModule: Module<ProductsState, any> = {
       commit("SET_CURRENT_PAGE", 1);
       dispatch("fetchProducts");
     },
+    async fetchSuggestedProducts({ state, commit }, pageIndex) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        const response = await productAPI.getProducts(
+          pageIndex,
+          state.suggestedPageSize
+        );
+        const { result } = response.data;
+
+        commit("SET_PRODUCTS", result);
+      } catch (error) {
+        console.error("Error fetching suggested products:", error);
+        commit("SET_ERROR", "Failed to fetch suggested products.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
     updatePaginatedProducts({ state, commit }) {
       const pageSize = Number(state.pageSize);
       const currentPage = Number(state.currentPage);
@@ -141,6 +162,9 @@ const productsModule: Module<ProductsState, any> = {
     },
     currentPage(state) {
       return state.currentPage;
+    },
+    suggestedPageSize(state) {
+      return state.suggestedPageSize;
     },
     pageSize(state) {
       return state.pageSize;

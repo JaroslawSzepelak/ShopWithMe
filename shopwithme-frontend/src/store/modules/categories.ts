@@ -1,5 +1,5 @@
-import { Module, Commit } from "vuex";
-import { categoryAPI } from "@/plugins/axios";
+import { Module } from "vuex";
+import { categoryAPI } from "@/plugins/shopAxios";
 
 export interface Category {
   id: number;
@@ -11,6 +11,9 @@ interface CategoryState {
   selectedCategory: Category | null;
   loading: boolean;
   error: string | null;
+  totalCategories: number;
+  pageIndex: number;
+  pageSize: number;
 }
 
 const categoryModule: Module<CategoryState, any> = {
@@ -21,6 +24,9 @@ const categoryModule: Module<CategoryState, any> = {
     selectedCategory: null,
     loading: false,
     error: null,
+    totalCategories: 0,
+    pageIndex: 1,
+    pageSize: 10,
   },
 
   getters: {
@@ -35,6 +41,15 @@ const categoryModule: Module<CategoryState, any> = {
     },
     errorMessage(state): string | null {
       return state.error;
+    },
+    totalCategories(state): number {
+      return state.totalCategories;
+    },
+    pageIndex(state): number {
+      return state.pageIndex;
+    },
+    pageSize(state): number {
+      return state.pageSize;
     },
   },
 
@@ -51,19 +66,49 @@ const categoryModule: Module<CategoryState, any> = {
     SET_ERROR(state, error: string | null) {
       state.error = error;
     },
+    SET_TOTAL_CATEGORIES(state, total: number) {
+      state.totalCategories = total;
+    },
+    SET_PAGE_INDEX(state, pageIndex: number) {
+      state.pageIndex = pageIndex;
+    },
+    SET_PAGE_SIZE(state, pageSize: number) {
+      state.pageSize = pageSize;
+    },
   },
 
   actions: {
-    async fetchCategories({ commit }) {
+    async fetchCategories({ commit, state }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
-        const response = await categoryAPI.getCategories();
-        commit("SET_CATEGORIES", response.data);
+        const response = await categoryAPI.getCategories(
+          state.pageIndex,
+          state.pageSize
+        );
+        const { result, pager } = response.data;
+
+        commit("SET_CATEGORIES", result);
+        commit("SET_TOTAL_CATEGORIES", pager.totalRows);
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
         commit("SET_ERROR", "Nie udało się pobrać kategorii produktów.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+
+    async fetchAllCategories({ commit }) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        const response = await categoryAPI.getAllCategories();
+        commit("SET_CATEGORIES", response.data);
+      } catch (error) {
+        console.error("Błąd podczas pobierania wszystkich kategorii:", error);
+        commit("SET_ERROR", "Nie udało się pobrać wszystkich kategorii.");
       } finally {
         commit("SET_LOADING", false);
       }
@@ -133,6 +178,15 @@ const categoryModule: Module<CategoryState, any> = {
       } finally {
         commit("SET_LOADING", false);
       }
+    },
+
+    async changePage(
+      { commit, dispatch },
+      { pageIndex, pageSize }: { pageIndex: number; pageSize: number }
+    ) {
+      commit("SET_PAGE_INDEX", pageIndex);
+      commit("SET_PAGE_SIZE", pageSize);
+      await dispatch("fetchCategories");
     },
   },
 };

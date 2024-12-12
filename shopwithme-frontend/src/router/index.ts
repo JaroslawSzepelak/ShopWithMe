@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "@/views/Home.vue";
-import Login from "@/views/Login.vue";
+import AdminLogin from "@/views/AdminLogin.vue";
 import ProductList from "@/views/ProductList.vue";
 import ProductDetails from "@/views/ProductDetails.vue";
 import Cart from "@/views/Cart.vue";
@@ -10,7 +10,9 @@ import PaymentMethod from "@/views/PaymentMethod.vue";
 import SummaryView from "@/views/SummaryView.vue";
 import AdminPanel from "@/views/AdminPanel.vue";
 import ProductEditor from "@/components/ProductEditor.vue";
+import CategoryEditor from "@/components/CategoryEditor.vue";
 import ProductAdmin from "@/components/ProductAdmin.vue";
+import CategoryAdmin from "@/components/CategoryAdmin.vue";
 import OrderAdmin from "@/components/OrderAdmin.vue";
 import NotFound from "@/views/NotFound.vue";
 
@@ -20,7 +22,7 @@ const routes = [
   { path: "/", component: Home },
   { path: "/products", component: ProductList },
   { path: "*", component: NotFound },
-  { path: "/login", component: Login },
+  { path: "/admin/login", component: AdminLogin },
   {
     path: "/products/:id",
     name: "ProductDetails",
@@ -50,6 +52,11 @@ const routes = [
         component: ProductAdmin,
       },
       {
+        path: "categories",
+        name: "CategoryAdmin",
+        component: CategoryAdmin,
+      },
+      {
         path: "orders",
         name: "OrderAdmin",
         component: OrderAdmin,
@@ -64,6 +71,18 @@ const routes = [
         path: "products/edit/:id",
         name: "ProductEdit",
         component: ProductEditor,
+        props: { op: "edit" },
+      },
+      {
+        path: "categories/create",
+        name: "CategoryCreate",
+        component: CategoryEditor,
+        props: { op: "create" },
+      },
+      {
+        path: "categories/edit/:id",
+        name: "CategoryEdit",
+        component: CategoryEditor,
         props: { op: "edit" },
       },
     ],

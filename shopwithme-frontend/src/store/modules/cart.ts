@@ -1,4 +1,4 @@
-import { cartAPI } from "@/plugins/axios";
+import { cartAPI } from "@/plugins/shopAxios";
 import { Module } from "vuex";
 
 export interface CartItem {

@@ -54,6 +54,14 @@
           v-model.number="product.price"
         />
       </div>
+      <div class="form-group">
+        <label>Dane techniczne (w formacie JSON)</label>
+        <textarea
+          class="form-control json-input"
+          v-model.trim="product.technicalDetails"
+          placeholder="Wprowadź dane techniczne w formacie JSON"
+        ></textarea>
+      </div>
     </div>
     <div class="button-group">
       <router-link to="/admin/products" class="btn back-btn"
@@ -78,6 +86,7 @@ export default class ProductEditor extends Vue {
     description: "",
     categoryId: null,
     price: 0,
+    technicalDetails: "",
   };
 
   errorMessages: string[] = [];
@@ -94,7 +103,6 @@ export default class ProductEditor extends Vue {
     if (!this.categories.length) {
       try {
         await this.$store.dispatch("admin/adminCategories/fetchCategories");
-        console.log("Kategorie załadowane:", this.categories);
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
       }
@@ -109,6 +117,7 @@ export default class ProductEditor extends Vue {
         );
         const product =
           this.$store.getters["admin/adminProducts/selectedProduct"];
+        console.log("Załadowano produkt:", product);
         if (product) {
           this.product = {
             id: product.id || null,
@@ -117,8 +126,14 @@ export default class ProductEditor extends Vue {
             description: product.description || "",
             categoryId: product.categoryId || null,
             price: product.price || 0,
+            technicalDetails: product.technicalData
+              ? JSON.stringify(JSON.parse(product.technicalData), null, 2)
+              : "",
           };
-          console.log("Załadowano produkt:", this.product);
+          console.log(
+            "Sformatowane dane techniczne podczas edycji:",
+            this.product.technicalDetails
+          );
         }
       } catch (error) {
         console.error("Błąd podczas pobierania produktu:", error);
@@ -140,12 +155,24 @@ export default class ProductEditor extends Vue {
       this.errorMessages.push("Pole 'Kategoria' jest wymagane.");
     if (this.product.price <= 0)
       this.errorMessages.push("Cena musi być większa niż 0.");
+    if (this.product.technicalDetails) {
+      try {
+        JSON.parse(this.product.technicalDetails);
+      } catch (e) {
+        console.error("Błąd walidacji JSON:", e);
+        this.errorMessages.push(
+          "Pole 'Dane techniczne' musi być w formacie JSON."
+        );
+      }
+    }
 
     return this.errorMessages.length === 0;
   }
 
   async handleSave() {
     if (!this.validateForm()) return;
+
+    console.log("Przed wysłaniem danych:", this.product);
 
     const action = this.editMode ? "updateProduct" : "createProduct";
     const payload = {
@@ -155,7 +182,10 @@ export default class ProductEditor extends Vue {
       description: this.product.description,
       price: this.product.price,
       categoryId: this.product.categoryId,
+      technicalData: this.product.technicalDetails || null,
     };
+
+    console.log("Payload wysyłany do API:", payload);
 
     try {
       await this.$store.dispatch(`admin/adminProducts/${action}`, payload);
@@ -217,6 +247,12 @@ export default class ProductEditor extends Vue {
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+
+      &.json-input {
+        font-family: monospace;
+        height: 150px;
+        resize: vertical;
+      }
     }
 
     .readonly-input {

@@ -1,50 +1,46 @@
 <template>
-  <div class="product-admin">
-    <router-link to="/admin/products/create" class="btn btn-primary my-3">
-      Utwórz produkt
+  <div class="category-admin">
+    <router-link to="/admin/categories/create" class="btn btn-primary my-3">
+      Utwórz kategorię
     </router-link>
 
     <!-- Loading Spinner -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>
-      <p>Ładowanie produktów...</p>
+      <p>Ładowanie kategorii...</p>
     </div>
 
-    <!-- Product Table -->
+    <!-- Categories Table -->
     <div v-else>
       <table class="table table-striped table-bordered">
         <thead class="thead-dark">
           <tr>
             <th>ID</th>
             <th>Nazwa</th>
-            <th>Kategoria</th>
-            <th class="text-right">Cena</th>
             <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="product in paginatedProducts" :key="product.id">
-            <td>{{ product.id }}</td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.category }}</td>
-            <td class="text-right">{{ product.price.toFixed(2) }} PLN</td>
+          <tr v-for="category in paginatedCategories" :key="category.id">
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
             <td class="text-center">
               <button
                 class="btn btn-sm btn-danger mx-1"
-                @click="confirmRemoveProduct(product)"
+                @click="confirmRemoveCategory(category)"
               >
                 Usuń
               </button>
               <router-link
-                :to="{ name: 'ProductEdit', params: { id: product.id } }"
+                :to="{ name: 'CategoryEdit', params: { id: category.id } }"
                 class="btn btn-sm btn-warning mx-1"
               >
                 Edytuj
               </router-link>
             </td>
           </tr>
-          <tr v-if="paginatedProducts.length === 0">
-            <td colspan="5" class="text-center">Brak dostępnych produktów.</td>
+          <tr v-if="paginatedCategories.length === 0">
+            <td colspan="3" class="text-center">Brak dostępnych kategorii.</td>
           </tr>
         </tbody>
       </table>
@@ -52,7 +48,7 @@
       <!-- Pagination Controls -->
       <div class="pagination-container">
         <div class="page-size-selector">
-          <label for="pageSize">Ilość produktów na stronę:</label>
+          <label for="pageSize">Ilość kategorii na stronę:</label>
           <select
             id="pageSize"
             class="page-size-select"
@@ -98,10 +94,10 @@
     <div v-if="showConfirmModal" class="modal-overlay">
       <div class="modal-content">
         <p class="modal-message">
-          Czy na pewno chcesz usunąć produkt: "{{ productToDelete?.name }}"?
+          Czy na pewno chcesz usunąć kategorię: "{{ categoryToDelete?.name }}"?
         </p>
         <div class="modal-buttons">
-          <button @click="removeProduct" class="btn modal-btn">Tak</button>
+          <button @click="removeCategory" class="btn modal-btn">Tak</button>
           <button @click="closeModal" class="btn modal-btn cancel-btn">
             Nie
           </button>
@@ -115,28 +111,28 @@
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class ProductAdmin extends Vue {
-  productToDelete: any = null;
+export default class CategoryAdmin extends Vue {
+  categoryToDelete: any = null;
   showConfirmModal = false;
 
-  get paginatedProducts() {
-    return this.$store.getters["admin/adminProducts/allProducts"];
+  get paginatedCategories() {
+    return this.$store.getters["admin/adminCategories/allCategories"];
   }
 
   get pageSize() {
-    return this.$store.getters["admin/adminProducts/pageSize"];
+    return this.$store.getters["admin/adminCategories/pageSize"];
   }
 
   get pageIndex() {
-    return this.$store.getters["admin/adminProducts/pageIndex"];
+    return this.$store.getters["admin/adminCategories/pageIndex"];
   }
 
   get totalPages() {
-    return this.$store.getters["admin/adminProducts/totalPages"];
+    return this.$store.getters["admin/adminCategories/totalPages"];
   }
 
   get isLoading() {
-    return this.$store.getters["admin/adminProducts/isLoading"];
+    return this.$store.getters["admin/adminCategories/isLoading"];
   }
 
   get visiblePages(): number[] {
@@ -167,50 +163,50 @@ export default class ProductAdmin extends Vue {
   }
 
   async created() {
-    this.fetchProducts();
+    await this.fetchCategories();
   }
 
-  async fetchProducts() {
-    await this.$store.dispatch("admin/adminProducts/fetchProducts");
+  async fetchCategories() {
+    await this.$store.dispatch("admin/adminCategories/fetchCategories");
   }
 
   async changePage(page: number) {
     if (page > 0 && page <= this.totalPages) {
-      await this.$store.dispatch("admin/adminProducts/changePage", page);
+      await this.$store.dispatch("admin/adminCategories/changePage", page);
       this.scrollToTop();
     }
   }
 
   async changePageSize(size: number) {
     await this.$store.dispatch(
-      "admin/adminProducts/changePageSize",
+      "admin/adminCategories/changePageSize",
       Number(size)
     );
     this.scrollToTop();
   }
 
-  confirmRemoveProduct(product: any) {
-    this.productToDelete = product;
+  confirmRemoveCategory(category: any) {
+    this.categoryToDelete = category;
     this.showConfirmModal = true;
   }
 
   closeModal() {
-    this.productToDelete = null;
+    this.categoryToDelete = null;
     this.showConfirmModal = false;
   }
 
-  async removeProduct() {
-    if (!this.productToDelete) return;
+  async removeCategory() {
+    if (!this.categoryToDelete) return;
 
     try {
       await this.$store.dispatch(
-        "admin/adminProducts/deleteProduct",
-        this.productToDelete.id
+        "admin/adminCategories/deleteCategory",
+        this.categoryToDelete.id
       );
       this.closeModal();
-      await this.fetchProducts();
+      await this.fetchCategories();
     } catch (error) {
-      console.error("Błąd podczas usuwania produktu:", error);
+      console.error("Błąd podczas usuwania kategorii:", error);
     }
   }
 
@@ -221,7 +217,7 @@ export default class ProductAdmin extends Vue {
 </script>
 
 <style scoped lang="scss">
-.product-admin {
+.category-admin {
   .btn {
     margin-bottom: 15px;
   }
@@ -234,10 +230,6 @@ export default class ProductAdmin extends Vue {
   .thead-dark {
     background-color: #343a40;
     color: white;
-  }
-
-  .text-right {
-    text-align: right;
   }
 
   .text-center {

@@ -1,4 +1,4 @@
-import { contactDataAPI } from "@/plugins/axios";
+import { contactDataAPI } from "@/plugins/shopAxios";
 import { Module } from "vuex";
 
 interface ContactDataState {

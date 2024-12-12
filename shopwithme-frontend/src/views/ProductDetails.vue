@@ -77,7 +77,7 @@ import TechnicalDetails from "@/components/TechnicalDetails.vue";
 })
 export default class ProductDetails extends Vue {
   mainImage = "";
-  quantity = 1; // Domyślnie ilość ustawiona na 1
+  quantity = 1;
 
   get product() {
     return (
