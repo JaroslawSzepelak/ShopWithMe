@@ -184,6 +184,7 @@ export default class PaymentMethod extends Vue {
 }
 
 .payment-method {
+  box-sizing: border-box;
   background-color: #ffffff;
   padding: 30px;
   border-radius: 10px;
@@ -214,6 +215,7 @@ export default class PaymentMethod extends Vue {
       }
 
       .custom-radio {
+        box-sizing: border-box;
         width: 20px;
         height: 20px;
         border: 2px solid #c70a0a;
@@ -247,6 +249,7 @@ export default class PaymentMethod extends Vue {
     }
 
     input {
+      box-sizing: border-box;
       width: 100%;
       padding: 10px;
       font-size: 1rem;

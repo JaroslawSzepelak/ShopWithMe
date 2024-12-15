@@ -29,33 +29,63 @@
             {{ errors.password }}
           </span>
         </div>
-        <div v-if="formError" class="form-error">{{ formError }}</div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Zaloguj się</button>
         </div>
-        <div class="form-links">
-          <router-link to="/register"
-            >Nie masz konta? Zarejestruj się!</router-link
-          >
-        </div>
       </form>
+      <div class="form-links">
+        <p>
+          Nie masz jeszcze konta?
+          <router-link to="/register" class="register-link"
+            >Załóż je tutaj!</router-link
+          >
+        </p>
+      </div>
     </div>
+    <!-- Modal for error -->
+    <AppModal
+      v-if="showErrorModal"
+      :visible="showErrorModal"
+      :message="formError"
+      @close="closeModal"
+    />
+    <!-- Modal for already logged-in users -->
+    <LoggedInModal
+      :visible="showAlreadyLoggedInModal"
+      @close="handleLoggedInModalClose"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import AppModal from "@/components/modals/AppModal.vue";
+import LoggedInModal from "@/components/modals/LoggedInModal.vue";
 
-@Component
+@Component({
+  components: {
+    AppModal,
+    LoggedInModal,
+  },
+})
 export default class Login extends Vue {
   username = "";
   password = "";
   formError: string | null = null;
+  showErrorModal = false;
+  showAlreadyLoggedInModal = false;
 
   errors = {
     username: "",
     password: "",
   };
+
+  async created() {
+    const isLoggedIn = this.$store.getters["account/isLoggedIn"];
+    if (isLoggedIn) {
+      this.showAlreadyLoggedInModal = true;
+    }
+  }
 
   validateForm() {
     this.errors.username = this.username ? "" : "Login jest wymagany.";
@@ -68,18 +98,30 @@ export default class Login extends Vue {
 
   async login() {
     try {
-      await this.$store.dispatch("admin/adminAccount/login", {
+      await this.$store.dispatch("account/login", {
         username: this.username,
         password: this.password,
       });
-      this.$router.push("/admin");
+
+      await this.$store.dispatch("account/fetchUser");
+
+      this.$router.push("/");
     } catch (error: any) {
       console.error("Błąd logowania:", error);
-      alert(
-        this.$store.getters["admin/adminAccount/accountError"] ||
-          "Niepoprawny login lub hasło."
-      );
+      this.formError =
+        this.$store.getters["account/accountError"] ||
+        "Niepoprawny login lub hasło.";
+      this.showErrorModal = true;
     }
+  }
+
+  closeModal() {
+    this.showErrorModal = false;
+  }
+
+  handleLoggedInModalClose() {
+    this.showAlreadyLoggedInModal = false;
+    this.$router.go(-1);
   }
 }
 </script>
@@ -94,6 +136,7 @@ export default class Login extends Vue {
 }
 
 .login-card {
+  box-sizing: border-box;
   background: #ffffff;
   padding: 2rem;
   border-radius: 10px;
@@ -118,6 +161,7 @@ h1 {
   }
 
   input {
+    box-sizing: border-box;
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;
@@ -147,12 +191,17 @@ h1 {
 .form-links {
   margin-top: 1rem;
 
-  a {
-    color: #007bff;
-    text-decoration: none;
+  p {
+    font-size: 0.9rem;
+    color: #555;
 
-    &:hover {
-      text-decoration: underline;
+    .register-link {
+      color: #007bff;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }

@@ -31,17 +31,20 @@ const accountModule: Module<AccountState, any> = {
 
   actions: {
     async login(
-      { commit },
+      { commit, dispatch },
       { username, password }: { username: string; password: string }
     ) {
       commit("SET_ERROR", null);
       try {
         await accountAPI.login({ name: username, password });
         commit("SET_LOGGED_IN", true);
-        await this.dispatch("account/fetchUser");
+        await dispatch("fetchUser");
       } catch (error: any) {
         console.error("Error logging in:", error);
-        commit("SET_ERROR", "Login failed. Please check your credentials.");
+        commit(
+          "SET_ERROR",
+          "Logowanie nie powiodło się. Sprawdź swoje dane uwierzytelniające."
+        );
         throw error;
       }
     },
@@ -53,7 +56,7 @@ const accountModule: Module<AccountState, any> = {
         commit("SET_USER", null);
       } catch (error) {
         console.error("Error logging out:", error);
-        commit("SET_ERROR", "Logout failed.");
+        commit("SET_ERROR", "Wylogowanie nie powiodło się");
       }
     },
 
@@ -61,10 +64,14 @@ const accountModule: Module<AccountState, any> = {
       commit("SET_ERROR", null);
       try {
         const response = await accountAPI.getUser();
-        commit("SET_USER", response.data);
+        commit("SET_USER", {
+          id: response.data.id,
+          name: response.data.userName,
+          email: response.data.email,
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
-        commit("SET_ERROR", "Failed to fetch user data.");
+        commit("SET_ERROR", "Nie udało się pobrać danych użytkownika.");
       }
     },
 
@@ -95,7 +102,7 @@ const accountModule: Module<AccountState, any> = {
         console.error("Error registering user:", error);
         commit(
           "SET_ERROR",
-          "Registration failed. Please check your input and try again."
+          error || "Rejestracja nie powiodła się. Spróbuj ponownie."
         );
         throw error;
       }

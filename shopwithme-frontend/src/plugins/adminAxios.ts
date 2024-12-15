@@ -27,9 +27,8 @@ export const productAPI = {
     description: string;
     price: number;
     categoryId: number;
-    technicalData?: string; // Uwzględniono dane techniczne
+    technicalData?: string;
   }) {
-    // Konwersja danych technicznych do JSON string
     const formattedTechnicalData = product.technicalData
       ? JSON.stringify(JSON.parse(product.technicalData))
       : null;
@@ -89,11 +88,9 @@ export const categoryAPI = {
     return adminAxios.get(`/ProductCategories/${id}`);
   },
   createCategory(category: { name: string }) {
-    console.log("Wysyłanie danych kategorii do API:", category);
     return adminAxios
       .post("/ProductCategories", { name: category.name })
       .then((response) => {
-        console.log("Utworzono kategorię. Odpowiedź API:", response.data);
         return response;
       })
       .catch((error) => {
@@ -122,6 +119,9 @@ export const accountAPI = {
   },
   logout() {
     return adminAxios.post("/Account/logout");
+  },
+  getAdminUser() {
+    return adminAxios.get("Account/get-user");
   },
 };
 

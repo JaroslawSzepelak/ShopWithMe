@@ -17,14 +17,32 @@
       <div class="user-menu">
         <i class="fas fa-user user-icon"></i>
         <div class="user-dropdown">
-          <router-link v-if="!isLoggedIn" to="/login">Zaloguj się</router-link>
-          <router-link v-else to="/profile">Profil</router-link>
-          <button v-if="isLoggedIn" class="logout-button" @click="handleLogout">
-            Wyloguj się
-          </button>
+          <template v-if="isLoggedIn || isAdminLoggedIn">
+            <div class="dropdown-header">
+              <span v-if="isAdminLoggedIn">
+                Witaj, {{ currentAdmin?.userName || "Administratorze" }}
+              </span>
+              <span v-else>
+                Witaj, {{ currentUser?.name || "Użytkowniku" }}
+              </span>
+            </div>
+            <button v-if="!isAdminLoggedIn" @click="openProfileModal">
+              Profil
+            </button>
+            <button class="logout-button" @click="handleLogout">
+              Wyloguj się
+            </button>
+          </template>
+          <template v-else>
+            <router-link to="/login">Zaloguj się</router-link>
+          </template>
         </div>
       </div>
     </div>
+    <UserProfileModal
+      :visible="isProfileModalVisible"
+      @close="isProfileModalVisible = false"
+    />
     <!-- Modal po wylogowaniu -->
     <AppModal
       :visible="showLogoutModal"
@@ -37,27 +55,35 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import CategoryDropdown from "@/components/CategoryDropdown.vue";
-import AppModal from "@/components/AppModal.vue";
-import { mapGetters, mapActions } from "vuex";
+import AppModal from "@/components/modals/AppModal.vue";
+import UserProfileModal from "@/components/modals/UserProfileModal.vue";
 
 @Component({
   components: {
     CategoryDropdown,
     AppModal,
-  },
-  computed: {
-    ...mapGetters("admin/adminAccount", ["isLoggedIn"]),
-  },
-  methods: {
-    ...mapActions("admin/adminAccount", ["logout"]),
+    UserProfileModal,
   },
 })
 export default class Navbar extends Vue {
   isDropdownVisible = false;
   showLogoutModal = false;
+  isProfileModalVisible = false;
 
   get isLoggedIn(): boolean {
-    return this.$store.getters["admin/adminAccount/isLoggedIn"];
+    return this.$store.getters["account/isLoggedIn"];
+  }
+
+  get isAdminLoggedIn(): boolean {
+    return this.$store.getters["admin/adminAccount/isAdminLoggedIn"];
+  }
+
+  get currentUser() {
+    return this.$store.getters["account/currentUser"];
+  }
+
+  get currentAdmin() {
+    return this.$store.getters["admin/adminAccount/adminUser"];
   }
 
   toggleDropdown(isOpen: boolean) {
@@ -72,7 +98,11 @@ export default class Navbar extends Vue {
 
   async handleLogout() {
     try {
-      await this.$store.dispatch("admin/adminAccount/logout");
+      if (this.isAdminLoggedIn) {
+        await this.$store.dispatch("admin/adminAccount/logout", "admin");
+      } else {
+        await this.$store.dispatch("account/logout");
+      }
       this.showLogoutModal = true;
 
       setTimeout(() => {
@@ -80,6 +110,28 @@ export default class Navbar extends Vue {
       }, 1000);
     } catch (error) {
       console.error("Błąd podczas wylogowywania:", error);
+    }
+  }
+
+  openProfileModal() {
+    this.isProfileModalVisible = true;
+  }
+
+  async mounted() {
+    if (this.isLoggedIn) {
+      try {
+        await this.$store.dispatch("account/fetchUser");
+      } catch (error) {
+        console.error("Błąd podczas pobierania danych użytkownika:", error);
+      }
+    }
+
+    if (this.isAdminLoggedIn) {
+      try {
+        await this.$store.dispatch("admin/adminAccount/fetchAdminUser");
+      } catch (error) {
+        console.error("Błąd podczas pobierania danych administratora:", error);
+      }
     }
   }
 
@@ -91,6 +143,7 @@ export default class Navbar extends Vue {
 
 <style scoped lang="scss">
 .navbar {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -176,6 +229,12 @@ export default class Navbar extends Vue {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 0.5rem;
       border: 1px solid #ddd;
+
+      .dropdown-header {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
 
       a,
       button {

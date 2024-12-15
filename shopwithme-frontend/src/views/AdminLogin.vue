@@ -34,32 +34,45 @@
         </div>
       </form>
     </div>
-    <!-- Modal for error -->
     <AppModal
       :visible="showErrorModal"
       :message="errorMessage"
       @close="closeModal"
+    />
+    <LoggedInModal
+      :visible="showAlreadyLoggedInModal"
+      @close="handleModalClose"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import AppModal from "@/components/AppModal.vue";
+import AppModal from "@/components/modals/AppModal.vue";
+import LoggedInModal from "@/components/modals/LoggedInModal.vue";
 
 @Component({
-  components: { AppModal },
+  components: { AppModal, LoggedInModal },
 })
 export default class AdminLogin extends Vue {
   username = "";
   password = "";
   showErrorModal = false;
   errorMessage = "";
+  showAlreadyLoggedInModal = false;
 
   errors = {
     username: "",
     password: "",
   };
+
+  async created() {
+    const isAdminLoggedIn =
+      this.$store.getters["admin/adminAccount/isAdminLoggedIn"];
+    if (isAdminLoggedIn) {
+      this.showAlreadyLoggedInModal = true;
+    }
+  }
 
   validateForm() {
     this.errors.username = this.username ? "" : "Login jest wymagany.";
@@ -76,6 +89,9 @@ export default class AdminLogin extends Vue {
         username: this.username,
         password: this.password,
       });
+
+      await this.$store.dispatch("admin/adminAccount/fetchAdminUser");
+
       this.$router.push("/admin");
     } catch (error: any) {
       console.error("Błąd logowania:", error);
@@ -88,6 +104,11 @@ export default class AdminLogin extends Vue {
 
   closeModal() {
     this.showErrorModal = false;
+  }
+
+  handleModalClose() {
+    this.showAlreadyLoggedInModal = false;
+    this.$router.push("/admin");
   }
 }
 </script>
@@ -102,6 +123,7 @@ export default class AdminLogin extends Vue {
 }
 
 .login-card {
+  box-sizing: border-box;
   background: #ffffff;
   padding: 2rem;
   border-radius: 10px;
@@ -126,6 +148,7 @@ h1 {
   }
 
   input {
+    box-sizing: border-box;
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;

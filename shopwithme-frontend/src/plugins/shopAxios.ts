@@ -126,10 +126,6 @@ export const categoryAPI = {
     return apiClient
       .delete(`/ProductCategories/${id}`)
       .then((response) => {
-        console.log(
-          "Odpowiedź na żądanie DELETE /ProductCategories:",
-          response
-        );
         return response;
       })
       .catch((error) => {

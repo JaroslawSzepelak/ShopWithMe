@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const accountAxios = axios.create({
-  baseURL: "http://localhost:5000/api/account",
+  baseURL: "http://localhost:5000/api/Account",
   headers: {
     "Content-Type": "application/json",
   },
@@ -9,25 +9,32 @@ const accountAxios = axios.create({
 });
 
 export const accountAPI = {
-  getUser() {
+  async getUser() {
     return accountAxios.get("/get-user");
   },
 
-  login(credentials: { name: string; password: string }) {
+  async login(credentials: { name: string; password: string }) {
     return accountAxios.post("/login", credentials);
   },
 
-  logout() {
+  async logout() {
     return accountAxios.post("/logout");
   },
 
-  register(registerData: {
+  async register(registerData: {
     userName: string;
     email: string;
     password: string;
     repeatPassword: string;
   }) {
-    return accountAxios.post("/register", registerData);
+    try {
+      return await accountAxios.post("/register", registerData);
+    } catch (error: any) {
+      if (error.response && error.response.status === 422) {
+        throw error.response.data;
+      }
+      throw error;
+    }
   },
 };
 

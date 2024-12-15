@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import AppModal from "./AppModal.vue";
+import AppModal from "./modals/AppModal.vue";
 
 @Component({
   components: {

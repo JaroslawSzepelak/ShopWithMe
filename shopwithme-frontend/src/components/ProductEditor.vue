@@ -117,7 +117,6 @@ export default class ProductEditor extends Vue {
         );
         const product =
           this.$store.getters["admin/adminProducts/selectedProduct"];
-        console.log("Załadowano produkt:", product);
         if (product) {
           this.product = {
             id: product.id || null,
@@ -130,10 +129,6 @@ export default class ProductEditor extends Vue {
               ? JSON.stringify(JSON.parse(product.technicalData), null, 2)
               : "",
           };
-          console.log(
-            "Sformatowane dane techniczne podczas edycji:",
-            this.product.technicalDetails
-          );
         }
       } catch (error) {
         console.error("Błąd podczas pobierania produktu:", error);
@@ -172,8 +167,6 @@ export default class ProductEditor extends Vue {
   async handleSave() {
     if (!this.validateForm()) return;
 
-    console.log("Przed wysłaniem danych:", this.product);
-
     const action = this.editMode ? "updateProduct" : "createProduct";
     const payload = {
       id: this.editMode ? this.product.id : undefined,
@@ -184,8 +177,6 @@ export default class ProductEditor extends Vue {
       categoryId: this.product.categoryId,
       technicalData: this.product.technicalDetails || null,
     };
-
-    console.log("Payload wysyłany do API:", payload);
 
     try {
       await this.$store.dispatch(`admin/adminProducts/${action}`, payload);

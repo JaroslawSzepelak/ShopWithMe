@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
 @Component({
   components: { ConfirmationModal },
@@ -155,7 +155,6 @@ export default class OrderAdmin extends Vue {
   async created(): Promise<void> {
     try {
       await this.$store.dispatch("order/fetchOrders");
-      console.log("Fetched orders:", this.$store.state.order.orders);
     } catch (error) {
       console.error("Błąd podczas pobierania zamówień:", error);
     }
@@ -175,6 +174,7 @@ export default class OrderAdmin extends Vue {
   }
 
   .spinner {
+    box-sizing: border-box;
     margin: 20px auto;
     width: 40px;
     height: 40px;

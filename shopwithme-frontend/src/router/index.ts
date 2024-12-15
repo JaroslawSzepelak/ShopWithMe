@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "@/views/Home.vue";
+import Login from "@/views/Login.vue";
+import Register from "@/views/Register.vue";
 import AdminLogin from "@/views/AdminLogin.vue";
 import ProductList from "@/views/ProductList.vue";
 import ProductDetails from "@/views/ProductDetails.vue";
@@ -23,6 +25,8 @@ const routes = [
   { path: "/", component: Home },
   { path: "/products", component: ProductList },
   { path: "*", component: NotFound },
+  { path: "/login", component: Login },
+  { path: "/register", name: "Register", component: Register },
   { path: "/admin/login", component: AdminLogin },
   {
     path: "/products/:id",
@@ -44,8 +48,8 @@ const routes = [
   },
   {
     path: "/admin",
-    redirect: "/admin/products",
     component: AdminPanel,
+    redirect: "/admin/products",
     children: [
       {
         path: "products",

@@ -111,7 +111,7 @@ namespace ShopWithMe.Controllers
 
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError("", $"Wystąpił problem podczas tworzenia konta: {error}");
+                ModelState.AddModelError("", $"Wystąpił problem podczas tworzenia konta: {error.Description}");
             }
 
             return UnprocessableEntity(ModelState);

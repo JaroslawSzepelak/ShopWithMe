@@ -46,6 +46,7 @@ export default class TechnicalDetails extends Vue {
 
 <style scoped lang="scss">
 .technical-details {
+  box-sizing: border-box;
   padding: 2rem;
   margin-top: 30px;
   margin-bottom: 30px;

@@ -41,7 +41,6 @@ export default class CategoryEditor extends Vue {
     if (this.editMode) {
       const categoryId = this.$route.params.id;
       try {
-        console.log("Pobieranie szczegółów kategorii o ID:", categoryId);
         await this.$store.dispatch(
           "admin/adminCategories/fetchCategory",
           categoryId
@@ -49,7 +48,6 @@ export default class CategoryEditor extends Vue {
         const fetchedCategory =
           this.$store.getters["admin/adminCategories/selectedCategory"];
         this.category = { id: fetchedCategory.id, name: fetchedCategory.name };
-        console.log("Załadowano kategorię:", this.category);
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
       }
@@ -71,14 +69,12 @@ export default class CategoryEditor extends Vue {
     }
 
     const action = this.editMode ? "updateCategory" : "createCategory";
-    console.log("Rozpoczynanie zapisu kategorii:", this.category);
 
     try {
       await this.$store.dispatch(
         `admin/adminCategories/${action}`,
         this.category
       );
-      console.log("Kategoria zapisana pomyślnie.");
       this.$router.push("/admin/categories");
     } catch (error) {
       console.error("Błąd podczas zapisywania kategorii:", error);

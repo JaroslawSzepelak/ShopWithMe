@@ -53,7 +53,7 @@
             id="pageSize"
             class="page-size-select"
             :value="pageSize"
-            @change="changePageSize($event.target.value)"
+            @change="changePageSize($event)"
           >
             <option value="10">10 na stronę</option>
             <option value="20">20 na stronę</option>
@@ -102,7 +102,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
 @Component({
   components: {
@@ -175,11 +175,10 @@ export default class CategoryAdmin extends Vue {
     }
   }
 
-  async changePageSize(size: number) {
-    await this.$store.dispatch(
-      "admin/adminCategories/changePageSize",
-      Number(size)
-    );
+  async changePageSize(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const size = Number(target.value);
+    await this.$store.dispatch("admin/adminCategories/changePageSize", size);
     this.scrollToTop();
   }
 

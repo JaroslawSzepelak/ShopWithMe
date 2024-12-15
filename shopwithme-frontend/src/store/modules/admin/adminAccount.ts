@@ -1,10 +1,12 @@
 import { Module } from "vuex";
 import { accountAPI } from "@/plugins/adminAxios";
+import router from "@/router";
 
 export interface AdminAccountState {
   loggedIn: boolean;
   adminLoggedIn: boolean;
   error: string | null;
+  adminUser: any | null;
 }
 
 const adminAccountModule: Module<AdminAccountState, any> = {
@@ -16,22 +18,21 @@ const adminAccountModule: Module<AdminAccountState, any> = {
       sessionStorage.getItem("adminLoggedIn") || "false"
     ),
     error: null,
+    adminUser: null,
   },
 
   mutations: {
-    SET_LOGGED_IN(
-      state,
-      { userType, status }: { userType: string; status: boolean }
-    ) {
-      if (userType === "admin") {
-        state.adminLoggedIn = status;
-        sessionStorage.setItem("adminLoggedIn", JSON.stringify(status));
-      }
+    SET_LOGGED_IN(state, { status }: { userType: string; status: boolean }) {
+      state.adminLoggedIn = status;
+      sessionStorage.setItem("adminLoggedIn", JSON.stringify(status));
       state.loggedIn = status;
       sessionStorage.setItem("loggedIn", JSON.stringify(status));
     },
     SET_ERROR(state, error: string | null) {
       state.error = error;
+    },
+    SET_ADMIN_USER(state, user: any) {
+      state.adminUser = user;
     },
   },
 
@@ -59,9 +60,22 @@ const adminAccountModule: Module<AdminAccountState, any> = {
       try {
         await accountAPI.logout();
         commit("SET_LOGGED_IN", { userType, status: false });
+        commit("SET_ADMIN_USER", null);
+        router.push("/admin/login");
       } catch (error) {
         console.error("Error logging out:", error);
         commit("SET_ERROR", "Logout failed.");
+      }
+    },
+
+    async fetchAdminUser({ commit }) {
+      commit("SET_ERROR", null);
+      try {
+        const response = await accountAPI.getAdminUser();
+        commit("SET_ADMIN_USER", response.data);
+      } catch (error) {
+        console.error("Error fetching admin user data:", error);
+        commit("SET_ERROR", "Failed to fetch admin user data.");
       }
     },
   },
@@ -75,6 +89,9 @@ const adminAccountModule: Module<AdminAccountState, any> = {
     },
     accountError(state): string | null {
       return state.error;
+    },
+    adminUser(state): any | null {
+      return state.adminUser;
     },
   },
 };

@@ -225,6 +225,7 @@ export default class ProductList extends Vue {
     height: 200px;
 
     .spinner {
+      box-sizing: border-box;
       width: 50px;
       height: 50px;
       border: 5px solid #ccc;

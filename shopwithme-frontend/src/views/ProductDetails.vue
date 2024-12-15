@@ -223,6 +223,7 @@ export default class ProductDetails extends Vue {
       }
 
       .thumbnail {
+        box-sizing: border-box;
         width: 60px;
         height: 60px;
         object-fit: cover;
@@ -306,6 +307,7 @@ export default class ProductDetails extends Vue {
       }
 
       .quantity-input {
+        box-sizing: border-box;
         width: 50px;
         height: 35px;
         text-align: center;

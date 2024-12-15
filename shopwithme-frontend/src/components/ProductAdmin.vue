@@ -109,7 +109,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import ConfirmationModal from "@/components/ConfirmationModal.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
 @Component({
   components: { ConfirmationModal },

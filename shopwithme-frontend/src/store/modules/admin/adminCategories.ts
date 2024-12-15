@@ -93,13 +93,11 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
       }
     },
 
-    async createCategory({ dispatch, commit }, category: { name: string }) {
+    async createCategory({ dispatch, commit }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
-        const response = await categoryAPI.createCategory(category);
-        console.log("Kategoria utworzona pomyślnie:", response.data);
         await dispatch("fetchCategories");
       } catch (error) {
         if (error instanceof Error) {

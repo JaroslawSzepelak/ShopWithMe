@@ -324,6 +324,7 @@ export default class SummaryView extends Vue {
   }
 
   .confirm-btn {
+    box-sizing: border-box;
     background-color: #c70a0a;
     color: white;
     border: none;

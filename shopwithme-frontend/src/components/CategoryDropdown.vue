@@ -134,6 +134,7 @@ export default class CategoryDropdown extends Vue {
   }
 
   .dropdown-menu {
+    box-sizing: border-box;
     position: absolute;
     top: calc(100% + 0.5rem);
     left: 0;
@@ -149,6 +150,7 @@ export default class CategoryDropdown extends Vue {
       display: flex;
 
       .categories {
+        box-sizing: border-box;
         list-style: none;
         margin: 0;
         padding: 0;

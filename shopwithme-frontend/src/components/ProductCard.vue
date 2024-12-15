@@ -40,6 +40,7 @@ export default class ProductCard extends Vue {
 
 <style scoped lang="scss">
 .product-card {
+  box-sizing: border-box;
   display: flex;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -89,6 +90,7 @@ export default class ProductCard extends Vue {
     }
 
     .details-btn {
+      box-sizing: border-box;
       background-color: #c70a0a;
       color: #fff;
       text-decoration: none;

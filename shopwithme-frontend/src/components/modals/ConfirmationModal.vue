@@ -52,6 +52,7 @@ export default defineComponent({
 }
 
 .modal-content {
+  box-sizing: border-box;
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;

@@ -95,7 +95,7 @@ const cartModule: Module<CartState, any> = {
       }
     },
     async updateItem(
-      { commit, dispatch },
+      { commit },
       { productId, quantity }: { productId: number; quantity: number }
     ) {
       try {

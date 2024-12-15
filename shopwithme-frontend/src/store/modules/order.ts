@@ -44,7 +44,6 @@ const orderModule: Module<OrderState, any> = {
       commit("SET_ERROR", null);
       try {
         const response = await orderAPI.getOrders();
-        console.log("Fetched orders from API:", response.data);
         commit("SET_ORDERS", response.data);
       } catch (error) {
         console.error("Error fetching orders:", error);

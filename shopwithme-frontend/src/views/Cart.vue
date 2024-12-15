@@ -314,6 +314,7 @@ export default class Cart extends Vue {
         }
 
         .quantity-input {
+          box-sizing: border-box;
           width: 50px;
           height: 35px;
           text-align: center;

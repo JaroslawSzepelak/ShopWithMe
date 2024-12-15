@@ -80,6 +80,7 @@ export default {
 }
 
 .circle {
+  box-sizing: border-box;
   width: 60px;
   height: 60px;
   border-radius: 50%;

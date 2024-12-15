@@ -37,24 +37,26 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class AdminPanel extends Vue {
   get isAdminLoggedIn(): boolean {
-    return this.$store.getters["admin/adminProducts/isAdminLoggedIn"];
+    return this.$store.getters["admin/adminAccount/isAdminLoggedIn"];
   }
 
-  created() {
-    if (this.$route.path === "/admin") {
-      this.$router.push("/admin/products");
-    }
-  }
+  async created() {
+    try {
+      await this.$store.dispatch("admin/adminAccount/fetchAdminUser");
 
-  @Watch("isAdminLoggedIn")
-  onAdminLoggedInChange(newVal: boolean) {
-    if (!newVal) {
-      this.$router.push("/admin/login");
+      if (!this.isAdminLoggedIn) {
+        this.$router.push("/admin/login");
+      }
+    } catch (error) {
+      console.error(
+        "Błąd podczas sprawdzania statusu logowania administratora:",
+        error
+      );
     }
   }
 }
@@ -95,6 +97,7 @@ export default class AdminPanel extends Vue {
 }
 
 .admin-sidebar .btn {
+  box-sizing: border-box;
   width: 100%;
   text-align: left;
   font-size: 1.2rem;
@@ -109,7 +112,7 @@ export default class AdminPanel extends Vue {
 }
 
 .admin-sidebar .active {
-  background-color: #495057 !important;
+  background-color: #495057;
   font-weight: bold;
 }
 
