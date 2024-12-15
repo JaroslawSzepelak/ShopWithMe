@@ -2,7 +2,14 @@
   <div class="suggested-products">
     <h2>Proponowane dla Ciebie</h2>
 
-    <div v-if="products.length > 0" class="carousel-container">
+    <!-- Loading Spinner -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Ładowanie produktów...</p>
+    </div>
+
+    <!-- Carousel Content -->
+    <div v-else-if="products.length > 0" class="carousel-container">
       <button class="arrow-btn prev-btn" @click="prevProducts">❮</button>
       <div class="carousel">
         <div class="products-list">
@@ -44,11 +51,12 @@
       <button class="arrow-btn next-btn" @click="nextProducts">❯</button>
     </div>
 
+    <!-- No Products -->
     <div v-else>
       <p>Brak proponowanych produktów.</p>
     </div>
 
-    <!-- Update Modal usage -->
+    <!-- Modal -->
     <AppModal
       :visible="showModal"
       :message="modalMessage"
@@ -71,14 +79,17 @@ export default class SuggestedProducts extends Vue {
   pageIndex = 1;
   products: any[] = [];
   totalRows = 0;
+  totalPages = 0;
   showModal = false;
   modalMessage = "";
+  isLoading = false;
 
   async mounted() {
     await this.fetchSuggestedProducts();
   }
 
   async fetchSuggestedProducts() {
+    this.isLoading = true; // Start loading
     try {
       await this.$store.dispatch(
         "products/fetchSuggestedProducts",
@@ -86,16 +97,18 @@ export default class SuggestedProducts extends Vue {
       );
       this.products = this.$store.state.products.products;
       this.totalRows = this.$store.state.products.totalRows;
+      this.totalPages = Math.ceil(
+        this.totalRows / this.$store.state.products.suggestedPageSize
+      );
     } catch (error) {
       console.error("Error fetching suggested products:", error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async nextProducts() {
-    if (
-      this.pageIndex <
-      Math.ceil(this.totalRows / this.$store.state.products.suggestedPageSize)
-    ) {
+    if (this.pageIndex < this.totalPages) {
       this.pageIndex++;
       await this.fetchSuggestedProducts();
     } else {
@@ -276,6 +289,38 @@ export default class SuggestedProducts extends Vue {
     &.next-btn {
       position: absolute;
       right: 0;
+    }
+  }
+
+  .loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      box-sizing: border-box;
+      border: 6px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 6px solid #c70a0a;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    p {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #555;
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 }
