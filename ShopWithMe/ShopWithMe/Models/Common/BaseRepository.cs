@@ -80,5 +80,19 @@ namespace ShopWithMe.Models.Common
             await _context.SaveChangesAsync();
         }
         #endregion
+
+        #region SaveChanges()
+        public virtual void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+        #endregion
+
+        #region SaveChangesAsync()
+        public virtual async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+        #endregion
     }
 }

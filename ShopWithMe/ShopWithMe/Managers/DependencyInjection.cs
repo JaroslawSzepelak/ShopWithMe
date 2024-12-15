@@ -1,4 +1,5 @@
-﻿using ShopWithMe.Managers.ProductCategories;
+﻿using ShopWithMe.Managers.Orders;
+using ShopWithMe.Managers.ProductCategories;
 using ShopWithMe.Managers.Products;
 
 namespace ShopWithMe.Managers
@@ -10,6 +11,7 @@ namespace ShopWithMe.Managers
         {
             services = services.AddScoped<ProductsManager>();
             services = services.AddScoped<ProductCategoriesManager>();
+            services = services.AddScoped<OrdersManager>();
 
             return services;
         }

@@ -14,5 +14,7 @@ namespace ShopWithMe.Models.Common
         Task UpdateAsync(TEntity entity);
         void Delete(TEntity entity);
         Task DeleteAsync(TEntity entity);
+        void SaveChanges();
+        Task SaveChangesAsync();
     }
 }

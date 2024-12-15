@@ -30,7 +30,7 @@ namespace ShopWithMe.Controllers
 
         #region UpdateCartLine()
         [HttpPut]
-        public IActionResult UpdateCartLine([FromBody] CartLineUpdateMOdel model)
+        public IActionResult UpdateCartLine([FromBody] CartLineUpdateModel model)
         {
             var cartLine = _cart.Lines.FirstOrDefault(c1 => c1.Product.Id == model.ProductId);
 
@@ -45,7 +45,7 @@ namespace ShopWithMe.Controllers
 
         #region AddItem()
         [HttpPost]
-        public IActionResult AddItem([FromBody] CartLineUpdateMOdel model)
+        public IActionResult AddItem([FromBody] CartLineUpdateModel model)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == model.ProductId);
 
