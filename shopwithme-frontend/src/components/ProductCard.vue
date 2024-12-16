@@ -11,12 +11,9 @@
       <p class="product-price">
         <strong>Cena:</strong> {{ product.price }} PLN
       </p>
-      <router-link
-        :to="{ name: 'ProductDetails', params: { id: product.id } }"
-        class="details-btn"
-      >
+      <a @click="goToProduct(product.id)" class="details-btn">
         Zobacz szczegóły
-      </router-link>
+      </a>
     </div>
   </div>
 </template>
@@ -35,6 +32,14 @@ export default class ProductCard extends Vue {
   };
 
   placeholderImage = "https://placehold.co/300x300";
+
+  goToProduct(productId: number) {
+    this.$router.push({
+      name: "ProductDetails",
+      params: { id: productId.toString() },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 </script>
 
@@ -91,6 +96,8 @@ export default class ProductCard extends Vue {
 
     .details-btn {
       box-sizing: border-box;
+      cursor: pointer;
+      display: inline-block;
       background-color: #c70a0a;
       color: #fff;
       text-decoration: none;
@@ -100,6 +107,7 @@ export default class ProductCard extends Vue {
       width: 50%;
       margin: 0 auto;
       text-align: center;
+      transition: background-color 0.3s;
 
       &:hover {
         background-color: #a50e0e;

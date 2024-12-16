@@ -2,6 +2,7 @@ import { Module } from "vuex";
 import adminProductsModule, { AdminProductState } from "./adminProducts";
 import adminCategoriesModule, { AdminCategoryState } from "./adminCategories";
 import adminAccountModule, { AdminAccountState } from "./adminAccount";
+import adminOrdersModule from "./adminOrders";
 
 interface AdminState {
   adminProducts: AdminProductState;
@@ -15,6 +16,7 @@ const adminModule: Module<AdminState, any> = {
     adminProducts: adminProductsModule,
     adminCategories: adminCategoriesModule,
     adminAccount: adminAccountModule,
+    adminOrders: adminOrdersModule,
   },
 };
 

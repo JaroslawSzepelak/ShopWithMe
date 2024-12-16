@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import CategoryDropdown from "@/components/CategoryDropdown.vue";
+import CategoryDropdown from "@/components/homeComponents/CategoryDropdown.vue";
 import AppModal from "@/components/modals/AppModal.vue";
 import UserProfileModal from "@/components/modals/UserProfileModal.vue";
 

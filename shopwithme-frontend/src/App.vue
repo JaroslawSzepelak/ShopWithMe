@@ -15,8 +15,8 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Navbar from "./components/Navbar.vue";
-import Footer from "./components/Footer.vue";
+import Navbar from "./components/homeComponents/Navbar.vue";
+import Footer from "./components/homeComponents/Footer.vue";
 import AppModal from "@/components/modals/AppModal.vue";
 
 @Component({

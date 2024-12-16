@@ -24,9 +24,9 @@
               class="product-image"
             />
             <div class="product-info">
-              <router-link :to="`/products/${product.id}`" class="product-name">
+              <a @click="goToProduct(product.id)" class="product-name">
                 {{ product.name || "Nazwa produktu" }}
-              </router-link>
+              </a>
               <p class="product-description">
                 {{ product.lead || "Opis wstępny produktu" }}
               </p>
@@ -56,6 +56,12 @@
       <p>Brak proponowanych produktów.</p>
     </div>
 
+    <div class="view-all-products" v-if="!isLoading && products.length > 0">
+      <router-link to="/products" class="btn-view-all">
+        Zobacz wszystkie produkty
+      </router-link>
+    </div>
+
     <!-- Modal -->
     <AppModal
       :visible="showModal"
@@ -67,7 +73,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import AppModal from "./modals/AppModal.vue";
+import AppModal from "@/components/modals/AppModal.vue";
 
 @Component({
   components: {
@@ -89,7 +95,7 @@ export default class SuggestedProducts extends Vue {
   }
 
   async fetchSuggestedProducts() {
-    this.isLoading = true; // Start loading
+    this.isLoading = true;
     try {
       await this.$store.dispatch(
         "products/fetchSuggestedProducts",
@@ -145,6 +151,11 @@ export default class SuggestedProducts extends Vue {
     }
   }
 
+  goToProduct(productId: number) {
+    this.$router.push(`/products/${productId}`).then(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
   goToCart() {
     this.$router.push("/cart");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -217,6 +228,7 @@ export default class SuggestedProducts extends Vue {
       margin-top: 0.5rem;
 
       .product-name {
+        cursor: pointer;
         font-size: 1.1rem;
         color: #333;
         font-weight: bold;
@@ -289,6 +301,25 @@ export default class SuggestedProducts extends Vue {
     &.next-btn {
       position: absolute;
       right: 0;
+    }
+  }
+
+  .view-all-products {
+    margin-top: 100px;
+
+    .btn-view-all {
+      display: inline-block;
+      padding: 20px 30px;
+      font-size: 1.2rem;
+      background-color: #c70a0a;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #a50d0d;
+      }
     }
   }
 

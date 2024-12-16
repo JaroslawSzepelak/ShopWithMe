@@ -112,6 +112,34 @@ export const categoryAPI = {
   },
 };
 
+// API dla zamówień
+export const orderAPI = {
+  getOrders(pageIndex: number, pageSize: number) {
+    return adminAxios.get("/Orders", {
+      params: { pageIndex, pageSize },
+    });
+  },
+  getOrder(id: number) {
+    return adminAxios.get(`/Orders/${id}`);
+  },
+  updateOrder(order: {
+    id: number;
+    cartLines: any[];
+    contactData: any;
+    totalAmount: number;
+  }) {
+    return adminAxios.put("/Orders", order);
+  },
+  addCartLine(cartLine: { productId: number; quantity: number }) {
+    return adminAxios.post("/Orders/cart-line", cartLine);
+  },
+  removeCartLine(cartLine: { productId: number; orderId: number }) {
+    return adminAxios.delete("/Orders/cart-line", {
+      data: cartLine,
+    });
+  },
+};
+
 // API dla kont administratora
 export const accountAPI = {
   login(credentials: { name: string; password: string }) {

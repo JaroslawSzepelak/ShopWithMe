@@ -1,7 +1,7 @@
 <template>
   <div>
-    <WelcomeSection class="welcome" />
     <ProductCarousel class="productCarousel" />
+    <WelcomeSection class="welcome" />
     <PromotionsSection />
     <SuggestedProducts />
     <AboutSection />
@@ -10,11 +10,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import WelcomeSection from "@/components/WelcomeSection.vue";
-import ProductCarousel from "@/components/ProductCarousel.vue";
-import PromotionsSection from "@/components/PromotionsSection.vue";
-import SuggestedProducts from "@/components/SuggestedProducts.vue";
-import AboutSection from "@/components/AboutSection.vue";
+import WelcomeSection from "@/components/homeComponents/WelcomeSection.vue";
+import ProductCarousel from "@/components/homeComponents/OffersCarousel.vue";
+import PromotionsSection from "@/components/homeComponents/PromotionsSection.vue";
+import SuggestedProducts from "@/components/homeComponents/SuggestedProducts.vue";
+import AboutSection from "@/components/homeComponents/AboutSection.vue";
 
 @Component({
   components: {
@@ -30,8 +30,8 @@ export default class Home extends Vue {}
 
 <style scoped>
 .welcome {
-  max-width: 1200px;
   margin-left: 30px;
+  margin-right: 30px;
 }
 .productCarousel {
   margin-top: 30px;

@@ -108,6 +108,12 @@ export default class ProductDetails extends Vue {
     return this.$store.getters["cart/isProductInCart"](this.product.id);
   }
 
+  beforeRouteEnter(to, from, next) {
+    next(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
   async created() {
     const productId = Number(this.$route.params.id);
     await this.fetchProduct(productId);

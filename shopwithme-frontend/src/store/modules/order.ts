@@ -52,21 +52,6 @@ const orderModule: Module<OrderState, any> = {
         commit("SET_LOADING", false);
       }
     },
-    /*
-    async fetchOrderById({ commit }, id: number) {
-      commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
-      try {
-        const response = await orderAPI.getOrderById(id);
-        commit("SET_SELECTED_ORDER", response.data);
-      } catch (error) {
-        console.error("Error fetching order by ID:", error);
-        commit("SET_ERROR", "Failed to fetch order by ID.");
-      } finally {
-        commit("SET_LOADING", false);
-      }
-    },
-    */
     async fetchOrderSummary({ commit }) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);

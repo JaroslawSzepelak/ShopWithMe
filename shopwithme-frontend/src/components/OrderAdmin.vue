@@ -1,10 +1,13 @@
 <template>
   <div class="order-admin">
     <h4 class="orders-header text-white text-center py-3">Zamówienia</h4>
+    <!-- Loading Spinner -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="spinner"></div>
       <p>Ładowanie zamówień...</p>
     </div>
+
+    <!-- Orders Table -->
     <div v-else>
       <div class="form-group text-center my-3">
         <input
@@ -21,30 +24,22 @@
         <thead class="thead-dark">
           <tr>
             <th>ID</th>
-            <th>Imię i nazwisko</th>
-            <th>Miasto, kod pocztowy</th>
-            <th class="text-right">Suma łączna</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Email</th>
             <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="displayOrders.length === 0">
-            <td colspan="5" class="text-center">Nie ma zamówień</td>
+            <td colspan="4" class="text-center">Brak zamówień</td>
           </tr>
           <tr v-for="order in displayOrders" :key="order.id">
             <td>{{ order.id }}</td>
-            <td>{{ getFullName(order) }}</td>
-            <td>{{ `${order.city}, ${order.zip}` }}</td>
-            <td class="text-right">
-              {{ calculateTotal(order).toFixed(2) }} PLN
-            </td>
+            <td>{{ order.firstname }}</td>
+            <td>{{ order.lastname }}</td>
+            <td>{{ order.email }}</td>
             <td class="text-center">
-              <button
-                class="btn btn-sm btn-warning mx-1"
-                @click="toggleShipped(order)"
-              >
-                {{ order.shipped ? "Anuluj wysyłkę" : "Potwierdź wysyłkę" }}
-              </button>
               <button
                 class="btn btn-sm btn-primary mx-1"
                 @click="viewOrderDetails(order)"
@@ -52,27 +47,60 @@
                 Szczegóły
               </button>
               <button
-                class="btn btn-sm btn-danger mx-1"
-                @click="confirmRemoveOrder(order)"
+                class="btn btn-sm btn-warning mx-1"
+                @click="editOrder(order)"
               >
-                Usuń
+                Edytuj
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <!-- Confirmation Modal -->
-    <ConfirmationModal
-      v-if="showConfirmModal"
-      :visible="showConfirmModal"
-      :message="
-        'Czy na pewno chcesz usunąć zamówienie: ' + orderToDelete?.id + '?'
-      "
-      @confirm="removeOrder"
-      @close="closeModal"
-    />
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <div class="page-size-selector">
+          <label for="pageSize">Ilość zamówień na stronę:</label>
+          <select
+            id="pageSize"
+            class="page-size-select"
+            :value="pageSize"
+            @change="changePageSize($event)"
+          >
+            <option value="10">10 na stronę</option>
+            <option value="20">20 na stronę</option>
+            <option value="30">30 na stronę</option>
+          </select>
+        </div>
+        <div class="pagination-controls">
+          <button
+            :disabled="pageIndex === 1"
+            @click="changePage(pageIndex - 1)"
+            class="btn btn-secondary"
+          >
+            Poprzednia
+          </button>
+          <span v-for="page in visiblePages" :key="page">
+            <button
+              v-if="page !== -1"
+              class="btn"
+              :class="{ 'btn-primary': page === pageIndex }"
+              @click="changePage(page)"
+            >
+              {{ page }}
+            </button>
+            <span v-else class="dots">...</span>
+          </span>
+          <button
+            :disabled="pageIndex === totalPages"
+            @click="changePage(pageIndex + 1)"
+            class="btn btn-secondary"
+          >
+            Następna
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -89,7 +117,7 @@ export default class OrderAdmin extends Vue {
   orderToDelete: any = null;
 
   get displayOrders() {
-    const orders = this.$store.getters["order/allOrders"];
+    const orders = this.$store.getters["admin/adminOrders/allOrders"];
     return orders
       ? this.showShipped
         ? orders
@@ -97,37 +125,71 @@ export default class OrderAdmin extends Vue {
       : [];
   }
 
+  get pageSize() {
+    return this.$store.getters["admin/adminOrders/pageSize"];
+  }
+
+  get pageIndex() {
+    return this.$store.getters["admin/adminOrders/pageIndex"];
+  }
+
+  get totalPages() {
+    return this.$store.getters["admin/adminOrders/totalPages"];
+  }
+
   get isLoading() {
-    return this.$store.getters["order/isOrderLoading"];
+    return this.$store.getters["admin/adminOrders/isLoading"];
+  }
+
+  get visiblePages(): number[] {
+    const maxVisible = 5;
+    const pages: number[] = [];
+    pages.push(1);
+
+    if (this.totalPages <= maxVisible) {
+      for (let i = 2; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const minPage = Math.max(2, this.pageIndex - 2);
+      const maxPage = Math.min(this.totalPages - 1, this.pageIndex + 2);
+
+      if (minPage > 2) pages.push(-1);
+
+      for (let i = minPage; i <= maxPage; i++) {
+        pages.push(i);
+      }
+
+      if (maxPage < this.totalPages - 1) pages.push(-1);
+
+      pages.push(this.totalPages);
+    }
+
+    return pages;
   }
 
   getFullName(order: any): string {
     return `${order.firstname || ""} ${order.lastname || ""}`.trim();
   }
-
-  calculateTotal(order: any): number {
-    if (order.lines && Array.isArray(order.lines)) {
-      return order.lines.reduce((total: number, line: any) => {
-        const quantity = line.quantity || 0;
-        const price = line.product?.price || 0;
-        return total + quantity * price;
-      }, 0);
-    }
-    return 0;
+  async toggleShipped(order: any) {
+    const updatedOrder = { ...order, shipped: !order.shipped };
+    await this.$store.dispatch("admin/adminOrders/updateOrder", updatedOrder);
+    await this.$store.dispatch("admin/adminOrders/fetchOrders");
   }
 
-  async toggleShipped(order: any): Promise<void> {
-    try {
-      const updatedOrder = { ...order, shipped: !order.shipped };
-      await this.$store.dispatch("order/updateOrder", updatedOrder);
-      await this.$store.dispatch("order/fetchOrders");
-    } catch (error) {
-      console.error("Błąd podczas aktualizacji zamówienia:", error);
+  async changePage(page: number) {
+    if (page > 0 && page <= this.totalPages) {
+      await this.$store.dispatch("admin/adminOrders/changePage", page);
     }
+  }
+
+  async changePageSize(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const size = Number(target.value);
+    await this.$store.dispatch("admin/adminOrders/changePageSize", size);
   }
 
   viewOrderDetails(order: any) {
-    this.$store.dispatch("order/selectOrder", order);
     this.$router.push({ name: "OrderDetailsAdmin", params: { id: order.id } });
   }
 
@@ -140,24 +202,13 @@ export default class OrderAdmin extends Vue {
     this.orderToDelete = null;
     this.showConfirmModal = false;
   }
-  async removeOrder() {
-    if (!this.orderToDelete) return;
 
-    try {
-      await this.$store.dispatch("order/deleteOrder", this.orderToDelete.id);
-      this.closeModal();
-      await this.$store.dispatch("order/fetchOrders");
-    } catch (error) {
-      console.error("Błąd podczas usuwania zamówienia:", error);
-    }
+  editOrder(order: any) {
+    this.$router.push({ name: "OrderEditAdmin", params: { id: order.id } });
   }
 
-  async created(): Promise<void> {
-    try {
-      await this.$store.dispatch("order/fetchOrders");
-    } catch (error) {
-      console.error("Błąd podczas pobierania zamówień:", error);
-    }
+  async created() {
+    await this.$store.dispatch("admin/adminOrders/fetchOrders");
   }
 }
 </script>
@@ -235,6 +286,67 @@ export default class OrderAdmin extends Vue {
 
     &:hover {
       background-color: #c82333;
+    }
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      label {
+        font-size: 1rem;
+        font-weight: bold;
+      }
+
+      .page-size-select {
+        padding: 5px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 10px;
+
+      .btn {
+        padding: 10px 15px;
+        background-color: #555;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          background-color: #333;
+        }
+
+        &.btn-primary {
+          background-color: #111;
+          border-color: #000;
+        }
+
+        &:disabled {
+          background-color: #888;
+          cursor: not-allowed;
+        }
+      }
+
+      .dots {
+        padding: 10px 15px;
+        color: #777;
+        font-weight: bold;
+        cursor: default;
+      }
     }
   }
 }
