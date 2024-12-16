@@ -1,5 +1,6 @@
 ﻿using ShopWithMe.Models.ProductCategories.Admin;
 using ShopWithMe.Models.ProductCategories.Public;
+using ShopWithMe.Models.Products;
 using AdminModel = ShopWithMe.Models.ProductCategories.Admin;
 using PublicModel = ShopWithMe.Models.ProductCategories.Public;
 
@@ -7,6 +8,15 @@ namespace ShopWithMe.Models.ProductCategories
 {
     public class ProductCategoryModelsMapper
     {
+        protected ProductModelsMapper _mapper;
+
+        #region ProductCategoryModelsMapper()
+        public ProductCategoryModelsMapper(ProductModelsMapper mapper)
+        {
+            _mapper = mapper;
+        }
+        #endregion
+
         public void Map(AdminModel.ProductCategoryFormModel mapFrom, ProductCategory mapTo)
         {
             mapTo.Id = mapFrom.Id;
@@ -35,6 +45,7 @@ namespace ShopWithMe.Models.ProductCategories
         {
             mapTo.Id = mapFrom.Id;
             mapTo.Name = mapFrom.Name;
+            mapTo.Products = _mapper.MapToPublicListModel(mapFrom.Products.ToList());
         }
 
         public ProductCategoryFormModel MapToFormModel(ProductCategory mapFromList)

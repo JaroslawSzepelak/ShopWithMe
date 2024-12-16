@@ -37,9 +37,9 @@ namespace ShopWithMe.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<List<ProductCategoryListModel>> GetList()
+        public async Task<List<ProductCategoryListModel>> GetList([FromQuery] bool withProducts)
         {
-            var entries = await _manager.GetListAsync();
+            var entries = await _manager.GetListAsync(withProducts);
 
             return _mapper.MapToPublicListModel(entries);
         }
