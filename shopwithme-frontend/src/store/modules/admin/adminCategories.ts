@@ -3,6 +3,7 @@ import { categoryAPI } from "@/plugins/adminAxios";
 
 export interface AdminCategoryState {
   categories: any[];
+  allCategories: any[];
   selectedCategory: any | null;
   loading: boolean;
   error: string | null;
@@ -17,6 +18,7 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
 
   state: {
     categories: [],
+    allCategories: [],
     selectedCategory: null,
     loading: false,
     error: null,
@@ -29,6 +31,9 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
   mutations: {
     SET_CATEGORIES(state, categories: any[]) {
       state.categories = categories;
+    },
+    SET_ALL_CATEGORIES(state, allCategories: any[]) {
+      state.allCategories = allCategories;
     },
     SET_SELECTED_CATEGORY(state, category: any) {
       state.selectedCategory = category;
@@ -59,10 +64,10 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
       commit("SET_ERROR", null);
 
       try {
-        const response = await categoryAPI.getCategories({
-          pageIndex: state.pageIndex,
-          pageSize: state.pageSize,
-        });
+        const response = await categoryAPI.getCategories(
+          state.pageIndex,
+          state.pageSize
+        );
         const { result, pager } = response.data;
 
         commit("SET_CATEGORIES", result);
@@ -73,6 +78,21 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
         commit("SET_ERROR", "Nie udało się pobrać kategorii.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+
+    async fetchAllCategories({ commit }) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        const response = await categoryAPI.getAllCategories();
+        commit("SET_ALL_CATEGORIES", response.data);
+      } catch (error) {
+        console.error("Błąd podczas pobierania pełnej listy kategorii:", error);
+        commit("SET_ERROR", "Nie udało się pobrać pełnej listy kategorii.");
       } finally {
         commit("SET_LOADING", false);
       }
@@ -162,6 +182,9 @@ const adminCategoriesModule: Module<AdminCategoryState, any> = {
   getters: {
     allCategories(state) {
       return state.categories || [];
+    },
+    fullCategoryList(state) {
+      return state.allCategories || [];
     },
     selectedCategory(state) {
       return state.selectedCategory;

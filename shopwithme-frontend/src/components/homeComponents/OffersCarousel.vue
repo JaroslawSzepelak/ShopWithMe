@@ -6,7 +6,6 @@
       @mouseleave="startAutoSlide"
     >
       <div class="carousel-track" :style="trackStyle">
-        <!-- Baner jako odnośnik -->
         <div class="carousel-slide">
           <router-link to="/special-offers">
             <img

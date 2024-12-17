@@ -15,6 +15,8 @@ interface Product {
 interface ProductsState {
   products: Product[];
   paginatedProducts: Product[];
+  suggestedProducts: Product[];
+
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
@@ -23,6 +25,7 @@ interface ProductsState {
   suggestedPageSize: number;
   totalRows: number;
   totalPages: number;
+  totalSuggestedRows: number;
 }
 
 const productsModule: Module<ProductsState, any> = {
@@ -30,12 +33,14 @@ const productsModule: Module<ProductsState, any> = {
   state: {
     products: [],
     paginatedProducts: [],
+    suggestedProducts: [],
     selectedProduct: null,
     loading: false,
     error: null,
     currentPage: Number(sessionStorage.getItem("currentPage")) || 1,
     pageSize: Number(sessionStorage.getItem("pageSize")) || 10,
     suggestedPageSize: 5,
+    totalSuggestedRows: 0,
     totalRows: 0,
     totalPages: 0,
   },
@@ -66,6 +71,12 @@ const productsModule: Module<ProductsState, any> = {
     SET_PAGER_INFO(state, pager: { totalRows: number; totalPages: number }) {
       state.totalRows = pager.totalRows;
       state.totalPages = pager.totalPages;
+    },
+    SET_SUGGESTED_PRODUCTS(state, products: Product[]) {
+      state.suggestedProducts = products;
+    },
+    SET_TOTAL_SUGGESTED_ROWS(state, total: number) {
+      state.totalSuggestedRows = total;
     },
   },
   actions: {
@@ -116,7 +127,7 @@ const productsModule: Module<ProductsState, any> = {
       commit("SET_CURRENT_PAGE", 1);
       dispatch("fetchProducts");
     },
-    async fetchSuggestedProducts({ state, commit }, pageIndex) {
+    async fetchSuggestedProducts({ commit, state }, pageIndex: number) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
@@ -125,9 +136,10 @@ const productsModule: Module<ProductsState, any> = {
           pageIndex,
           state.suggestedPageSize
         );
-        const { result } = response.data;
+        const { result, pager } = response.data;
 
-        commit("SET_PRODUCTS", result);
+        commit("SET_SUGGESTED_PRODUCTS", result);
+        commit("SET_TOTAL_SUGGESTED_ROWS", pager.totalRows);
       } catch (error) {
         console.error("Error fetching suggested products:", error);
         commit("SET_ERROR", "Failed to fetch suggested products.");
@@ -135,6 +147,11 @@ const productsModule: Module<ProductsState, any> = {
         commit("SET_LOADING", false);
       }
     },
+
+    async refreshSuggestedProducts({ dispatch }) {
+      await dispatch("fetchSuggestedProducts", 1);
+    },
+
     updatePaginatedProducts({ state, commit }) {
       const pageSize = Number(state.pageSize);
       const currentPage = Number(state.currentPage);
@@ -163,8 +180,14 @@ const productsModule: Module<ProductsState, any> = {
     currentPage(state) {
       return state.currentPage;
     },
+    suggestedProducts(state): Product[] {
+      return state.suggestedProducts;
+    },
     suggestedPageSize(state) {
       return state.suggestedPageSize;
+    },
+    totalSuggestedPages(state): number {
+      return Math.ceil(state.totalSuggestedRows / state.suggestedPageSize);
     },
     pageSize(state) {
       return state.pageSize;

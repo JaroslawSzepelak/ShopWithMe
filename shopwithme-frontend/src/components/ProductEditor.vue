@@ -24,7 +24,7 @@
         <input class="form-control" v-model.trim="product.name" />
       </div>
       <div class="form-group">
-        <label>Lead</label>
+        <label>Wstęp</label>
         <input class="form-control" v-model.trim="product.lead" />
       </div>
       <div class="form-group">
@@ -96,13 +96,13 @@ export default class ProductEditor extends Vue {
   }
 
   get categories(): Array<any> {
-    return this.$store.getters["admin/adminCategories/allCategories"] || [];
+    return this.$store.getters["admin/adminCategories/fullCategoryList"] || [];
   }
 
   async created() {
     if (!this.categories.length) {
       try {
-        await this.$store.dispatch("admin/adminCategories/fetchCategories");
+        await this.$store.dispatch("admin/adminCategories/fetchAllCategories");
       } catch (error) {
         console.error("Błąd podczas pobierania kategorii:", error);
       }

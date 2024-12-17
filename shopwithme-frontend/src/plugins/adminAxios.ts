@@ -73,16 +73,20 @@ export const productAPI = {
 
 // API dla kategorii produktów
 export const categoryAPI = {
-  getCategories(params?: { pageIndex?: number; pageSize?: number }) {
-    if (params) {
-      return adminAxios.get("/ProductCategories", {
-        params: {
-          pageIndex: params.pageIndex || 1,
-          pageSize: params.pageSize || 10,
-        },
-      });
-    }
-    return adminAxios.get("/ProductCategories/all");
+  getCategories(pageIndex: number, pageSize: number, includeProducts = false) {
+    return adminAxios.get("/ProductCategories", {
+      params: {
+        pageIndex,
+        pageSize,
+        includeProducts,
+      },
+    });
+  },
+
+  getAllCategories(withProducts = false) {
+    return adminAxios.get("/ProductCategories/all", {
+      params: { withProducts },
+    });
   },
   getCategory(id: number) {
     return adminAxios.get(`/ProductCategories/${id}`);

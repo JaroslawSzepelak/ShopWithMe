@@ -51,6 +51,10 @@ const cartModule: Module<CartState, any> = {
         );
       }
     },
+    CLEAR_CART(state) {
+      state.items = [];
+      state.total = 0;
+    },
   },
 
   actions: {
@@ -103,6 +107,14 @@ const cartModule: Module<CartState, any> = {
         commit("UPDATE_ITEM_QUANTITY", { productId, quantity });
       } catch (error) {
         console.error("Błąd podczas aktualizacji ilości w koszyku:", error);
+      }
+    },
+    async clearCart({ commit }) {
+      try {
+        await cartAPI.clearCart();
+        commit("CLEAR_CART");
+      } catch (error) {
+        console.error("Błąd podczas czyszczenia koszyka:", error);
       }
     },
   },

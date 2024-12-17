@@ -15,8 +15,8 @@
         <div class="products-list">
           <div
             class="product-card"
-            v-for="(product, index) in products"
-            :key="index"
+            v-for="product in products"
+            :key="product.id"
           >
             <img
               :src="product.image || placeholderImage"
@@ -53,7 +53,7 @@
 
     <!-- No Products -->
     <div v-else>
-      <p>Brak proponowanych produktów.</p>
+      <p class="none-products">Brak proponowanych produktów.</p>
     </div>
 
     <div class="view-all-products" v-if="!isLoading && products.length > 0">
@@ -83,34 +83,30 @@ import AppModal from "@/components/modals/AppModal.vue";
 export default class SuggestedProducts extends Vue {
   placeholderImage = "https://placehold.co/200x200";
   pageIndex = 1;
-  products: any[] = [];
-  totalRows = 0;
-  totalPages = 0;
   showModal = false;
   modalMessage = "";
-  isLoading = false;
+
+  get products() {
+    return this.$store.getters["products/suggestedProducts"];
+  }
+
+  get isLoading() {
+    return this.$store.getters["products/isLoading"];
+  }
+
+  get totalPages() {
+    return this.$store.getters["products/totalSuggestedPages"];
+  }
 
   async mounted() {
     await this.fetchSuggestedProducts();
   }
 
   async fetchSuggestedProducts() {
-    this.isLoading = true;
-    try {
-      await this.$store.dispatch(
-        "products/fetchSuggestedProducts",
-        this.pageIndex
-      );
-      this.products = this.$store.state.products.products;
-      this.totalRows = this.$store.state.products.totalRows;
-      this.totalPages = Math.ceil(
-        this.totalRows / this.$store.state.products.suggestedPageSize
-      );
-    } catch (error) {
-      console.error("Error fetching suggested products:", error);
-    } finally {
-      this.isLoading = false;
-    }
+    await this.$store.dispatch(
+      "products/fetchSuggestedProducts",
+      this.pageIndex
+    );
   }
 
   async nextProducts() {
@@ -118,7 +114,7 @@ export default class SuggestedProducts extends Vue {
       this.pageIndex++;
       await this.fetchSuggestedProducts();
     } else {
-      this.modalMessage = "Brak kolejnych produktów.";
+      this.modalMessage = "To już ostatnia sekcja produktów.";
       this.showModal = true;
     }
   }
@@ -128,7 +124,7 @@ export default class SuggestedProducts extends Vue {
       this.pageIndex--;
       await this.fetchSuggestedProducts();
     } else {
-      this.modalMessage = "Jesteś na początku kolejki.";
+      this.modalMessage = "Jesteś na początku listy produktów.";
       this.showModal = true;
     }
   }
@@ -156,6 +152,7 @@ export default class SuggestedProducts extends Vue {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
   goToCart() {
     this.$router.push("/cart");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -171,6 +168,7 @@ export default class SuggestedProducts extends Vue {
 .suggested-products {
   text-align: center;
   padding: 2rem 1rem;
+  min-height: 500px;
   background-color: #f3f3f3;
 
   h2 {
@@ -281,6 +279,10 @@ export default class SuggestedProducts extends Vue {
     }
   }
 
+  .none-products {
+    margin-top: 200px;
+  }
+
   .arrow-btn {
     font-size: 2rem;
     color: #c70a0a;
@@ -328,6 +330,7 @@ export default class SuggestedProducts extends Vue {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 600px;
 
     .spinner {
       box-sizing: border-box;

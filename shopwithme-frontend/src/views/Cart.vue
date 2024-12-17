@@ -60,6 +60,12 @@
               <button @click="checkout" class="checkout-btn">
                 Dostawa zamówienia
               </button>
+              <button
+                @click="clearCartWithConfirmation"
+                class="checkout-btn clear-btn"
+              >
+                Wyczyść koszyk
+              </button>
               <button @click="goBack" class="back-btn">Wróć</button>
             </div>
           </div>
@@ -91,6 +97,13 @@
       </div>
     </div>
 
+    <ConfirmationModal
+      :visible="showClearCartModal"
+      message="Czy na pewno chcesz wyczyścić koszyk?"
+      @confirm="clearCart"
+      @close="showClearCartModal = false"
+    />
+
     <EmptyCartMessage
       v-if="!cartItems.length && !showConfirmModal && !showInfoModal"
     />
@@ -102,16 +115,19 @@ import { Component, Vue } from "vue-property-decorator";
 import { CartItem } from "@/store/modules/cart";
 import OrderProgress from "@/components/OrderProgress.vue";
 import EmptyCartMessage from "@/components/EmptyCartMessage.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
 @Component({
   components: {
     OrderProgress,
     EmptyCartMessage,
+    ConfirmationModal,
   },
 })
 export default class Cart extends Vue {
   placeholderImage = "https://placehold.co/100x100";
   showConfirmModal = false;
+  showClearCartModal = false;
   showInfoModal = false;
   currentProduct: CartItem | null = null;
   removedProduct: CartItem | null = null;
@@ -166,6 +182,19 @@ export default class Cart extends Vue {
       this.removedProduct = null;
     }
     this.showInfoModal = false;
+  }
+
+  clearCartWithConfirmation() {
+    this.showClearCartModal = true;
+  }
+
+  async clearCart() {
+    try {
+      await this.$store.dispatch("cart/clearCart");
+      this.showClearCartModal = false;
+    } catch (error) {
+      console.error("Błąd podczas czyszczenia koszyka:", error);
+    }
   }
 
   closeModal() {
@@ -374,6 +403,20 @@ export default class Cart extends Vue {
       border-radius: 5px;
       font-size: 1.1rem;
       cursor: pointer;
+
+      &:hover {
+        background-color: #a80808;
+      }
+    }
+
+    .clear-btn {
+      background-color: #fff;
+      color: #c70a0a;
+      border: 1px solid #c70a0a;
+
+      &:hover {
+        background-color: #ffecec;
+      }
     }
 
     .back-btn {
@@ -384,6 +427,10 @@ export default class Cart extends Vue {
       border-radius: 5px;
       font-size: 1rem;
       cursor: pointer;
+
+      &:hover {
+        background-color: #4a4a4a;
+      }
     }
   }
   .shop-btn {

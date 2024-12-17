@@ -82,6 +82,9 @@ export const cartAPI = {
         throw error;
       });
   },
+  clearCart() {
+    return apiClient.delete("/Cart/clear").then((response) => response);
+  },
 };
 
 // API dla kategorii produktów
