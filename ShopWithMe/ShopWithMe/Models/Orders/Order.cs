@@ -14,6 +14,7 @@ namespace ShopWithMe.Models.Orders
         public string Address { get; set; }
         public string City { get; set; }
         public string Zip { get; set; }
+        public DateTime DateCreated { get; set; }
 
         #region Order()
         public Order() { }

@@ -40,6 +40,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Address = mapFrom.Address;
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
+            mapTo.DateCreated = mapFrom.DateCreated;
         }
 
         public void Map(Order mapFrom, AdminModel.OrderListModel mapTo)

@@ -12,5 +12,12 @@ namespace ShopWithMe.Models
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Order> Orders { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Order>()
+                .Property(b => b.DateCreated)
+                .HasDefaultValueSql("getdate()");
+        }
     }
 }
