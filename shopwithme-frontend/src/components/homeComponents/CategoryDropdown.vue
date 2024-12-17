@@ -10,7 +10,7 @@
           <li
             v-for="category in categories"
             :key="category.id"
-            @mouseover="fetchProducts(category)"
+            @click="fetchProducts(category)"
           >
             {{ category.name }}
             <i class="fas fa-chevron-right"></i>
@@ -52,21 +52,21 @@ import { Component, Vue } from "vue-property-decorator";
 export default class CategoryDropdown extends Vue {
   isOpen = false;
   placeholderImage = "https://placehold.co/100x100";
+  selectedCategory: any = null;
 
   get categories() {
     return this.$store.getters["categories/allCategories"];
   }
 
   get products() {
-    const selectedCategory = this.$store.getters["categories/selectedCategory"];
-    return selectedCategory?.products || [];
+    return this.selectedCategory?.products || [];
   }
 
   async mounted() {
     try {
-      await this.$store.dispatch("categories/fetchCategories");
+      await this.$store.dispatch("categories/fetchAllCategories", true);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Błąd podczas pobierania kategorii z produktami:", error);
     }
     document.addEventListener("click", this.handleOutsideClick);
   }
@@ -79,16 +79,8 @@ export default class CategoryDropdown extends Vue {
     this.isOpen = !this.isOpen;
   }
 
-  async fetchProducts(category: { id: number; name: string }) {
-    console.log(`Fetching products for category: ${category.name}`);
-    try {
-      await this.$store.dispatch("categories/fetchCategory", category.id);
-    } catch (error) {
-      console.error(
-        `Error fetching products for category ${category.name}:`,
-        error
-      );
-    }
+  fetchProducts(category: { id: number; name: string }) {
+    this.selectedCategory = category;
   }
 
   goToProductDetails(productId: number) {

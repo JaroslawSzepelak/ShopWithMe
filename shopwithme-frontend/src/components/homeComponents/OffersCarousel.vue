@@ -1,17 +1,38 @@
 <template>
   <div class="carousel">
-    <div class="carousel-content">
+    <div
+      class="carousel-content"
+      @mouseenter="stopAutoSlide"
+      @mouseleave="startAutoSlide"
+    >
       <div class="carousel-track" :style="trackStyle">
-        <div
-          v-for="product in products"
-          :key="product.image"
-          class="carousel-slide"
-        >
-          <img :src="product.image" alt="product image" class="product-image" />
-          <div class="product-info">
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.price }} zł</p>
-          </div>
+        <!-- Baner jako odnośnik -->
+        <div class="carousel-slide">
+          <router-link to="/special-offers">
+            <img
+              src="@/assets/banners/Offers1.png"
+              alt="Special Offers"
+              class="product-image"
+            />
+          </router-link>
+        </div>
+        <div class="carousel-slide">
+          <router-link to="/special-offers">
+            <img
+              src="@/assets/banners/Offers2.png"
+              alt="Special Offers"
+              class="product-image"
+            />
+          </router-link>
+        </div>
+        <div class="carousel-slide">
+          <router-link to="/special-offers">
+            <img
+              src="@/assets/banners/Offers3.png"
+              alt="Special Offers"
+              class="product-image"
+            />
+          </router-link>
         </div>
       </div>
       <button class="arrow-btn prev-btn" @click="prevProduct">❮</button>
@@ -25,20 +46,11 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class ProductCarousel extends Vue {
-  products = [
+  offers = [
     {
-      name: "Telewizor MAX",
-      price: "3000,00",
-      image: "https://placehold.co/1200x600/abb7e7/7b8277",
-    },
-    {
-      name: "Laptop Pro",
-      price: "4500,00",
       image: "https://placehold.co/1200x600/abd4c7/7b8277",
     },
     {
-      name: "Smartfon X",
-      price: "1500,00",
       image: "https://placehold.co/1200x600/e6dcae/7b8277",
     },
   ];
@@ -62,7 +74,9 @@ export default class ProductCarousel extends Vue {
   }
 
   startAutoSlide() {
-    this.intervalId = window.setInterval(this.nextProduct, 5000);
+    if (!this.intervalId) {
+      this.intervalId = window.setInterval(this.nextProduct, 5000);
+    }
   }
 
   stopAutoSlide() {
@@ -73,12 +87,13 @@ export default class ProductCarousel extends Vue {
   }
 
   nextProduct() {
-    this.currentIndex = (this.currentIndex + 1) % this.products.length;
+    this.currentIndex = (this.currentIndex + 1) % (this.offers.length + 1);
   }
 
   prevProduct() {
     this.currentIndex =
-      (this.currentIndex - 1 + this.products.length) % this.products.length;
+      (this.currentIndex - 1 + this.offers.length + 1) %
+      (this.offers.length + 1);
   }
 }
 </script>
@@ -87,54 +102,31 @@ export default class ProductCarousel extends Vue {
 .carousel {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 600px;
   overflow: hidden;
 
   .carousel-content {
     position: relative;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
 
     .carousel-track {
       display: flex;
       transition: transform 0.6s ease-in-out;
-      width: 100%;
+      height: 100%;
     }
 
     .carousel-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-width: 100%;
       height: 100%;
-      position: relative;
 
       .product-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .product-info {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-align: left;
-
-        h3 {
-          margin: 0;
-          font-size: 1.5em;
-          color: #333;
-        }
-
-        p {
-          margin: 0;
-          font-size: 1.2em;
-          color: #333;
-          font-weight: bold;
-        }
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
       }
     }
 
@@ -149,14 +141,18 @@ export default class ProductCarousel extends Vue {
       color: red;
       padding: 0 10px;
       z-index: 2;
+
+      &:hover {
+        color: darkred;
+      }
     }
 
     .prev-btn {
-      left: 10px;
+      left: 40px;
     }
 
     .next-btn {
-      right: 10px;
+      right: 40px;
     }
   }
 }

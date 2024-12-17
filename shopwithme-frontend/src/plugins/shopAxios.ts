@@ -86,20 +86,26 @@ export const cartAPI = {
 
 // API dla kategorii produktów
 export const categoryAPI = {
-  getCategories(pageIndex: number, pageSize: number) {
+  getCategories(pageIndex: number, pageSize: number, includeProducts = false) {
     return apiClient.get("/ProductCategories", {
       params: {
         pageIndex,
         pageSize,
+        includeProducts,
       },
     });
   },
-  getAllCategories() {
-    return apiClient.get("/ProductCategories/all");
+
+  getAllCategories(withProducts = false) {
+    return apiClient.get("/ProductCategories/all", {
+      params: { withProducts },
+    });
   },
+
   getCategory(id: number) {
     return apiClient.get(`/ProductCategories/${id}`);
   },
+
   createCategory(name: string) {
     return apiClient
       .post("/ProductCategories", { name })
@@ -111,6 +117,7 @@ export const categoryAPI = {
         throw error;
       });
   },
+
   updateCategory(id: number, name: string) {
     return apiClient
       .put("/ProductCategories", { id, name })
@@ -122,6 +129,7 @@ export const categoryAPI = {
         throw error;
       });
   },
+
   deleteCategory(id: number) {
     return apiClient
       .delete(`/ProductCategories/${id}`)

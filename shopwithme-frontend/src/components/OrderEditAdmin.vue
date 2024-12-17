@@ -166,6 +166,7 @@ export default class OrderEditAdmin extends Vue {
   }
 
   async fetchProductsAutocomplete() {
+    /*
     try {
       const response = await this.$axios.get("/api/products/autocomplete", {
         params: { query: this.productSearch },
@@ -174,6 +175,7 @@ export default class OrderEditAdmin extends Vue {
     } catch (error) {
       console.error("Error fetching autocomplete:", error);
     }
+      */
   }
 
   addCartLine() {

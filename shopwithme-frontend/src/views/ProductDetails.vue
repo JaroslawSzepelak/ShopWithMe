@@ -52,12 +52,6 @@
         </div>
       </div>
     </div>
-    <div class="tabs">
-      <button>DANE TECHNICZNE</button>
-      <button>NAJCZĘŚCIEJ KUPOWANE RAZEM</button>
-      <button>OPINIE</button>
-      <button>PYTANIA I ODPOWIEDZI</button>
-    </div>
     <div class="description-section">
       <h2>Opis produktu</h2>
       <p>{{ product.description || "Brak opisu produktu." }}</p>
@@ -363,30 +357,6 @@ export default class ProductDetails extends Vue {
         &:hover {
           background-color: darken(#444, 20%);
         }
-      }
-    }
-  }
-
-  .tabs {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 3rem;
-    width: 100%;
-
-    button {
-      flex: 1;
-      padding: 1rem;
-      font-size: 1rem;
-      color: #c70a0a;
-      background-color: #fff;
-      text-transform: uppercase;
-      font-weight: bold;
-      border: 2px solid #c70a0a;
-      border-radius: 5px;
-      cursor: pointer;
-      &:hover {
-        background-color: #f9f9f9;
       }
     }
   }

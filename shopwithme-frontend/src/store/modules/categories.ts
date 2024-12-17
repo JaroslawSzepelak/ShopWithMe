@@ -4,6 +4,7 @@ import { categoryAPI } from "@/plugins/shopAxios";
 export interface Category {
   id: number;
   name: string;
+  products?: any[];
 }
 
 interface CategoryState {
@@ -78,14 +79,15 @@ const categoryModule: Module<CategoryState, any> = {
   },
 
   actions: {
-    async fetchCategories({ commit, state }) {
+    async fetchCategories({ commit, state }, includeProducts = false) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
         const response = await categoryAPI.getCategories(
           state.pageIndex,
-          state.pageSize
+          state.pageSize,
+          includeProducts
         );
         const { result, pager } = response.data;
 
@@ -104,7 +106,7 @@ const categoryModule: Module<CategoryState, any> = {
       commit("SET_ERROR", null);
 
       try {
-        const response = await categoryAPI.getAllCategories();
+        const response = await categoryAPI.getAllCategories(true);
         commit("SET_CATEGORIES", response.data);
       } catch (error) {
         console.error("Błąd podczas pobierania wszystkich kategorii:", error);
