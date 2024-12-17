@@ -35,6 +35,12 @@ namespace ShopWithMe.Models.Products
             mapTo.Category = mapFrom.Category?.Name;
         }
 
+        public void Map(Product mapFrom, AdminModel.ProductAutocompleteModel mapTo)
+        {
+            mapTo.Id = mapFrom.Id;
+            mapTo.Name = mapFrom.Name;
+        }
+
         public void Map(Product mapFrom, PublicModel.ProductDetailsModel mapTo)
         {
             mapTo.Id = mapFrom.Id;
@@ -70,6 +76,22 @@ namespace ShopWithMe.Models.Products
             foreach (var mapFrom in mapFromList)
             {
                 var mapTo = new AdminModel.ProductListModel();
+
+                Map(mapFrom, mapTo);
+
+                results.Add(mapTo);
+            }
+
+            return results;
+        }
+
+        public List<AdminModel.ProductAutocompleteModel> MapToAdminAutocompleteModel(List<Product> mapFromList)
+        {
+            var results = new List<AdminModel.ProductAutocompleteModel>();
+
+            foreach (var mapFrom in mapFromList)
+            {
+                var mapTo = new AdminModel.ProductAutocompleteModel();
 
                 Map(mapFrom, mapTo);
 

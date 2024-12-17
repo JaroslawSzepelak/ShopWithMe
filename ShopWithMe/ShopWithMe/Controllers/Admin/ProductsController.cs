@@ -40,6 +40,16 @@ namespace ShopWithMe.Controllers.Admin
         }
         #endregion
 
+        #region GetList()
+        [HttpGet("get-autocomplete")]
+        public async Task<List<ProductAutocompleteModel>> GetAutocomplete([FromQuery] string search)
+        {
+            var entries = await _manager.GetListAsync(search);
+
+            return _mapper.MapToAdminAutocompleteModel(entries);
+        }
+        #endregion
+
         #region Get()
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)

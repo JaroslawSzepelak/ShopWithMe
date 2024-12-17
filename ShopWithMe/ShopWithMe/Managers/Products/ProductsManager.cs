@@ -29,6 +29,14 @@ namespace ShopWithMe.Managers.Products
             return await query.ToListAsync();
         }
 
+        public async Task<List<Product>> GetListAsync(string search)
+        {
+            return await _repository.Entities
+                .Where(p => p.Name.Contains(search))
+                .Take(10)
+                .ToListAsync();
+        }
+
         public override async Task<List<Product>> GetListAsync(Pager pager)
         {
             return await GetListAsync(false, pager);
