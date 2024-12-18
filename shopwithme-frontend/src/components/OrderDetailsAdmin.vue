@@ -19,6 +19,9 @@
         </p>
         <p><strong>Email:</strong> {{ order.email }}</p>
         <p><strong>Telefon:</strong> {{ order.phoneNumber }}</p>
+        <p>
+          <strong>Data Złożenia:</strong> {{ formatDate(order.dateCreated) }}
+        </p>
       </div>
 
       <!-- Adres -->
@@ -87,6 +90,17 @@ export default class OrderDetailsAdmin extends Vue {
 
   async created() {
     await this.fetchOrderDetails();
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString("pl-PL", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   calculateTotal(order: any): number {

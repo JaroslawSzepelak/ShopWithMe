@@ -3,6 +3,7 @@ import { productAPI } from "@/plugins/adminAxios";
 
 export interface AdminProductState {
   products: any[];
+  autocompleteProducts: any[];
   selectedProduct: any | null;
   loading: boolean;
   error: string | null;
@@ -17,6 +18,7 @@ const adminProductsModule: Module<AdminProductState, any> = {
 
   state: {
     products: [],
+    autocompleteProducts: [],
     selectedProduct: null,
     loading: false,
     error: null,
@@ -29,6 +31,9 @@ const adminProductsModule: Module<AdminProductState, any> = {
   mutations: {
     SET_PRODUCTS(state, products: any[]) {
       state.products = products;
+    },
+    SET_AUTOCOMPLETE_PRODUCTS(state, products: any[]) {
+      state.autocompleteProducts = products;
     },
     SET_SELECTED_PRODUCT(state, product: any) {
       state.selectedProduct = product;
@@ -73,6 +78,21 @@ const adminProductsModule: Module<AdminProductState, any> = {
           throw error;
         }
         commit("SET_ERROR", "Failed to fetch products.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+
+    async fetchAutocompleteProducts({ commit }, search: string) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        const response = await productAPI.getProductsAutocomplete(search);
+        commit("SET_AUTOCOMPLETE_PRODUCTS", response.data);
+      } catch (error) {
+        console.error("Error fetching autocomplete products:", error);
+        commit("SET_ERROR", "Failed to fetch autocomplete products.");
       } finally {
         commit("SET_LOADING", false);
       }
@@ -151,6 +171,9 @@ const adminProductsModule: Module<AdminProductState, any> = {
   getters: {
     allProducts(state) {
       return state.products || [];
+    },
+    autocompleteProducts(state) {
+      return state.autocompleteProducts || [];
     },
     selectedProduct(state) {
       return state.selectedProduct || {};

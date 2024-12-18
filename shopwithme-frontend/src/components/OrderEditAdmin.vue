@@ -10,6 +10,13 @@
     <div v-else-if="order">
       <h2 class="text-center mb-4">Edytuj Zamówienie #{{ order.id }}</h2>
 
+      <!-- Order Details -->
+      <div class="order-details text-center mb-4">
+        <p>
+          <strong>Data złożenia:</strong> {{ formatDate(order.dateCreated) }}
+        </p>
+      </div>
+
       <!-- Order Form -->
       <form @submit.prevent="saveOrder" class="order-form mx-auto">
         <div class="order-section mb-4">
@@ -83,7 +90,7 @@
               <td>{{ line.product.price }} PLN</td>
               <td>
                 <button
-                  @click="removeCartLine(line)"
+                  @click="confirmRemoveCartLine(line)"
                   class="btn btn-sm btn-danger"
                 >
                   Usuń
@@ -99,21 +106,13 @@
           <div class="form-inline justify-content-center">
             <div class="form-group mr-2">
               <label class="mr-2">Produkt</label>
-              <input
-                v-model="productSearch"
-                @input="fetchProductsAutocomplete"
-                class="form-control"
-                placeholder="Wpisz nazwę produktu"
-                list="product-options"
+              <SearchAutocomplete
+                :isAsync="true"
+                :items="autocompleteProducts"
+                :isLoading="loadingAutocomplete"
+                @search="onProductSearch"
+                @select="onProductSelect"
               />
-              <datalist id="product-options">
-                <option
-                  v-for="product in autocompleteProducts"
-                  :key="product.id"
-                  :value="product.name"
-                  :data-id="product.id"
-                ></option>
-              </datalist>
             </div>
             <div class="form-group mr-2">
               <label class="mr-2">Ilość</label>
@@ -124,20 +123,42 @@
                 min="1"
               />
             </div>
-            <button @click="addCartLine" class="btn add-product-button">
+            <button
+              @click="addCartLine"
+              class="btn add-product-button"
+              :disabled="!selectedProduct"
+            >
               Dodaj
             </button>
           </div>
+          <p
+            v-if="!selectedProduct && productSearch.length > 0"
+            class="text-danger mt-2"
+          >
+            Musisz wybrać produkt z listy.
+          </p>
         </div>
       </div>
     </div>
+    <!-- Confirmation Modal -->
+    <ConfirmationModal
+      v-if="isConfirmationModalVisible"
+      :visible="isConfirmationModalVisible"
+      :message="'Czy na pewno chcesz usunąć produkt?'"
+      @confirm="removeCartLine"
+      @close="isConfirmationModalVisible = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import SearchAutocomplete from "@/components/SearchAutocomplete.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
-@Component
+@Component({
+  components: { SearchAutocomplete, ConfirmationModal },
+})
 export default class OrderEditAdmin extends Vue {
   order: any = null;
   form = {
@@ -151,11 +172,26 @@ export default class OrderEditAdmin extends Vue {
     zip: "",
   };
   productSearch = "";
-  autocompleteProducts: any[] = [];
+  autocompleteProducts: { id: number; name: string }[] = [];
+  selectedProduct: { id: number; name: string } | null = null;
+  loadingAutocomplete = false;
   newCartLine = { productId: 0, quantity: 1 };
+  isConfirmationModalVisible = false;
+  lineToRemove: any = null;
 
   get isLoading() {
     return this.$store.getters["admin/adminOrders/isLoading"];
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString("pl-PL", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   async fetchOrderDetails() {
@@ -165,40 +201,62 @@ export default class OrderEditAdmin extends Vue {
     Object.assign(this.form, this.order);
   }
 
-  async fetchProductsAutocomplete() {
-    /*
-    try {
-      const response = await this.$axios.get("/api/products/autocomplete", {
-        params: { query: this.productSearch },
-      });
-      this.autocompleteProducts = response.data;
-    } catch (error) {
-      console.error("Error fetching autocomplete:", error);
+  async onProductSearch(query: string) {
+    if (query.trim().length >= 3) {
+      this.loadingAutocomplete = true;
+      try {
+        await this.$store.dispatch(
+          "admin/adminProducts/fetchAutocompleteProducts",
+          query
+        );
+        this.autocompleteProducts =
+          this.$store.getters["admin/adminProducts/autocompleteProducts"];
+      } catch (error) {
+        console.error("Błąd podczas wyszukiwania produktów:", error);
+      } finally {
+        this.loadingAutocomplete = false;
+      }
+    } else {
+      this.autocompleteProducts = [];
     }
-      */
+  }
+
+  onProductSelect(product: { id: number; name: string }) {
+    console.log("Wybrany produkt:", product);
+    this.selectedProduct = product;
   }
 
   addCartLine() {
-    const product = this.autocompleteProducts.find(
-      (p) => p.name === this.productSearch
-    );
-    if (product) {
-      this.$store.dispatch("admin/adminOrders/updateCartLine", {
-        productId: product.id,
-        quantity: this.newCartLine.quantity,
-        orderId: this.order.id,
-      });
-    }
-  }
+    if (!this.selectedProduct) return;
 
-  removeCartLine(line: any) {
-    this.$store.dispatch("admin/adminOrders/removeCartLine", {
-      productId: line.product.id,
-      quantity: line.quantity,
+    console.log("Dodawanie produktu do zamówienia:", this.selectedProduct);
+    this.$store.dispatch("admin/adminOrders/updateCartLine", {
+      productId: this.selectedProduct.id,
+      quantity: this.newCartLine.quantity,
       orderId: this.order.id,
     });
+    this.selectedProduct = null;
+    this.autocompleteProducts = [];
+    this.productSearch = "";
+    location.reload();
   }
 
+  confirmRemoveCartLine(line: any) {
+    this.lineToRemove = line;
+    this.isConfirmationModalVisible = true;
+  }
+
+  removeCartLine() {
+    if (this.lineToRemove) {
+      this.$store.dispatch("admin/adminOrders/removeCartLine", {
+        productId: this.lineToRemove.product.id,
+        quantity: this.lineToRemove.quantity,
+        orderId: this.order.id,
+      });
+      this.isConfirmationModalVisible = false;
+      location.reload();
+    }
+  }
   async saveOrder() {
     await this.$store.dispatch("admin/adminOrders/updateOrder", this.form);
     this.$router.push({ name: "OrderAdmin" });
@@ -217,6 +275,7 @@ export default class OrderEditAdmin extends Vue {
 <style scoped lang="scss">
 .order-edit-admin {
   padding: 2rem;
+  padding-bottom: 200px;
   max-width: 900px;
   margin: auto;
 

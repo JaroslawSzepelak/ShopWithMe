@@ -27,18 +27,20 @@
             <th>Imię</th>
             <th>Nazwisko</th>
             <th>Email</th>
+            <th>Data Złożenia</th>
             <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="displayOrders.length === 0">
-            <td colspan="4" class="text-center">Brak zamówień</td>
+            <td colspan="6" class="text-center">Brak zamówień</td>
           </tr>
           <tr v-for="order in displayOrders" :key="order.id">
             <td>{{ order.id }}</td>
             <td>{{ order.firstname }}</td>
             <td>{{ order.lastname }}</td>
             <td>{{ order.email }}</td>
+            <td>{{ formatDate(order.dateCreated) }}</td>
             <td class="text-center">
               <button
                 class="btn btn-sm btn-primary mx-1"
@@ -168,9 +170,17 @@ export default class OrderAdmin extends Vue {
     return pages;
   }
 
-  getFullName(order: any): string {
-    return `${order.firstname || ""} ${order.lastname || ""}`.trim();
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString("pl-PL", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
+
   async toggleShipped(order: any) {
     const updatedOrder = { ...order, shipped: !order.shipped };
     await this.$store.dispatch("admin/adminOrders/updateOrder", updatedOrder);
@@ -212,7 +222,6 @@ export default class OrderAdmin extends Vue {
   }
 }
 </script>
-
 <style scoped lang="scss">
 .order-admin {
   .orders-header {

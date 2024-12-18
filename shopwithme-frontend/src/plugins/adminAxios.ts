@@ -21,6 +21,11 @@ export const productAPI = {
       },
     });
   },
+  getProductsAutocomplete(search: string) {
+    return adminAxios.get("/Products/get-autocomplete", {
+      params: { search },
+    });
+  },
   createProduct(product: {
     name: string;
     lead: string;

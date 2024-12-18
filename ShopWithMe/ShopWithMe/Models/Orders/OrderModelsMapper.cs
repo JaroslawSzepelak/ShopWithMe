@@ -49,6 +49,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Firstname = mapFrom.Firstname;
             mapTo.Lastname = mapFrom.Lastname;
             mapTo.Email = mapFrom.Email;
+            mapTo.DateCreated = mapFrom.DateCreated;
         }
 
         public void Map(Order mapFrom, PublicModel.OrderDetailsModel mapTo)
