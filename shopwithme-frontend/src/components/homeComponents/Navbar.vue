@@ -14,9 +14,18 @@
         </button>
       </div>
       <i class="fas fa-shopping-cart cart-icon" @click="goToCart"></i>
-      <div class="user-menu">
-        <i class="fas fa-user user-icon"></i>
-        <div class="user-dropdown">
+      <div class="user-menu" @mouseleave="hideDropdown">
+        <i
+          class="fas fa-user user-icon"
+          @mouseenter="showDropdown"
+          @click="toggleDropdownVisible"
+        ></i>
+        <div
+          v-if="isDropdownVisible"
+          class="user-dropdown"
+          @mouseenter="keepDropdownVisible"
+          @mouseleave="hideDropdown"
+        >
           <template v-if="isLoggedIn || isAdminLoggedIn">
             <div class="dropdown-header">
               <span v-if="isAdminLoggedIn">
@@ -88,6 +97,22 @@ export default class Navbar extends Vue {
 
   toggleDropdown(isOpen: boolean) {
     this.isDropdownVisible = isOpen;
+  }
+
+  toggleDropdownVisible() {
+    this.isDropdownVisible = !this.isDropdownVisible;
+  }
+
+  showDropdown() {
+    this.isDropdownVisible = true;
+  }
+
+  hideDropdown() {
+    this.isDropdownVisible = false;
+  }
+
+  keepDropdownVisible() {
+    this.isDropdownVisible = true;
   }
 
   goToCart() {
@@ -216,11 +241,12 @@ export default class Navbar extends Vue {
 
   .user-menu {
     position: relative;
+    z-index: 1000; /* Ensure dropdown is always on top */
 
     .user-dropdown {
       display: none;
       position: absolute;
-      min-width: 200px;
+      min-width: 250px; /* Widen dropdown */
       top: 1.5rem;
       right: 0;
       background-color: #ffffff;
@@ -260,7 +286,7 @@ export default class Navbar extends Vue {
     }
 
     &:hover .user-dropdown {
-      display: block;
+      display: block; /* Ensure dropdown remains visible */
     }
   }
 }

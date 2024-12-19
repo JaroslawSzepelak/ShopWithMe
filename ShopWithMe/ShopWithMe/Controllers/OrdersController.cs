@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShopWithMe.Managers.Orders;
 using ShopWithMe.Models.Cart;
@@ -18,6 +19,7 @@ namespace ShopWithMe.Controllers
         protected OrderModelsMapper _mapper;
         protected Cart _cart;
         protected ContactData _contactData;
+        protected UserManager<IdentityUser> _userManager;
 
         #region OrdersController()
         public OrdersController(
@@ -25,13 +27,15 @@ namespace ShopWithMe.Controllers
             OrdersManager manager,
             OrderModelsMapper mapper,
             Cart cart,
-            ContactData contactData)
+            ContactData contactData,
+            UserManager<IdentityUser> userManager)
         {
             _repository = repository;
             _manager = manager;
             _mapper = mapper;
             _cart = cart;
             _contactData = contactData;
+            _userManager = userManager;
         }
         #endregion
 
@@ -65,6 +69,10 @@ namespace ShopWithMe.Controllers
         public async Task<IActionResult> Create()
         {
             var entity = new Order(_cart, _contactData);
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+                entity.UserId = user.Id;
 
             await _repository.SaveOrder(entity);
 

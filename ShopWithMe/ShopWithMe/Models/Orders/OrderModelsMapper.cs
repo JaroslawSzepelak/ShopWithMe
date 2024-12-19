@@ -41,6 +41,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
             mapTo.DateCreated = mapFrom.DateCreated;
+            mapTo.UserId = mapFrom.UserId;
         }
 
         public void Map(Order mapFrom, AdminModel.OrderListModel mapTo)
