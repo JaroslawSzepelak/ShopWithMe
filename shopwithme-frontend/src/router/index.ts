@@ -3,6 +3,8 @@ import Router from "vue-router";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
+import CustomerOrderHistory from "@/views/CustomerOrderHistory.vue";
+import CustomerOrderDetails from "@/views/CustomerOrderDetails.vue";
 import AdminLogin from "@/views/AdminLogin.vue";
 import ProductList from "@/views/ProductList.vue";
 import ProductDetails from "@/views/ProductDetails.vue";
@@ -46,6 +48,17 @@ const routes = [
     path: "/summary",
     name: "SummaryView",
     component: SummaryView,
+  },
+  {
+    path: "/orders/customer-history",
+    name: "CustomerOrderHistory",
+    component: CustomerOrderHistory,
+  },
+  {
+    path: "/orders/customer-details/:id",
+    name: "CustomerOrderDetails",
+    component: CustomerOrderDetails,
+    props: true,
   },
   {
     path: "/admin",

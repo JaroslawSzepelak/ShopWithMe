@@ -5,6 +5,7 @@ using ShopWithMe.Models.Common;
 using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Products;
 using ShopWithMe.Tools.Exceptions;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers.Orders
 {
@@ -12,6 +13,26 @@ namespace ShopWithMe.Managers.Orders
     {
         #region OrdersManager()
         public OrdersManager(IBaseRepository<Order> repository) : base(repository) { }
+        #endregion
+
+        #region GetAsync()
+        public async Task<List<Order>> GetListAsync(string userId, Pager pager)
+        {
+            var query = _repository.Entities
+                .Where(o => o.UserId == userId)
+                .AsQueryable();
+
+            if (pager != null)
+            {
+                pager.TotalRows = query.Count();
+
+                query = query
+                    .Skip(pager.Skip)
+                    .Take(pager.PageSize);
+            }
+
+            return await query.ToListAsync();
+        }
         #endregion
 
         #region GetAsync()

@@ -38,6 +38,7 @@
             <button v-if="!isAdminLoggedIn" @click="openProfileModal">
               Profil
             </button>
+            <button @click="viewOrderHistory">Historia zamówień</button>
             <button class="logout-button" @click="handleLogout">
               Wyloguj się
             </button>
@@ -142,6 +143,10 @@ export default class Navbar extends Vue {
     this.isProfileModalVisible = true;
   }
 
+  viewOrderHistory() {
+    this.$router.push("/orders/customer-history");
+  }
+
   async mounted() {
     if (this.isLoggedIn) {
       try {
@@ -241,12 +246,12 @@ export default class Navbar extends Vue {
 
   .user-menu {
     position: relative;
-    z-index: 1000; /* Ensure dropdown is always on top */
+    z-index: 1000;
 
     .user-dropdown {
       display: none;
       position: absolute;
-      min-width: 250px; /* Widen dropdown */
+      min-width: 250px;
       top: 1.5rem;
       right: 0;
       background-color: #ffffff;
@@ -286,7 +291,7 @@ export default class Navbar extends Vue {
     }
 
     &:hover .user-dropdown {
-      display: block; /* Ensure dropdown remains visible */
+      display: block;
     }
   }
 }

@@ -159,8 +159,13 @@ export const contactDataAPI = {
 };
 
 export const orderAPI = {
-  getOrders() {
-    return apiClient.get("/Orders");
+  getOrders(pageIndex: number, pageSize: number) {
+    return apiClient.get("/Orders", {
+      params: { pageIndex, pageSize },
+    });
+  },
+  getOrderById(id: number) {
+    return apiClient.get(`/Orders/${id}`);
   },
   createOrder() {
     return apiClient.post("/Orders");

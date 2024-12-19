@@ -64,14 +64,13 @@ namespace ShopWithMe.Models.Orders
             mapTo.Address = mapFrom.Address;
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
+            mapTo.DateCreated = mapFrom.DateCreated;
         }
 
         public void Map(Order mapFrom, PublicModel.OrderListModel mapTo)
         {
             mapTo.Id = mapFrom.Id;
-            mapTo.Firstname = mapFrom.Firstname;
-            mapTo.Lastname = mapFrom.Lastname;
-            mapTo.Email = mapFrom.Email;
+            mapTo.DateCreated = mapFrom.DateCreated;
         }
 
         public AdminModel.OrderFormModel MapToFormModel(Order mapFromList)

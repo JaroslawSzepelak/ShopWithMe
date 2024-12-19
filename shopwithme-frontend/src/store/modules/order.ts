@@ -7,6 +7,10 @@ interface OrderState {
   error: string | null;
   loading: boolean;
   selectedOrder: any | null;
+  totalRows: number;
+  totalPages: number;
+  pageSize: number;
+  pageIndex: number;
 }
 
 const orderModule: Module<OrderState, any> = {
@@ -18,6 +22,10 @@ const orderModule: Module<OrderState, any> = {
     error: null,
     loading: false,
     selectedOrder: null,
+    totalRows: 0,
+    totalPages: 0,
+    pageSize: 10,
+    pageIndex: 1,
   },
 
   mutations: {
@@ -36,18 +44,31 @@ const orderModule: Module<OrderState, any> = {
     SET_SELECTED_ORDER(state, order) {
       state.selectedOrder = order;
     },
+    SET_PAGER_INFO(state, pager) {
+      state.totalRows = pager.totalRows;
+      state.totalPages = pager.totalPages;
+    },
+    SET_PAGE_INDEX(state, pageIndex: number) {
+      state.pageIndex = pageIndex;
+    },
+    SET_PAGE_SIZE(state, pageSize: number) {
+      state.pageSize = pageSize;
+    },
   },
 
   actions: {
-    async fetchOrders({ commit }) {
+    async fetchOrders({ commit, state }) {
       commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
       try {
-        const response = await orderAPI.getOrders();
-        commit("SET_ORDERS", response.data);
+        const response = await orderAPI.getOrders(
+          state.pageIndex,
+          state.pageSize
+        );
+        const { result, pager } = response.data;
+        commit("SET_ORDERS", result);
+        commit("SET_PAGER_INFO", pager);
       } catch (error) {
-        console.error("Error fetching orders:", error);
-        commit("SET_ERROR", "Failed to fetch orders.");
+        commit("SET_ERROR", "Nie udało się pobrać zamówień.");
       } finally {
         commit("SET_LOADING", false);
       }
@@ -64,6 +85,27 @@ const orderModule: Module<OrderState, any> = {
       } finally {
         commit("SET_LOADING", false);
       }
+    },
+    async fetchOrderById({ commit }, id: number) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+      try {
+        const response = await orderAPI.getOrderById(id);
+        commit("SET_SELECTED_ORDER", response.data);
+      } catch (error) {
+        console.error("Error fetching order by ID:", error);
+        commit("SET_ERROR", "Failed to fetch order by ID.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+    async changePage({ commit, dispatch }, pageIndex: number) {
+      commit("SET_PAGE_INDEX", pageIndex);
+      await dispatch("fetchOrders");
+    },
+    async changePageSize({ commit, dispatch }, pageSize: number) {
+      commit("SET_PAGE_SIZE", pageSize);
+      await dispatch("fetchOrders");
     },
     async createOrder({ commit }) {
       commit("SET_LOADING", true);
@@ -111,6 +153,10 @@ const orderModule: Module<OrderState, any> = {
       return state.loading;
     },
     selectedOrder: (state) => state.selectedOrder,
+    totalPages: (state) => state.totalPages,
+    totalRows: (state) => state.totalRows,
+    pageIndex: (state) => state.pageIndex,
+    pageSize: (state) => state.pageSize,
   },
 };
 
