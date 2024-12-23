@@ -60,6 +60,23 @@
           </div>
         </div>
 
+        <!-- Order Status -->
+        <div class="order-section mb-4">
+          <h4 class="section-title">Status Zamówienia</h4>
+          <div class="form-group">
+            <label>Status</label>
+            <select v-model.number="form.status" class="form-control">
+              <option
+                v-for="(label, value) in statusOptions"
+                :key="value"
+                :value="value"
+              >
+                {{ label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
         <!-- Save Button -->
         <div class="actions text-center">
           <button type="submit" class="btn save-changes-button">
@@ -170,6 +187,7 @@ export default class OrderEditAdmin extends Vue {
     address: "",
     city: "",
     zip: "",
+    status: 0,
   };
   productSearch = "";
   autocompleteProducts: { id: number; name: string }[] = [];
@@ -178,6 +196,13 @@ export default class OrderEditAdmin extends Vue {
   newCartLine = { productId: 0, quantity: 1 };
   isConfirmationModalVisible = false;
   lineToRemove: any = null;
+
+  statusOptions = {
+    0: "Zlecone",
+    1: "Wysłane",
+    2: "Zakończone",
+    3: "Anulowane",
+  };
 
   get isLoading() {
     return this.$store.getters["admin/adminOrders/isLoading"];
@@ -222,14 +247,12 @@ export default class OrderEditAdmin extends Vue {
   }
 
   onProductSelect(product: { id: number; name: string }) {
-    console.log("Wybrany produkt:", product);
     this.selectedProduct = product;
   }
 
   addCartLine() {
     if (!this.selectedProduct) return;
 
-    console.log("Dodawanie produktu do zamówienia:", this.selectedProduct);
     this.$store.dispatch("admin/adminOrders/updateCartLine", {
       productId: this.selectedProduct.id,
       quantity: this.newCartLine.quantity,
@@ -258,8 +281,27 @@ export default class OrderEditAdmin extends Vue {
     }
   }
   async saveOrder() {
-    await this.$store.dispatch("admin/adminOrders/updateOrder", this.form);
-    this.$router.push({ name: "OrderAdmin" });
+    try {
+      const updatedOrder = {
+        id: this.form.id,
+        firstname: this.form.firstname,
+        lastname: this.form.lastname,
+        email: this.form.email,
+        phoneNumber: this.form.phoneNumber,
+        address: this.form.address,
+        city: this.form.city,
+        zip: this.form.zip,
+        status: Number(this.form.status),
+      };
+
+      await this.$store.dispatch("admin/adminOrders/updateOrder", updatedOrder);
+      this.$router.push({ name: "OrderAdmin" });
+    } catch (error) {
+      console.error("Błąd podczas aktualizacji zamówienia:", error);
+      alert(
+        "Nie udało się zapisać zmian. Sprawdź wprowadzone dane i spróbuj ponownie."
+      );
+    }
   }
 
   goBack() {

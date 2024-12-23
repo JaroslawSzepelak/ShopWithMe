@@ -28,12 +28,13 @@
             <th>Nazwisko</th>
             <th>Email</th>
             <th>Data Złożenia</th>
+            <th>Status</th>
             <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="displayOrders.length === 0">
-            <td colspan="6" class="text-center">Brak zamówień</td>
+            <td colspan="7" class="text-center">Brak zamówień</td>
           </tr>
           <tr v-for="order in displayOrders" :key="order.id">
             <td>{{ order.id }}</td>
@@ -41,6 +42,11 @@
             <td>{{ order.lastname }}</td>
             <td>{{ order.email }}</td>
             <td>{{ formatDate(order.dateCreated) }}</td>
+            <td class="text-center">
+              <span :class="getStatusClass(order.status)" class="status-label">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
             <td class="text-center">
               <button
                 class="btn btn-sm btn-primary mx-1"
@@ -170,6 +176,26 @@ export default class OrderAdmin extends Vue {
     return pages;
   }
 
+  getStatusLabel(status: number): string {
+    const labels = ["Zlecone", "Wysłane", "Zakończone", "Anulowane"];
+    return labels[status] || "Nieznany";
+  }
+
+  getStatusClass(status: number): string {
+    switch (status) {
+      case 0:
+        return "status-pending";
+      case 1:
+        return "status-shipped";
+      case 2:
+        return "status-completed";
+      case 3:
+        return "status-canceled";
+      default:
+        return "";
+    }
+  }
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleString("pl-PL", {
@@ -260,12 +286,6 @@ export default class OrderAdmin extends Vue {
     color: white;
   }
 
-  .text-center {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-
   .btn {
     min-width: 100px;
     margin: 0;
@@ -296,6 +316,38 @@ export default class OrderAdmin extends Vue {
     &:hover {
       background-color: #c82333;
     }
+  }
+
+  .status-label {
+    display: inline-block;
+    padding: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .status-pending {
+    background-color: #fffbcc;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+
+  .status-shipped {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+
+  .status-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .status-canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
   }
 
   .pagination-container {

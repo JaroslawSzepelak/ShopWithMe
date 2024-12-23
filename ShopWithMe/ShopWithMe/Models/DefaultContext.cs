@@ -18,6 +18,10 @@ namespace ShopWithMe.Models
             modelBuilder.Entity<Order>()
                 .Property(b => b.DateCreated)
                 .HasDefaultValueSql("getdate()");
+
+            modelBuilder.Entity<Order>()
+                .Property(b => b.Status)
+                .HasDefaultValue(OrderStatus.Pending);
         }
     }
 }

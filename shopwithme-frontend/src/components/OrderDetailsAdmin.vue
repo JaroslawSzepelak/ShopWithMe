@@ -10,6 +10,13 @@
     <div v-else>
       <h2 class="text-center">Szczegóły Zamówienia #{{ order.id }}</h2>
 
+      <!-- Status Zamówienia -->
+      <div class="order-status text-center">
+        <span :class="getStatusClass(order.status)">
+          Status: {{ getStatusLabel(order.status) }}
+        </span>
+      </div>
+
       <!-- Dane kontaktowe -->
       <div class="order-section">
         <h3>Dane Kontaktowe</h3>
@@ -114,6 +121,26 @@ export default class OrderDetailsAdmin extends Vue {
     return 0;
   }
 
+  getStatusLabel(status: number): string {
+    const labels = ["Zlecone", "Wysłane", "Zakończone", "Anulowane"];
+    return labels[status] || "Nieznany";
+  }
+
+  getStatusClass(status: number): string {
+    switch (status) {
+      case 0:
+        return "status-pending";
+      case 1:
+        return "status-shipped";
+      case 2:
+        return "status-completed";
+      case 3:
+        return "status-canceled";
+      default:
+        return "";
+    }
+  }
+
   goBack() {
     this.$router.push({ name: "OrderAdmin" });
   }
@@ -124,6 +151,42 @@ export default class OrderDetailsAdmin extends Vue {
 .order-details-admin {
   padding: 2rem;
   background-color: #f9f9f9;
+
+  .order-status {
+    margin-top: 30px;
+    margin-bottom: 2rem;
+
+    span {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+    }
+
+    .status-pending {
+      background-color: #fffbcc;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .status-shipped {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .status-completed {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-canceled {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  }
 
   .order-section {
     margin-bottom: 2rem;

@@ -18,16 +18,18 @@
             <tr>
               <th>Numer zamówienia</th>
               <th>Data złożenia zamówienia</th>
+              <th>Status</th>
               <th>Akcje</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="orders.length === 0">
-              <td colspan="3" class="text-center">Brak zamówień</td>
+              <td colspan="4" class="text-center">Brak zamówień</td>
             </tr>
             <tr v-for="order in orders" :key="order.id">
               <td>{{ order.id }}</td>
               <td>{{ formatDate(order.dateCreated) }}</td>
+              <td>{{ getStatusLabel(order.status) }}</td>
               <td class="table-center">
                 <button
                   class="btn btn-sm btn-primary"
@@ -86,6 +88,8 @@ import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class CustomerOrderHistory extends Vue {
+  statusLabels = ["Zlecone", "Wysłane", "Zakończone", "Anulowane"];
+
   get orders() {
     return this.$store.getters["order/allOrders"];
   }
@@ -141,6 +145,10 @@ export default class CustomerOrderHistory extends Vue {
       hour: "2-digit",
       minute: "2-digit",
     });
+  }
+
+  getStatusLabel(status: number): string {
+    return this.statusLabels[status] || "Nieznany";
   }
 
   async fetchOrders() {

@@ -10,6 +10,11 @@
     <div v-else>
       <h2 class="text-center">Szczegóły Zamówienia #{{ order.id }}</h2>
 
+      <!-- Status Zamówienia -->
+      <div class="order-status" :class="getStatusClass(order.status)">
+        <p><strong>Status:</strong> {{ getStatusLabel(order.status) }}</p>
+      </div>
+
       <!-- Dane z formularza -->
       <div class="order-section">
         <h3>Dane Zamówienia</h3>
@@ -82,6 +87,8 @@ export default class CustomerOrderDetails extends Vue {
   isLoading = true;
   error: string | null = null;
 
+  statusLabels = ["Zlecone", "Wysłane", "Zakończone", "Anulowane"];
+
   async fetchOrderDetails() {
     const orderId = Number(this.$route.params.id);
     try {
@@ -113,6 +120,25 @@ export default class CustomerOrderDetails extends Vue {
     return 0;
   }
 
+  getStatusLabel(status: number): string {
+    return this.statusLabels[status] || "Nieznany";
+  }
+
+  getStatusClass(status: number): string {
+    switch (status) {
+      case 0:
+        return "status-pending";
+      case 1:
+        return "status-shipped";
+      case 2:
+        return "status-completed";
+      case 3:
+        return "status-canceled";
+      default:
+        return "";
+    }
+  }
+
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleString("pl-PL", {
@@ -137,6 +163,40 @@ export default class CustomerOrderDetails extends Vue {
 <style scoped lang="scss">
 .order-details-customer {
   padding: 2rem;
+
+  .order-status {
+    text-align: center;
+    margin: 20px auto;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    max-width: 300px;
+  }
+
+  .status-pending {
+    background-color: #fffbcc;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+
+  .status-shipped {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+
+  .status-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .status-canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
 
   .order-section {
     margin-bottom: 2rem;

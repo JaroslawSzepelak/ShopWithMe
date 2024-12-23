@@ -56,8 +56,6 @@ export default class SearchAutocomplete extends Vue {
   }
 
   onChange() {
-    console.log("Zapytanie wyszukiwania:", this.search);
-
     if (this.search.length < 3) {
       this.isOpen = false;
       this.results = [];
@@ -80,7 +78,6 @@ export default class SearchAutocomplete extends Vue {
   }
 
   setResult(result: Product) {
-    console.log("Wybrany produkt:", result);
     this.search = result.name;
     this.isOpen = false;
     this.$emit("select", result);

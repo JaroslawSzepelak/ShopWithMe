@@ -136,6 +136,7 @@ export const orderAPI = {
     cartLines: any[];
     contactData: any;
     totalAmount: number;
+    status: number;
   }) {
     return adminAxios.put("/Orders", order);
   },

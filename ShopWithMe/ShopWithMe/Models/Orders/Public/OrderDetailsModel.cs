@@ -14,5 +14,6 @@ namespace ShopWithMe.Models.Orders.Public
         public string City { get; set; }
         public string Zip { get; set; }
         public DateTime DateCreated { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }

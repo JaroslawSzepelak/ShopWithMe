@@ -15,6 +15,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Address = mapFrom.Address;
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
+            mapTo.Status = mapFrom.Status;
         }
 
         public void Map(Order mapFrom, AdminModel.OrderFormModel mapTo)
@@ -27,6 +28,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Address = mapFrom.Address;
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
+            mapTo.Status = mapFrom.Status;
         }
 
         public void Map(Order mapFrom, AdminModel.OrderDetailsModel mapTo)
@@ -42,6 +44,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Zip = mapFrom.Zip;
             mapTo.DateCreated = mapFrom.DateCreated;
             mapTo.UserId = mapFrom.UserId;
+            mapTo.Status = mapFrom.Status;
         }
 
         public void Map(Order mapFrom, AdminModel.OrderListModel mapTo)
@@ -51,6 +54,7 @@ namespace ShopWithMe.Models.Orders
             mapTo.Lastname = mapFrom.Lastname;
             mapTo.Email = mapFrom.Email;
             mapTo.DateCreated = mapFrom.DateCreated;
+            mapTo.Status = mapFrom.Status;
         }
 
         public void Map(Order mapFrom, PublicModel.OrderDetailsModel mapTo)
@@ -65,12 +69,14 @@ namespace ShopWithMe.Models.Orders
             mapTo.City = mapFrom.City;
             mapTo.Zip = mapFrom.Zip;
             mapTo.DateCreated = mapFrom.DateCreated;
+            mapTo.Status = mapFrom.Status;
         }
 
         public void Map(Order mapFrom, PublicModel.OrderListModel mapTo)
         {
             mapTo.Id = mapFrom.Id;
             mapTo.DateCreated = mapFrom.DateCreated;
+            mapTo.Status = mapFrom.Status;
         }
 
         public AdminModel.OrderFormModel MapToFormModel(Order mapFromList)

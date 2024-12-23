@@ -7,5 +7,6 @@
         public string Lastname { get; set; }
         public string Email { get; set; }
         public DateTime DateCreated { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }

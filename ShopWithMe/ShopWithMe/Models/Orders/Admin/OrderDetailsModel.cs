@@ -15,5 +15,6 @@ namespace ShopWithMe.Models.Orders.Admin
         public string Zip { get; set; }
         public DateTime DateCreated { get; set; }
         public string UserId { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }
