@@ -101,7 +101,7 @@ export default class ProductCarousel extends Vue {
 .carousel {
   position: relative;
   width: 100%;
-  height: 600px;
+  max-height: 600px;
   overflow: hidden;
 
   .carousel-content {

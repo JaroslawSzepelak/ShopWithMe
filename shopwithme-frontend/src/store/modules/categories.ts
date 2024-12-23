@@ -134,54 +134,6 @@ const categoryModule: Module<CategoryState, any> = {
       }
     },
 
-    async createCategory({ dispatch, commit }, name: string) {
-      commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
-
-      try {
-        await categoryAPI.createCategory(name);
-        await dispatch("fetchCategories");
-      } catch (error) {
-        console.error("Błąd podczas tworzenia kategorii:", error);
-        commit("SET_ERROR", "Nie udało się utworzyć nowej kategorii.");
-      } finally {
-        commit("SET_LOADING", false);
-      }
-    },
-
-    async updateCategory(
-      { dispatch, commit },
-      { id, name }: { id: number; name: string }
-    ) {
-      commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
-
-      try {
-        await categoryAPI.updateCategory(id, name);
-        await dispatch("fetchCategories");
-      } catch (error) {
-        console.error("Błąd podczas aktualizacji kategorii:", error);
-        commit("SET_ERROR", "Nie udało się zaktualizować kategorii.");
-      } finally {
-        commit("SET_LOADING", false);
-      }
-    },
-
-    async deleteCategory({ dispatch, commit }, id: number) {
-      commit("SET_LOADING", true);
-      commit("SET_ERROR", null);
-
-      try {
-        await categoryAPI.deleteCategory(id);
-        await dispatch("fetchCategories");
-      } catch (error) {
-        console.error("Błąd podczas usuwania kategorii:", error);
-        commit("SET_ERROR", "Nie udało się usunąć kategorii.");
-      } finally {
-        commit("SET_LOADING", false);
-      }
-    },
-
     async changePage(
       { commit, dispatch },
       { pageIndex, pageSize }: { pageIndex: number; pageSize: number }

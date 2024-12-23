@@ -194,8 +194,9 @@ export default class SuggestedProducts extends Vue {
 
   .products-list {
     display: flex;
-    justify-content: center;
+    flex-wrap: wrap;
     gap: 1rem;
+    justify-content: center;
   }
 
   .product-card {
@@ -355,6 +356,42 @@ export default class SuggestedProducts extends Vue {
     }
     100% {
       transform: rotate(360deg);
+    }
+  }
+  @media (max-width: 1300px) {
+    .product-card {
+      flex: 0 0 calc(33.33% - 1rem);
+    }
+  }
+
+  @media (max-width: 992px) {
+    .product-card {
+      flex: 0 0 calc(50% - 1rem);
+    }
+  }
+
+  @media (max-width: 840px) {
+    .product-card {
+      flex: 0 0 calc(100% - 1rem);
+      max-width: 250px;
+    }
+
+    .cart-btn {
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .view-all-products {
+      margin-top: 60px;
+
+      .btn-view-all {
+        padding: 10px 15px;
+        font-size: 1rem;
+      }
+    }
+
+    h2 {
+      font-size: 2rem;
     }
   }
 }

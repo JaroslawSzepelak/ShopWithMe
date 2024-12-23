@@ -45,6 +45,7 @@ export default class PromotionsSection extends Vue {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    gap: 2rem;
   }
 
   .promotion {
@@ -71,6 +72,82 @@ export default class PromotionsSection extends Vue {
       font-size: 1.2rem;
       color: #666;
       text-align: center;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    h2 {
+      font-size: 2rem;
+    }
+
+    .promotion {
+      width: 100px;
+
+      .discount-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 1.8rem;
+      }
+
+      .promotion-description {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  @media (max-width: 992px) {
+    .promotion {
+      width: 90px;
+
+      .discount-circle {
+        width: 90px;
+        height: 90px;
+        font-size: 1.6rem;
+      }
+
+      .promotion-description {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.8rem;
+    }
+
+    .promotion {
+      width: 80px;
+
+      .discount-circle {
+        width: 80px;
+        height: 80px;
+        font-size: 1.4rem;
+      }
+
+      .promotion-description {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .promotion {
+      width: 70px;
+
+      .discount-circle {
+        width: 70px;
+        height: 70px;
+        font-size: 1.2rem;
+      }
+
+      .promotion-description {
+        font-size: 0.7rem;
+      }
     }
   }
 }

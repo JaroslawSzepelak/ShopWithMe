@@ -21,30 +21,6 @@ export const productAPI = {
       },
     });
   },
-  createProduct(product: {
-    name: string;
-    price: number;
-    categoryId: number;
-    description?: string;
-    technicalData?: string;
-    image?: string;
-  }) {
-    return apiClient.post("/Products", product);
-  },
-  updateProduct(product: {
-    id: number;
-    name: string;
-    price: number;
-    categoryId: number;
-    description?: string;
-    technicalData?: string;
-    image?: string;
-  }) {
-    return apiClient.put("/Products", product);
-  },
-  deleteProduct(id: number) {
-    return apiClient.delete(`/Products/${id}`);
-  },
 };
 
 // API dla koszyka
@@ -64,7 +40,9 @@ export const cartAPI = {
   },
   removeItemFromCart(productId: number) {
     return apiClient
-      .delete(`/Cart/${productId}`)
+      .delete("/Cart", {
+        data: productId,
+      })
       .then((response) => {
         return response;
       })
@@ -107,42 +85,6 @@ export const categoryAPI = {
 
   getCategory(id: number) {
     return apiClient.get(`/ProductCategories/${id}`);
-  },
-
-  createCategory(name: string) {
-    return apiClient
-      .post("/ProductCategories", { name })
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        console.error("Błąd podczas tworzenia kategorii:", error);
-        throw error;
-      });
-  },
-
-  updateCategory(id: number, name: string) {
-    return apiClient
-      .put("/ProductCategories", { id, name })
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        console.error("Błąd podczas aktualizacji kategorii:", error);
-        throw error;
-      });
-  },
-
-  deleteCategory(id: number) {
-    return apiClient
-      .delete(`/ProductCategories/${id}`)
-      .then((response) => {
-        return response;
-      })
-      .catch((error) => {
-        console.error("Błąd podczas usuwania kategorii:", error);
-        throw error;
-      });
   },
 };
 

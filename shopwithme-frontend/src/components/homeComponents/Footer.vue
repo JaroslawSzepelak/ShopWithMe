@@ -62,6 +62,7 @@ export default class Footer extends Vue {}
   .footer-content {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
     width: 100%;
   }
 
@@ -78,7 +79,7 @@ export default class Footer extends Vue {}
 
     .social-icons {
       display: flex;
-      gap: 25px;
+      gap: 15px;
       margin-top: 1rem;
 
       .icon {
@@ -89,7 +90,7 @@ export default class Footer extends Vue {}
     }
 
     .footer-rights {
-      margin-top: 3rem;
+      margin-top: 2rem;
       font-size: 1.2rem;
       color: #666;
     }
@@ -98,10 +99,13 @@ export default class Footer extends Vue {}
   .footer-right {
     display: flex;
     margin-right: 50px;
-    gap: 5rem;
+    gap: 3rem;
+    flex-wrap: wrap;
     text-align: left;
 
     .footer-column {
+      min-width: 150px;
+
       h4 {
         font-size: 1.3rem;
         color: #000;
@@ -115,11 +119,107 @@ export default class Footer extends Vue {}
         font-size: 1.2rem;
         color: #555;
         text-decoration: none;
-        margin-bottom: 1rem;
+        margin-bottom: 0.8rem;
 
         &:hover {
           color: #000;
         }
+      }
+    }
+  }
+
+  @media (max-width: 1150px) {
+    .footer-content {
+      flex-direction: row;
+      gap: 2rem;
+    }
+
+    .footer-left {
+      font-size: 1rem;
+      margin-left: 0;
+      max-width: 100%;
+      text-align: center;
+
+      .logo img {
+        width: 150px;
+      }
+
+      .social-icons {
+        justify-content: center;
+        gap: 10px;
+
+        .icon {
+          font-size: 1.2rem;
+        }
+      }
+
+      .footer-rights {
+        font-size: 1rem;
+      }
+    }
+
+    .footer-right {
+      justify-content: center;
+      margin-right: 0;
+      gap: 1rem;
+
+      .footer-column {
+        text-align: center;
+
+        h4 {
+          font-size: 1.1rem;
+        }
+
+        a {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 920px) {
+    .footer-content {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .footer-left,
+    .footer-right {
+      margin: 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    .footer-right {
+      flex-direction: column;
+      gap: 1rem;
+
+      .footer-column {
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    .footer-content {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .footer-left,
+    .footer-right {
+      margin: 0;
+      text-align: center;
+    }
+
+    .footer-right {
+      flex-direction: column;
+      gap: 1rem;
+
+      .footer-column {
+        width: 100%;
       }
     }
   }

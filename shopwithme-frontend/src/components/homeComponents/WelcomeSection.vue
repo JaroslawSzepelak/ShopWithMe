@@ -84,6 +84,9 @@ export default class WelcomeSection extends Vue {}
         font-size: 1.2rem;
         color: #555;
         margin-bottom: 10px;
+        display: list-item;
+        list-style-position: outside;
+        padding-left: 1.5rem;
 
         strong {
           font-weight: bold;
@@ -98,6 +101,49 @@ export default class WelcomeSection extends Vue {}
       width: 100%;
       border-radius: 16px;
       box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  @media (max-width: 1400px) {
+    .image-container {
+      display: none;
+    }
+
+    .content {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 40px;
+
+    .content {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      p,
+      .features-list li {
+        font-size: 1rem;
+        text-align: left;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
+
+    .content {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      p,
+      .features-list li {
+        font-size: 0.9rem;
+      }
     }
   }
 }

@@ -66,7 +66,9 @@
               >
                 Wyczyść koszyk
               </button>
-              <button @click="goBack" class="back-btn">Wróć</button>
+              <button @click="goBack" class="checkout-btn back-btn">
+                Wróć
+              </button>
             </div>
           </div>
         </div>
@@ -512,5 +514,149 @@ export default class Cart extends Vue {
   font-size: 0.9rem;
   color: green;
   margin-top: 5px;
+}
+
+@media (max-width: 1024px) {
+  .cart {
+    .cart-container {
+      flex-wrap: wrap;
+    }
+
+    .cart-items {
+      margin-bottom: 40px;
+    }
+
+    .cart-item {
+      .product-image {
+        width: 100px;
+        height: 100px;
+      }
+
+      .item-details {
+        .product-name {
+          font-size: 1.2rem;
+        }
+
+        .total-price {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .cart-summary {
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 850px) {
+  .cart {
+    .cart-container {
+      flex-direction: column;
+    }
+
+    .cart-summary {
+      margin-top: 1rem;
+      align-items: center;
+
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      .summary-buttons {
+        width: 50%;
+      }
+    }
+  }
+}
+
+@media (max-width: 570px) {
+  .cart {
+    .cart-summary {
+      .checkout-btn {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .cart {
+    .cart-container {
+      width: 300px;
+    }
+    .cart-item {
+      flex-direction: column;
+      align-items: center;
+
+      .product-image {
+        width: 80%;
+        height: auto;
+        margin: 0;
+      }
+
+      .item-details {
+        margin-top: 30px;
+        width: 80%;
+
+        .product-name {
+          font-size: 1.2rem;
+          margin-bottom: 5px;
+        }
+
+        .availability {
+          font-size: 1rem;
+          margin-bottom: 5px;
+        }
+
+        .price-per-unit {
+          font-size: 0.9rem;
+          color: #555;
+          margin-bottom: 10px;
+        }
+
+        .quantity-control {
+          display: flex;
+          justify-content: space-around;
+          width: 100%;
+
+          .quantity-btn {
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+          }
+
+          .quantity-input {
+            width: 40px;
+            height: 30px;
+            font-size: 0.9rem;
+          }
+        }
+
+        .total-price {
+          font-size: 2rem;
+          font-weight: bold;
+          text-align: center;
+          color: #c70a0a;
+          margin-top: 15px;
+        }
+      }
+
+      .remove-btn {
+        align-self: center;
+        font-size: 2rem;
+        margin-top: 10px;
+      }
+    }
+
+    .cart-summary {
+      .summary-buttons {
+        width: 70%;
+      }
+    }
+  }
 }
 </style>
