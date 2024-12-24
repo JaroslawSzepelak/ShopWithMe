@@ -10,5 +10,6 @@ namespace ShopWithMe.Models.Storage
         public string ModifiedBy { get; set; }
         public string Name { get; set; }
         public string Path { get; set; }
+        public string ContentType { get; set; }
     }
 }

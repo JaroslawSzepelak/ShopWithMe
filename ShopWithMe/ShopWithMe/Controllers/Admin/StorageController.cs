@@ -24,7 +24,7 @@ namespace ShopWithMe.Controllers.Admin
 
         #region UploadFile()
         [HttpPost]
-        public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
             using var stream = file.OpenReadStream();
 
@@ -40,8 +40,9 @@ namespace ShopWithMe.Controllers.Admin
             
             var storageFile = new StorageFile()
             {
-                Name = file.Name,
-                Path = filePath
+                Name = file.FileName,
+                Path = filePath,
+                ContentType = file.ContentType,
             };
 
             await _manager.CreateAsync(storageFile);
