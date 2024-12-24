@@ -1,4 +1,6 @@
-﻿namespace ShopWithMe.Models.Products.Public
+﻿using ShopWithMe.Models.Storage;
+
+namespace ShopWithMe.Models.Products.Public
 {
     public class ProductDetailsModel
     {
@@ -9,5 +11,6 @@
         public decimal Price { get; set; }
         public string Category { get; set; }
         public string TechnicalData { get; set; }
+        public StorageFile MainImage { get; set; }
     }
 }

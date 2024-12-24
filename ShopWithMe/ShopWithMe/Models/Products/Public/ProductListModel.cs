@@ -1,4 +1,6 @@
-﻿namespace ShopWithMe.Models.Products.Public
+﻿using ShopWithMe.Models.Storage;
+
+namespace ShopWithMe.Models.Products.Public
 {
     public class ProductListModel
     {
@@ -7,5 +9,6 @@
         public string Lead { get; set; }
         public decimal Price { get; set; }
         public string Category { get; set; }
+        public StorageFile MainImage { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ShopWithMe.Models.Storage;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShopWithMe.Models.Products.Admin
 {
@@ -15,5 +16,7 @@ namespace ShopWithMe.Models.Products.Admin
         public decimal Price { get; set; }
         public long? CategoryId { get; set; }
         public string TechnicalData  { get; set; }
+        public long? MainImageId { get; set; }
+        public StorageFile MainImage { get; set; }
     }
 }

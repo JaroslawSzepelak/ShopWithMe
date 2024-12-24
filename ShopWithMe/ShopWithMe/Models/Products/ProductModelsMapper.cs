@@ -14,6 +14,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Price = mapFrom.Price;
             mapTo.CategoryId = mapFrom.CategoryId;
             mapTo.TechnicalData = mapFrom.TechnicalData;
+            mapTo.MainImageId = mapFrom.MainImageId;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductFormModel mapTo)
@@ -25,6 +26,8 @@ namespace ShopWithMe.Models.Products
             mapTo.Price = mapFrom.Price;
             mapTo.CategoryId = mapFrom.CategoryId;
             mapTo.TechnicalData = mapFrom.TechnicalData;
+            mapTo.MainImageId = mapFrom.MainImageId;
+            mapTo.MainImage = mapFrom.MainImage;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductListModel mapTo)
@@ -50,6 +53,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Price = mapFrom.Price;
             mapTo.Category = mapFrom.Category?.Name;
             mapTo.TechnicalData = mapFrom.TechnicalData;
+            mapTo.MainImage = mapFrom.MainImage;
         }
 
         public void Map(Product mapFrom, PublicModel.ProductListModel mapTo)
@@ -59,6 +63,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Lead = mapFrom.Lead;
             mapTo.Price = mapFrom.Price;
             mapTo.Category = mapFrom.Category?.Name;
+            mapTo.MainImage = mapFrom.MainImage;
         }
 
         public AdminModel.ProductFormModel MapToFormModel(Product mapFromList)

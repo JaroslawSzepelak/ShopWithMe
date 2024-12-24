@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShopWithMe.Models.ProductCategories;
+using ShopWithMe.Models.Storage;
 using ShopWithMe.Tools.Abstractions;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,8 +17,11 @@ namespace ShopWithMe.Models.Products
         [ForeignKey("ProductCategory")]
         public long? CategoryId { get; set; }
         public string TechnicalData { get; set; }
+        [ForeignKey("StorageFile")]
+        public long? MainImageId { get; set; }
 
 
         public virtual ProductCategory Category { get; set; }
+        public virtual StorageFile MainImage { get; set; }
     }
 }

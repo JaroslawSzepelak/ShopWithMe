@@ -16,6 +16,5 @@ namespace ShopWithMe.Managers.Storage
             return await _repository.Entities.FirstOrDefaultAsync(f => f.Name == fileName);
         }
         #endregion
-
     }
 }

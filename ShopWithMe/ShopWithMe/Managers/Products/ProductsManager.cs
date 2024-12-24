@@ -23,7 +23,9 @@ namespace ShopWithMe.Managers.Products
 
             if (loadLinkedData)
             {
-                query = query.Include(q => q.Category);
+                query = query
+                    .Include(q => q.Category)
+                    .Include(p => p.MainImage);
             }
 
             return await query.ToListAsync();
@@ -48,7 +50,9 @@ namespace ShopWithMe.Managers.Products
 
             if (loadLinkedData)
             {
-                query = query.Include(q => q.Category);
+                query = query
+                    .Include(q => q.Category)
+                    .Include(p => p.MainImage);
             }
 
             if (pager != null)
@@ -76,7 +80,9 @@ namespace ShopWithMe.Managers.Products
 
             if (loadLinkedData)
             {
-                query = query.Include(q => q.Category);
+                query = query
+                    .Include(q => q.Category)
+                    .Include(p => p.MainImage);
             }
 
             return await query.FirstOrDefaultAsync(q => q.Id == id);
