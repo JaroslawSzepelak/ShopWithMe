@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShopWithMe.Models.ProductCategories;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopWithMe.Models.Products

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ShopWithMe.Models.IdentityModels.Accounts;
 using ShopWithMe.Models.IdentityModels.Accounts.Admin;
 using ShopWithMe.Models.IdentityModels.Accounts.Public;

@@ -8,6 +8,7 @@ using ShopWithMe.Models.Common;
 using ShopWithMe.Models.Orders;
 using ShopWithMe.Models.Seed;
 using ShopWithMe.Session.Models;
+using ShopWithMe.Tools;
 using SportsStore.Models;
 using System.Text.Json.Serialization;
 
@@ -33,6 +34,9 @@ namespace ShopWithMe
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
             });
 
+            // Dodanie konfiguracji jako singletonu
+            builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
             // Dodanie obsługi Identity Core
             builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
@@ -54,6 +58,7 @@ namespace ShopWithMe
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddManagers();
             builder.Services.AddMappers();
+            builder.Services.AddTools();
 
             // Configure CORS policy to allow frontend access
             builder.Services.AddCors(options =>

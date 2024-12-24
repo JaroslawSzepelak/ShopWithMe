@@ -1,4 +1,4 @@
-﻿namespace ShopWithMe.Tools.Interfaces
+﻿namespace ShopWithMe.Tools.Abstractions
 {
     public interface ISessionModel
     {

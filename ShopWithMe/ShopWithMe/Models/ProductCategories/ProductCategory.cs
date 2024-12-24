@@ -1,5 +1,5 @@
 ﻿using ShopWithMe.Models.Products;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 
 namespace ShopWithMe.Models.ProductCategories
 {

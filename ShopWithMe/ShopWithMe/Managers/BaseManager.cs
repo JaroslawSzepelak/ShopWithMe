@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models.Common;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers

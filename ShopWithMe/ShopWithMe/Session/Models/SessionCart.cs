@@ -1,6 +1,6 @@
 ﻿using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.Products;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 using ShopWithMe.Utils.Extensions;
 using System.Text.Json.Serialization;
 

@@ -1,4 +1,4 @@
-﻿using ShopWithMe.Tools.Interfaces;
+﻿using ShopWithMe.Tools.Abstractions;
 
 namespace ShopWithMe.Models.Common
 {

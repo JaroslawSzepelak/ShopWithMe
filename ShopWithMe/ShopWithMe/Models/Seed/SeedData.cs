@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models.Products;
 using ShopWithMe.Models.ProductCategories;
+using ShopWithMe.Tools.Services;
 
 namespace ShopWithMe.Models.Seed
 {
@@ -12,7 +10,7 @@ namespace ShopWithMe.Models.Seed
         public static void EnsurePopulated(IServiceProvider serviceProvider)
         {
             using var context = new DefaultContext(
-                serviceProvider.GetRequiredService<DbContextOptions<DefaultContext>>());
+                serviceProvider.GetRequiredService<DbContextOptions<DefaultContext>>(), serviceProvider.GetRequiredService<UserService>());
 
             // Usuń istniejące produkty
             /*
