@@ -4,10 +4,10 @@ using ShopWithMe.Models.Storage;
 
 namespace ShopWithMe.Managers.Storage
 {
-    public class StorageManager : BaseManager<StorageFile>
+    public class StorageManager : BaseEntityManager<StorageFile>
     {
         #region StorageManager
-        public StorageManager(IBaseRepository<StorageFile> repository) : base(repository) { }
+        public StorageManager(IBaseEntityRepository<StorageFile> repository) : base(repository) { }
         #endregion
 
         #region GetAsync()

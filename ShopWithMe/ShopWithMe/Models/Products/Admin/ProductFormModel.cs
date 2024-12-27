@@ -18,5 +18,6 @@ namespace ShopWithMe.Models.Products.Admin
         public string TechnicalData  { get; set; }
         public long? MainImageId { get; set; }
         public StorageFile MainImage { get; set; }
+        public List<StorageFile> Images { get; set; }
     }
 }

@@ -4,10 +4,10 @@ using ShopWithMe.Models.ProductCategories;
 
 namespace ShopWithMe.Managers.ProductCategories
 {
-    public class ProductCategoriesManager : BaseManager<ProductCategory>
+    public class ProductCategoriesManager : BaseEntityManager<ProductCategory>
     {
         #region ProductsManagers()
-        public ProductCategoriesManager(IBaseRepository<ProductCategory> repository) : base(repository) { }
+        public ProductCategoriesManager(IBaseEntityRepository<ProductCategory> repository) : base(repository) { }
         #endregion
 
         #region GetListAsync()

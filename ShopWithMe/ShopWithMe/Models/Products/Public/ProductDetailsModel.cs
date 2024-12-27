@@ -12,5 +12,6 @@ namespace ShopWithMe.Models.Products.Public
         public string Category { get; set; }
         public string TechnicalData { get; set; }
         public StorageFile MainImage { get; set; }
+        public List<StorageFile> Images { get; set; }
     }
 }

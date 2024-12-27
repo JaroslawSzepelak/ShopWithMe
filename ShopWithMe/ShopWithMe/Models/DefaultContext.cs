@@ -24,6 +24,7 @@ namespace ShopWithMe.Models
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<StorageFile> Files { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
 
         #region OnModelCreating()
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +47,15 @@ namespace ShopWithMe.Models
             modelBuilder.Entity<StorageFile>()
                 .Property(b => b.DateModified)
                 .HasDefaultValueSql("getdate()");
+            #endregion
+
+            #region ProductImage
+            modelBuilder.Entity<ProductImage>()
+                .HasKey(p => new
+                {
+                    p.ProductId,
+                    p.StorageFileId
+                });
             #endregion
         }
         #endregion

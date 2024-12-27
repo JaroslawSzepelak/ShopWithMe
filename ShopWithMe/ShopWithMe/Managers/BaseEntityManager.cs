@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopWithMe.Models.Common;
+using ShopWithMe.Tools.Abstractions;
 using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers
 {
-    public class BaseManager<TEntity> where TEntity : class
+    public class BaseEntityManager<TEntity> where TEntity : class, IEntity
     {
-        protected readonly IBaseRepository<TEntity> _repository;
+        protected readonly IBaseEntityRepository<TEntity> _repository;
 
-        #region BaseManager()
-        public BaseManager(IBaseRepository<TEntity> repository)
+        #region BaseEntityManager()
+        public BaseEntityManager(IBaseEntityRepository<TEntity> repository)
         {
             _repository = repository;
         }
@@ -35,6 +36,13 @@ namespace ShopWithMe.Managers
             }
 
             return await query.ToListAsync();
+        }
+        #endregion
+
+        #region GetAsync()
+        public virtual async Task<TEntity> GetAsync(long id)
+        {
+            return await _repository.FindAsync(id);
         }
         #endregion
 

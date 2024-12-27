@@ -15,12 +15,14 @@ namespace ShopWithMe.Controllers.Admin
     {
         protected ProductsManager _manager;
         protected ProductModelsMapper _mapper;
+        protected ProductImagesManager _productImagesManager;
 
         #region ProductsController()
-        public ProductsController(ProductsManager manager, ProductModelsMapper mapper)
+        public ProductsController(ProductsManager manager,  ProductModelsMapper mapper, ProductImagesManager productImagesManager)
         {
             _manager = manager;
             _mapper = mapper;
+            _productImagesManager = productImagesManager;
         }
         #endregion
 
@@ -104,6 +106,37 @@ namespace ShopWithMe.Controllers.Admin
                 return NotFound();
 
             await _manager.DeleteAsync(entity);
+
+            return Ok();
+        }
+        #endregion
+
+        #region AddImage()
+        [HttpPost("{productId}/images")]
+        public async Task<IActionResult> AddImage(long productId, [FromBody] long imageId)
+        {
+            var entity = new ProductImage()
+            {
+                ProductId = productId,
+                StorageFileId = imageId
+            };
+
+            await _productImagesManager.CreateAsync(entity);
+
+            return Ok(entity);
+        }
+        #endregion
+
+        #region RemoveImage()
+        [HttpDelete("{productId}/images/{imageId}")]
+        public async Task<IActionResult> RemoveImage(long productId, long imageId)
+        {
+            var entity = await _productImagesManager.GetAsync(productId, imageId);
+
+            if (entity == null)
+                return NotFound();
+
+            await _productImagesManager.DeleteAsync(entity);
 
             return Ok();
         }

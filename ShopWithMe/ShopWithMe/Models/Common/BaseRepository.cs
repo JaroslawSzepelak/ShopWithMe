@@ -1,13 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ShopWithMe.Tools.Abstractions;
-
-namespace ShopWithMe.Models.Common
+﻿namespace ShopWithMe.Models.Common
 {
     /// <summary>
     /// Bazowa klasa odpowiedzialna za operacje na bazie danych
     /// </summary>
-    /// <typeparam name="TEntity">Klasa modelu danych używanych w DefaultContext, implementująca interfejs IEntity</typeparam>
-    public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class, IEntity
+    /// <typeparam name="TEntity">Klasa modelu danych używanych w DefaultContext</typeparam>
+    public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {
         protected DefaultContext _context;
         public IQueryable<TEntity> Entities => _context.Set<TEntity>();
@@ -16,20 +13,6 @@ namespace ShopWithMe.Models.Common
         public BaseRepository(DefaultContext context)
         {
             _context = context;
-        }
-        #endregion
-
-        #region Find()
-        public virtual TEntity Find(long id)
-        {
-            return Entities.FirstOrDefault(e => e.Id == id);
-        }
-        #endregion
-
-        #region FindAsync()
-        public virtual async Task<TEntity> FindAsync(long id)
-        {
-            return await Entities.FirstOrDefaultAsync(e => e.Id == id);
         }
         #endregion
 

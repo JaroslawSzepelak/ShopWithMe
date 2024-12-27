@@ -14,6 +14,7 @@ namespace ShopWithMe.Managers
             services = services.AddScoped<ProductCategoriesManager>();
             services = services.AddScoped<OrdersManager>();
             services = services.AddScoped<StorageManager>();
+            services = services.AddScoped<ProductImagesManager>();
 
             return services;
         }

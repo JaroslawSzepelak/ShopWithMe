@@ -9,10 +9,10 @@ using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers.Orders
 {
-    public class OrdersManager : BaseManager<Order>
+    public class OrdersManager : BaseEntityManager<Order>
     {
         #region OrdersManager()
-        public OrdersManager(IBaseRepository<Order> repository) : base(repository) { }
+        public OrdersManager(IBaseEntityRepository<Order> repository) : base(repository) { }
         #endregion
 
         #region GetAsync()

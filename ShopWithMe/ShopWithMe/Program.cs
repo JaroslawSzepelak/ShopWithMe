@@ -56,6 +56,7 @@ namespace ShopWithMe
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddScoped(typeof(IBaseEntityRepository<>), typeof(BaseEntityRepository<>));
             builder.Services.AddManagers();
             builder.Services.AddMappers();
             builder.Services.AddTools();

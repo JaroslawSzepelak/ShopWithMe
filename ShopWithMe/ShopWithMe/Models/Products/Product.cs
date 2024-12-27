@@ -23,5 +23,6 @@ namespace ShopWithMe.Models.Products
 
         public virtual ProductCategory Category { get; set; }
         public virtual StorageFile MainImage { get; set; }
+        public virtual ICollection<ProductImage> Images { get; set; }
     }
 }

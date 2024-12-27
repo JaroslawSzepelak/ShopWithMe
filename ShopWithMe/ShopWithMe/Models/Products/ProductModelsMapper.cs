@@ -28,6 +28,7 @@ namespace ShopWithMe.Models.Products
             mapTo.TechnicalData = mapFrom.TechnicalData;
             mapTo.MainImageId = mapFrom.MainImageId;
             mapTo.MainImage = mapFrom.MainImage;
+            mapTo.Images = mapFrom.Images.Select(i => i.StorageFile).ToList();
         }
 
         public void Map(Product mapFrom, AdminModel.ProductListModel mapTo)

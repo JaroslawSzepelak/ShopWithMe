@@ -5,10 +5,10 @@ using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Managers.Products
 {
-    public class ProductsManager : BaseManager<Product>
+    public class ProductsManager : BaseEntityManager<Product>
     {
         #region ProductsManagers()
-        public ProductsManager(IBaseRepository<Product> repository) : base(repository) { }
+        public ProductsManager(IBaseEntityRepository<Product> repository) : base(repository) { }
         #endregion
 
         #region GetListAsync()
@@ -82,7 +82,9 @@ namespace ShopWithMe.Managers.Products
             {
                 query = query
                     .Include(q => q.Category)
-                    .Include(p => p.MainImage);
+                    .Include(p => p.MainImage)
+                    .Include(p => p.Images)
+                        .ThenInclude(i => i.StorageFile);
             }
 
             return await query.FirstOrDefaultAsync(q => q.Id == id);
