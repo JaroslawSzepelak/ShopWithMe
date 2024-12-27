@@ -586,7 +586,7 @@ export default class Cart extends Vue {
 @media (max-width: 500px) {
   .cart {
     .cart-container {
-      width: 300px;
+      width: 270px;
     }
     .cart-item {
       flex-direction: column;
@@ -653,6 +653,7 @@ export default class Cart extends Vue {
     }
 
     .cart-summary {
+      margin-top: 40px;
       .summary-buttons {
         width: 70%;
       }

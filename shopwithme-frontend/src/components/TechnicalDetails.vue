@@ -96,4 +96,79 @@ export default class TechnicalDetails extends Vue {
     }
   }
 }
+
+@media (max-width: 1200px) {
+  .technical-details {
+    box-sizing: border-box;
+    width: 85%;
+    padding: 1.5rem;
+
+    h2 {
+      font-size: 1.8rem;
+    }
+
+    .technical-table td {
+      font-size: 0.95rem;
+      padding: 12px 15px;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .technical-details {
+    box-sizing: border-box;
+    width: 90%;
+    padding: 1.2rem;
+
+    h2 {
+      font-size: 1.6rem;
+    }
+
+    .technical-table td {
+      font-size: 0.9rem;
+      padding: 10px 12px;
+    }
+
+    .key-column {
+      width: 40%;
+    }
+
+    .value-column {
+      width: 60%;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .technical-details {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 1rem;
+
+    h2 {
+      font-size: 1.4rem;
+    }
+
+    .no-data-message {
+      font-size: 1rem;
+    }
+
+    .technical-table {
+      font-size: 0.85rem;
+
+      td {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+      }
+
+      .key-column {
+        width: 45%;
+      }
+
+      .value-column {
+        width: 55%;
+      }
+    }
+  }
+}
 </style>

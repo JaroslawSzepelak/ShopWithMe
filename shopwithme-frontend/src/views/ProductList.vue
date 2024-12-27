@@ -250,13 +250,7 @@ export default class ProductList extends Vue {
     }
   }
 
-  .error-message {
-    text-align: center;
-    color: red;
-    font-size: 1.2rem;
-    margin-top: 20px;
-  }
-
+  .error-message,
   .no-products {
     text-align: center;
     color: #555;
@@ -341,5 +335,91 @@ export default class ProductList extends Vue {
   cursor: pointer;
   font-size: 1rem;
   margin-top: 20px;
+}
+
+/* Responsywne style */
+@media (max-width: 1200px) {
+  .product-list-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-size-selector {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 800px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .product-list-container {
+    gap: 10px;
+  }
+
+  .pagination-container {
+    .btn {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .product-list {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-size-selector label {
+    font-size: 0.9rem;
+  }
+
+  .page-size-select {
+    font-size: 0.9rem;
+    padding: 4px;
+  }
+
+  .pagination-container {
+    .btn {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+  }
+
+  .shop-btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 450px) {
+  .pagination-container {
+    .pagination-controls {
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+
+      .btn {
+        font-size: 0.7rem;
+        padding: 5px 8px;
+        text-align: center;
+      }
+    }
+  }
 }
 </style>

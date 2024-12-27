@@ -7,7 +7,7 @@
     </div>
 
     <!-- Główna zawartość -->
-    <div v-else>
+    <div v-else class="order-container">
       <h2 class="text-center">Szczegóły Zamówienia #{{ order.id }}</h2>
 
       <!-- Status Zamówienia -->
@@ -150,7 +150,6 @@ export default class OrderDetailsAdmin extends Vue {
 <style scoped lang="scss">
 .order-details-admin {
   padding: 2rem;
-  background-color: #f9f9f9;
 
   .order-status {
     margin-top: 30px;
@@ -271,6 +270,86 @@ export default class OrderDetailsAdmin extends Vue {
       margin-top: 1rem;
       font-size: 1.2rem;
       color: #555;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .order-details-admin {
+    padding: 1rem;
+
+    .order-status {
+      font-size: 1rem;
+      padding: 8px;
+    }
+
+    .order-section {
+      h3 {
+        font-size: 1.2rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    .table {
+      display: block;
+      width: 600px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      text-wrap: nowrap;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+
+    .order-summary p {
+      font-size: 1rem;
+    }
+
+    .actions .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .order-details-admin {
+    .order-status {
+      font-size: 0.9rem;
+      max-width: 100%;
+      margin: 10px 0;
+    }
+
+    .order-section {
+      h3 {
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+
+    .table {
+      th,
+      td {
+        white-space: nowrap;
+        font-size: 0.8rem;
+      }
+    }
+
+    .order-summary p {
+      font-size: 0.9rem;
+    }
+
+    .actions .btn {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
     }
   }
 }

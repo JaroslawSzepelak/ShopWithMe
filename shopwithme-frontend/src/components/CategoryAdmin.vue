@@ -294,4 +294,102 @@ export default class CategoryAdmin extends Vue {
     }
   }
 }
+
+@media (max-width: 1250px) {
+  .category-admin {
+    padding: 1rem;
+
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .page-size-selector {
+      margin-top: 10px;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .category-admin {
+    padding: 1rem;
+
+    .table {
+      display: block;
+      width: 700px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .category-admin {
+    .table {
+      font-size: 0.85rem;
+      th,
+      td {
+        padding: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+
+      .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .btn {
+          padding: 8px 12px;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .category-admin {
+    .table {
+      font-size: 0.8rem;
+
+      th,
+      td {
+        padding: 0.4rem;
+        white-space: nowrap;
+      }
+    }
+
+    .page-size-selector {
+      select {
+        font-size: 0.8rem;
+      }
+
+      label {
+        font-size: 0.8rem;
+      }
+    }
+
+    .pagination-container {
+      gap: 10px;
+
+      .pagination-controls {
+        .btn {
+          padding: 6px 10px;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
 </style>

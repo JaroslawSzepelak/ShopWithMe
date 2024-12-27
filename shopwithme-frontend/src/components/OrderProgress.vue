@@ -69,6 +69,7 @@ export default {
   margin: 0 auto;
   margin-bottom: 40px;
   padding-top: 20px;
+  flex-wrap: wrap;
 }
 
 .step {
@@ -77,6 +78,7 @@ export default {
   align-items: center;
   text-align: center;
   flex: 1;
+  min-width: 120px;
 }
 
 .circle {
@@ -119,7 +121,6 @@ export default {
   background-color: #000;
   margin: 0 10px;
   transition: background-color 0.3s;
-  display: block;
 }
 
 .line.completed {
@@ -128,5 +129,73 @@ export default {
 
 .order-progress .line + .step {
   margin-left: 0;
+}
+
+@media (max-width: 1024px) {
+  .order-progress {
+    max-width: 800px;
+  }
+
+  .circle {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .step p {
+    font-size: 14px;
+  }
+
+  .line {
+    height: 3px;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-progress {
+    max-width: 600px;
+  }
+
+  .circle {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .step p {
+    font-size: 12px;
+  }
+
+  .line {
+    height: 2px;
+    margin: 0 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-progress {
+    max-width: 100%;
+    padding: 0 10px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+  }
+
+  .circle {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .step {
+    min-width: 80px;
+  }
+
+  .step p {
+    font-size: 10px;
+  }
+
+  .line {
+    height: 1px;
+  }
 }
 </style>

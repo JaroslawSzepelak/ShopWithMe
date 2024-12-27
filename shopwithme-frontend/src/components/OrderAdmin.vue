@@ -16,9 +16,6 @@
           type="checkbox"
           v-model="showShipped"
         />
-        <label for="showShipped" class="form-check-label">
-          Pokaż wysłane zamówienia
-        </label>
       </div>
       <table class="table table-striped table-bordered">
         <thead class="thead-dark">
@@ -278,6 +275,7 @@ export default class OrderAdmin extends Vue {
 
   .table {
     margin-top: 20px;
+    text-wrap: nowrap;
     width: 100%;
   }
 
@@ -407,6 +405,80 @@ export default class OrderAdmin extends Vue {
         color: #777;
         font-weight: bold;
         cursor: default;
+      }
+    }
+  }
+}
+
+@media (max-width: 1250px) {
+  .order-admin {
+    padding: 1rem;
+
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .order-admin {
+    .table {
+      display: block;
+      overflow-x: auto;
+      font-size: 0.9rem;
+
+      th,
+      td {
+        padding: 0.5rem;
+        white-space: nowrap;
+      }
+    }
+
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+
+      .btn {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .order-admin {
+    .orders-header {
+      font-size: 1.2rem;
+      padding: 0.5rem;
+    }
+
+    .table {
+      font-size: 0.8rem;
+
+      th,
+      td {
+        padding: 0.4rem;
+      }
+    }
+
+    .pagination-container {
+      .btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      .page-size-selector {
+        label {
+          font-size: 0.8rem;
+        }
+
+        select {
+          font-size: 0.8rem;
+        }
       }
     }
   }

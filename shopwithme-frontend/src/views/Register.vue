@@ -204,7 +204,7 @@ export default class Register extends Vue {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f9f9f9;
+  background-color: #f5f5f5;
 }
 
 .register-card {
@@ -214,14 +214,13 @@ export default class Register extends Vue {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  max-width: 500px;
+  max-width: 450px;
   width: 100%;
 }
 
 h1 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: #c70a0a;
 }
 
 .form-group {
@@ -231,8 +230,6 @@ h1 {
   label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: #333333;
   }
 
   input {
@@ -242,22 +239,14 @@ h1 {
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
-    background-color: #f9f9f9;
-
-    &:focus {
-      border-color: #c70a0a;
-      outline: none;
-      box-shadow: 0 0 3px rgba(199, 10, 10, 0.25);
-    }
   }
 }
 
 .form-actions {
   margin-top: 1.5rem;
-  text-align: center;
 
-  .btn-primary {
-    background-color: #c70a0a;
+  .btn {
+    background-color: #d9534f;
     color: white;
     padding: 0.5rem 1rem;
     margin: 10px;
@@ -265,24 +254,14 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
 
     &:hover {
-      background-color: #a50d0d;
+      background-color: #c9302c;
     }
   }
 
   .btn-secondary {
     background-color: #6c757d;
-    color: white;
-    padding: 0.5rem 1rem;
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-
     &:hover {
       background-color: #5a6268;
     }
@@ -297,5 +276,35 @@ h1 {
   color: red;
   font-size: 12px;
   margin-top: 5px;
+}
+
+@media (max-width: 540px) {
+  .register-container {
+    height: auto;
+    box-sizing: border-box;
+    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .register-card {
+    padding: 1.5rem;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .form-group input {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+
+  .form-actions .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
 }
 </style>

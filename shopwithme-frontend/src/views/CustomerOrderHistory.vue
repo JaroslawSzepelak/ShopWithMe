@@ -68,7 +68,7 @@
         >
           Następna
         </button>
-        <div>
+        <div class="page-size-selector">
           <label>
             Rozmiar strony:
             <select @change="changePageSize($event)" :value="pageSize">
@@ -186,6 +186,12 @@ export default class CustomerOrderHistory extends Vue {
   .table-container {
     margin: 20px auto;
     max-width: 80%;
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
   }
 
   .table-center {
@@ -194,6 +200,7 @@ export default class CustomerOrderHistory extends Vue {
 
   .pagination-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -207,6 +214,63 @@ export default class CustomerOrderHistory extends Vue {
 
   .error-message {
     margin: 20px;
+  }
+
+  .page-size-selector {
+    margin-left: 20px;
+  }
+}
+
+@media (max-width: 920px) {
+  .order-history {
+    margin-bottom: 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .order-history .table-container {
+    max-width: 95%;
+  }
+
+  .order-history .page-size-selector {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 610px) {
+  .order-history .table-container {
+    width: 580px;
+    text-wrap: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-history .orders-header {
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+
+  .order-history .pagination-container {
+    gap: 5px;
+  }
+
+  .order-history .table-container {
+    padding: 0 10px;
+  }
+
+  .order-history .table th,
+  .order-history .table td {
+    font-size: 0.9rem;
+    padding: 5px;
+  }
+
+  .order-history .btn {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .order-history .page-size-selector select {
+    font-size: 0.8rem;
   }
 }
 </style>

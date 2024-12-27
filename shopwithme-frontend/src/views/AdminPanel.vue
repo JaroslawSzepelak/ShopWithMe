@@ -133,4 +133,67 @@ h1,
 h4 {
   margin: 0;
 }
+
+@media (max-width: 1200px) {
+  .admin-sidebar {
+    max-width: 250px;
+    min-width: 250px;
+
+    .btn {
+      font-size: 1rem;
+      padding: 12px 18px;
+    }
+  }
+
+  .admin-header h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .admin-container {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+    min-width: 100%;
+    max-height: 230px;
+    padding: 10px;
+
+    .btn {
+      width: 60%;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 10px 15px;
+    }
+  }
+
+  .admin-content {
+    flex: 1;
+    padding: 10px;
+    border-left: none;
+    border-top: 1px solid #ddd;
+  }
+}
+
+@media (max-width: 500px) {
+  .admin-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .admin-sidebar {
+    .btn {
+      font-size: 0.8rem;
+      padding: 8px 12px;
+    }
+  }
+
+  .admin-content {
+    font-size: 1rem;
+  }
+}
 </style>

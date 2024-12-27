@@ -40,26 +40,30 @@
       <!-- Produkty -->
       <div class="order-section">
         <h3>Produkty</h3>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Nazwa Produktu</th>
-              <th>Kategoria</th>
-              <th>Ilość</th>
-              <th>Cena Jednostkowa</th>
-              <th>Cena Łączna</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="line in order.lines" :key="line.id">
-              <td>{{ line.product.name }}</td>
-              <td>{{ getCategoryName(line.product.categoryId) }}</td>
-              <td>{{ line.quantity }}</td>
-              <td>{{ line.product.price.toFixed(2) }} PLN</td>
-              <td>{{ (line.quantity * line.product.price).toFixed(2) }} PLN</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nazwa Produktu</th>
+                <th>Kategoria</th>
+                <th>Ilość</th>
+                <th>Cena Jednostkowa</th>
+                <th>Cena Łączna</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="line in order.lines" :key="line.id">
+                <td>{{ line.product.name }}</td>
+                <td>{{ getCategoryName(line.product.categoryId) }}</td>
+                <td>{{ line.quantity }}</td>
+                <td>{{ line.product.price.toFixed(2) }} PLN</td>
+                <td>
+                  {{ (line.quantity * line.product.price).toFixed(2) }} PLN
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Podsumowanie -->
@@ -211,8 +215,14 @@ export default class CustomerOrderDetails extends Vue {
     }
   }
 
+  .table-container {
+    display: flex;
+    justify-content: center;
+  }
+
   .table {
     width: 100%;
+    max-width: 1300px;
     margin-top: 1rem;
     border-collapse: collapse;
 
@@ -281,6 +291,86 @@ export default class CustomerOrderDetails extends Vue {
       margin-top: 1rem;
       font-size: 1.2rem;
       color: #555;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .order-details-customer {
+    padding: 1rem;
+
+    .order-status {
+      font-size: 1rem;
+      padding: 8px;
+    }
+
+    .order-section {
+      h3 {
+        font-size: 1.2rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    .table {
+      display: block;
+      width: 600px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      text-wrap: nowrap;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+
+    .order-summary p {
+      font-size: 1rem;
+    }
+
+    .actions .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .order-details-customer {
+    .order-status {
+      font-size: 0.9rem;
+      max-width: 100%;
+      margin: 10px 0;
+    }
+
+    .order-section {
+      h3 {
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+
+    .table {
+      th,
+      td {
+        white-space: nowrap;
+        font-size: 0.8rem;
+      }
+    }
+
+    .order-summary p {
+      font-size: 0.9rem;
+    }
+
+    .actions .btn {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
     }
   }
 }

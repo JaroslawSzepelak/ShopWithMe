@@ -364,6 +364,8 @@ export default class ProductDetails extends Vue {
   .description-section {
     margin-top: 50px;
     margin-bottom: 50px;
+    padding-left: 50px;
+    padding-right: 50px;
     text-align: center;
     max-width: 1000px;
 
@@ -376,6 +378,129 @@ export default class ProductDetails extends Vue {
       text-align: left;
       color: #666;
     }
+  }
+}
+
+@media (max-width: 1200px) {
+  .product-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .image-section {
+    .main-image {
+      max-width: 300px;
+    }
+
+    .image-thumbnails {
+      gap: 0.5rem;
+
+      .thumbnail {
+        width: 50px !important;
+        height: 50px !important;
+      }
+    }
+  }
+
+  .details-section {
+    h2 {
+      font-size: 1.6rem;
+    }
+
+    .price {
+      font-size: 1.8rem;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .image-section {
+    .main-image {
+      max-width: 250px;
+    }
+
+    .image-thumbnails {
+      .thumbnail {
+        width: 40px !important;
+        height: 40px !important;
+      }
+    }
+  }
+
+  .details-section {
+    h2 {
+      font-size: 1.4rem;
+    }
+
+    .price {
+      font-size: 1.6rem;
+    }
+
+    .quantity-control .quantity-btn {
+      width: 30px;
+      height: 30px;
+      font-size: 1rem;
+    }
+
+    .quantity-control .quantity-input {
+      width: 40px;
+      height: 30px;
+    }
+  }
+
+  .buttons {
+    flex-direction: column;
+
+    .cart-btn,
+    .back-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .image-section {
+    .main-image {
+      max-width: 200px;
+      padding: 40px;
+    }
+  }
+
+  .details-section {
+    h2 {
+      font-size: 1.2rem;
+    }
+
+    .price {
+      font-size: 1.4rem;
+    }
+
+    .quantity-control .quantity-btn {
+      width: 25px;
+      height: 25px;
+      font-size: 0.9rem;
+    }
+
+    .quantity-control .quantity-input {
+      width: 35px;
+      height: 25px;
+    }
+  }
+
+  .buttons {
+    gap: 0.5rem;
+
+    .cart-btn,
+    .back-btn {
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
+    }
+  }
+
+  .description-section p {
+    font-size: 0.9rem;
   }
 }
 </style>

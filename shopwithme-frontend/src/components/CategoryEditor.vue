@@ -183,4 +183,88 @@ export default class CategoryEditor extends Vue {
     }
   }
 }
+
+@media (max-width: 1200px) {
+  .category-editor {
+    max-width: 700px;
+
+    h4 {
+      font-size: 1.6rem;
+    }
+
+    .form-control {
+      font-size: 0.95rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .category-editor {
+    padding: 15px;
+
+    h4 {
+      font-size: 1.4rem;
+      padding: 10px;
+    }
+
+    .form-container {
+      gap: 10px;
+    }
+
+    .form-control {
+      font-size: 0.9rem;
+      padding: 8px;
+    }
+
+    .button-group {
+      flex-direction: column;
+      align-items: stretch;
+
+      .btn {
+        font-size: 0.9rem;
+        padding: 8px;
+      }
+    }
+
+    .error-messages {
+      font-size: 0.9rem;
+
+      ul li {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .category-editor {
+    padding: 10px;
+
+    h4 {
+      font-size: 1.2rem;
+    }
+
+    .form-control {
+      font-size: 0.85rem;
+      padding: 6px;
+    }
+
+    .button-group {
+      gap: 10px;
+
+      .btn {
+        font-size: 0.8rem;
+        padding: 6px;
+      }
+    }
+
+    .error-messages {
+      font-size: 0.8rem;
+
+      ul li {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}
 </style>

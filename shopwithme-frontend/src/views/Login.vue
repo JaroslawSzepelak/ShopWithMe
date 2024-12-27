@@ -215,4 +215,38 @@ h1 {
   font-size: 12px;
   margin-top: 5px;
 }
+
+@media (max-width: 480px) {
+  .login-container {
+    box-sizing: border-box;
+    height: auto;
+    padding: 20px;
+    align-items: flex-start;
+  }
+
+  .login-card {
+    padding: 1.5rem;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .form-group input {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+
+  .form-actions .btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .form-links p {
+    font-size: 0.8rem;
+  }
+}
 </style>

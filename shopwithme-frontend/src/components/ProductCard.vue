@@ -115,4 +115,96 @@ export default class ProductCard extends Vue {
     }
   }
 }
+
+@media (max-width: 900px) {
+  .product-card {
+    flex-direction: column;
+    align-items: center;
+    width: 70%;
+
+    .product-image {
+      margin-top: 40px;
+      width: 80%;
+      height: auto;
+    }
+
+    .product-details {
+      padding: 15px;
+
+      .product-name {
+        font-size: 1.6rem;
+      }
+
+      .product-price {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        font-size: 1.4rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .product-card {
+    padding: 10px;
+
+    .product-details {
+      .product-name {
+        font-size: 1.4rem;
+      }
+
+      .product-lead {
+        font-size: 0.9rem;
+      }
+
+      .product-price {
+        font-size: 1.3rem;
+      }
+
+      .details-btn {
+        box-sizing: border-box;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        width: 70%;
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .product-card {
+    width: 80%;
+    box-sizing: border-box;
+    flex-direction: column;
+    padding: 5px;
+
+    .product-image {
+      margin-top: 20px;
+      height: auto;
+    }
+
+    .product-details {
+      padding: 10px;
+
+      .product-name {
+        font-size: 1.2rem;
+      }
+
+      .product-lead {
+        font-size: 0.8rem;
+      }
+
+      .product-price {
+        font-size: 1.2rem;
+      }
+
+      .details-btn {
+        box-sizing: border-box;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        width: 80%;
+      }
+    }
+  }
+}
 </style>

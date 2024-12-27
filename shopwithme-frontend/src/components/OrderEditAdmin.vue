@@ -421,4 +421,106 @@ export default class OrderEditAdmin extends Vue {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .order-edit-admin {
+    padding: 1rem;
+
+    .order-section {
+      .section-title {
+        font-size: 1.2rem;
+      }
+
+      .form-group {
+        .form-control {
+          max-width: 100%;
+        }
+      }
+    }
+
+    .actions .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 1rem;
+    }
+
+    .table {
+      font-size: 0.9rem;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+
+    .add-cart-line {
+      .form-inline {
+        flex-direction: column;
+
+        .form-group {
+          width: 90%;
+
+          label {
+            font-size: 0.8rem;
+          }
+
+          .form-control {
+            width: 100%;
+          }
+        }
+
+        button {
+          width: 60%;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .order-edit-admin {
+    .order-section {
+      .section-title {
+        font-size: 1rem;
+      }
+
+      .form-group {
+        .form-control {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .actions .btn {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.8rem;
+    }
+
+    .table {
+      font-size: 0.8rem;
+      text-wrap: nowrap;
+      th,
+      td {
+        padding: 0.4rem;
+      }
+    }
+
+    .add-cart-line {
+      .form-inline {
+        .form-group {
+          label {
+            font-size: 0.7rem;
+          }
+
+          .form-control {
+            font-size: 0.8rem;
+          }
+        }
+
+        button {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
 </style>

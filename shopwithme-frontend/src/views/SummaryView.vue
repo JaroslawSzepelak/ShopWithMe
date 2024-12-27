@@ -260,6 +260,7 @@ export default class SummaryView extends Vue {
   display: flex;
   justify-content: space-between;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .cart-section {
@@ -268,9 +269,11 @@ export default class SummaryView extends Vue {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
 
   h1 {
     margin-bottom: 20px;
+    font-size: 1.5rem;
   }
 
   .cart-item {
@@ -278,16 +281,17 @@ export default class SummaryView extends Vue {
     align-items: center;
     gap: 15px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
 
     img {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       object-fit: cover;
       border-radius: 8px;
     }
 
     .item-details {
-      font-size: 1rem;
+      font-size: 0.9rem;
     }
   }
 }
@@ -297,6 +301,7 @@ export default class SummaryView extends Vue {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  max-width: 100%;
 
   .details-block {
     background: #fff;
@@ -306,11 +311,18 @@ export default class SummaryView extends Vue {
 
     h2 {
       margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    p {
+      font-size: 0.9rem;
     }
   }
 }
 
 .summary-total {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   background-color: #fff;
   padding: 20px;
@@ -318,9 +330,15 @@ export default class SummaryView extends Vue {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 20px;
+  max-width: 100%;
 
   h2 {
     margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1rem;
   }
 
   .confirm-btn {
@@ -392,6 +410,105 @@ export default class SummaryView extends Vue {
     &:hover {
       background-color: #a50e0e;
     }
+  }
+}
+
+@media (max-width: 1024px) {
+  .summary-content {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .cart-section,
+  .details-section,
+  .summary-total {
+    flex: 1 1 100%;
+    max-width: 100%;
+
+    .confirm-btn {
+      width: 70%;
+      align-self: center;
+    }
+  }
+
+  .cart-item {
+    img {
+      width: 70px;
+      height: 70px;
+    }
+
+    .item-details {
+      font-size: 0.8rem;
+    }
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-container {
+    padding: 20px;
+  }
+
+  .cart-item {
+    gap: 10px;
+
+    img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  .confirm-btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-container {
+    padding: 10px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+
+    img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .item-details {
+      font-size: 0.8rem;
+    }
+  }
+
+  .details-block {
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  h1,
+  h2 {
+    font-size: 1rem;
+  }
+
+  .confirm-btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
   }
 }
 </style>

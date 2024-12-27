@@ -305,7 +305,9 @@ export default class DeliveryForm extends Vue {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding: 40px 400px 200px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .delivery-form {
@@ -433,5 +435,76 @@ input {
   color: red;
   font-size: 12px;
   margin-top: 5px;
+}
+
+@media (max-width: 1230px) {
+  .delivery-form-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px 20%;
+  }
+
+  .form-section {
+    flex-direction: column;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .summary {
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .delivery-form-container {
+    flex-direction: column;
+  }
+
+  .delivery-form {
+    order: 1;
+    margin-bottom: 20px;
+  }
+
+  .summary {
+    order: 2;
+    width: 100%;
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .back-btn,
+  .next-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .delivery-form-container {
+    padding: 15px;
+  }
+
+  label {
+    font-size: 14px;
+  }
+
+  input {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .delivery-methods label {
+    font-size: 14px;
+  }
+
+  .back-btn,
+  .next-btn {
+    font-size: 14px;
+    padding: 8px 15px;
+  }
 }
 </style>
