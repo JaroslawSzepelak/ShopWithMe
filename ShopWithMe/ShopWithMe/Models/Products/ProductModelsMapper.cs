@@ -55,6 +55,7 @@ namespace ShopWithMe.Models.Products
             mapTo.Category = mapFrom.Category?.Name;
             mapTo.TechnicalData = mapFrom.TechnicalData;
             mapTo.MainImage = mapFrom.MainImage;
+            mapTo.Images = mapFrom.Images.Select(i => i.StorageFile).ToList();
         }
 
         public void Map(Product mapFrom, PublicModel.ProductListModel mapTo)
