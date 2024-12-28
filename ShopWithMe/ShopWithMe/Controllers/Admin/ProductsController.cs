@@ -42,7 +42,7 @@ namespace ShopWithMe.Controllers.Admin
         }
         #endregion
 
-        #region GetList()
+        #region GetAutocomplete()
         [HttpGet("get-autocomplete")]
         public async Task<List<ProductAutocompleteModel>> GetAutocomplete([FromQuery] string search)
         {

@@ -46,6 +46,11 @@ namespace ShopWithMe.Managers.Products
 
         public async Task<List<Product>> GetListAsync(bool loadLinkedData, Pager pager)
         {
+            return await GetListAsync(false, pager, 0, null);
+        }
+
+        public async Task<List<Product>> GetListAsync(bool loadLinkedData, Pager pager, long categoryId, string search)
+        {
             var query = _repository.Entities.AsQueryable();
 
             if (loadLinkedData)
@@ -53,6 +58,18 @@ namespace ShopWithMe.Managers.Products
                 query = query
                     .Include(q => q.Category)
                     .Include(p => p.MainImage);
+            }
+
+            if (categoryId > 0)
+            {
+                query = query
+                    .Where(p => p.CategoryId == categoryId);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query
+                    .Where(p => p.Name.Contains(search));
             }
 
             if (pager != null)

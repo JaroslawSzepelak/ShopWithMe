@@ -23,7 +23,11 @@ namespace ShopWithMe.Controllers
 
         #region GetList()
         [HttpGet]
-        public async Task<ResultModel<ProductListModel>> GetList([FromQuery] int pageIndex, [FromQuery] int pageSize)
+        public async Task<ResultModel<ProductListModel>> GetList(
+            [FromQuery] int pageIndex, 
+            [FromQuery] int pageSize,
+            [FromQuery] int categoryId,
+            [FromQuery] string search)
         {
             var pager = new Pager()
             {
@@ -31,9 +35,19 @@ namespace ShopWithMe.Controllers
                 PageSize = pageSize
             };
 
-            var entries = await _manager.GetListAsync(true, pager);
+            var entries = await _manager.GetListAsync(true, pager, categoryId, search);
 
             return new ResultModel<ProductListModel>(_mapper.MapToPublicListModel(entries), pager);
+        }
+        #endregion
+
+        #region GetAutocomplete()
+        [HttpGet("get-autocomplete")]
+        public async Task<List<ProductAutocompleteModel>> GetAutocomplete([FromQuery] string search)
+        {
+            var entries = await _manager.GetListAsync(search);
+
+            return _mapper.MapToPublicAutocompleteModel(entries);
         }
         #endregion
 
