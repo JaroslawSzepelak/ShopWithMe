@@ -19,8 +19,15 @@
             :key="product.id"
           >
             <img
-              :src="product.image || placeholderImage"
-              alt="Product image"
+              v-if="product.mainImage?.url"
+              :src="product.mainImage.url"
+              alt="Zdjęcie produktu"
+              class="product-image"
+            />
+            <img
+              v-else
+              :src="placeholderImage"
+              alt="Obraz zastępczy"
               class="product-image"
             />
             <div class="product-info">
@@ -74,6 +81,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import AppModal from "@/components/modals/AppModal.vue";
+import { storageAPI } from "@/plugins/shopAxios";
 
 @Component({
   components: {
@@ -98,7 +106,7 @@ export default class SuggestedProducts extends Vue {
     return this.$store.getters["products/totalSuggestedPages"];
   }
 
-  async mounted() {
+  async created() {
     await this.fetchSuggestedProducts();
   }
 
@@ -107,6 +115,26 @@ export default class SuggestedProducts extends Vue {
       "products/fetchSuggestedProducts",
       this.pageIndex
     );
+    const products = this.products;
+
+    for (const product of products) {
+      if (product.mainImage?.name) {
+        try {
+          const response = await storageAPI.getFile(product.mainImage.name);
+
+          const imageUrl = window.URL.createObjectURL(
+            new Blob([response.data])
+          );
+
+          this.$set(product.mainImage, "url", imageUrl);
+        } catch (error) {
+          console.error(
+            `Błąd podczas pobierania zdjęcia dla produktu ${product.id}:`,
+            error
+          );
+        }
+      }
+    }
   }
 
   async nextProducts() {
@@ -160,6 +188,14 @@ export default class SuggestedProducts extends Vue {
 
   isProductInCart(productId: number): boolean {
     return this.$store.getters["cart/isProductInCart"](productId);
+  }
+
+  logImageLoaded(productId: number) {
+    console.log(`Zdjęcie dla produktu ${productId} zostało załadowane.`);
+  }
+
+  logImageError(productId: number) {
+    console.error(`Nie udało się załadować zdjęcia dla produktu ${productId}.`);
   }
 }
 </script>
@@ -216,8 +252,11 @@ export default class SuggestedProducts extends Vue {
 
     .product-image {
       width: 100%;
-      height: 180px;
+      height: auto;
+      max-height: 200px;
       object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 1rem;
     }
 
     .product-info {

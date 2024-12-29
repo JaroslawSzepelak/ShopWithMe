@@ -2,11 +2,11 @@
   <div class="product-details" :key="$route.params.id">
     <div v-if="product" class="product-container">
       <div class="image-section">
-        <img :src="mainImage" alt="Product image" class="main-image" />
+        <img :src="mainImage" alt="Zdjęcie produktu" class="main-image" />
         <div class="image-thumbnails">
           <button class="arrow-btn" @click="prevImage">❮</button>
           <img
-            v-for="(image, index) in images"
+            v-for="(image, index) in thumbnailsList"
             :key="index"
             :src="image"
             alt="Thumbnail"
@@ -63,6 +63,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import TechnicalDetails from "@/components/TechnicalDetails.vue";
+import { storageAPI } from "@/plugins/shopAxios";
 
 @Component({
   components: {
@@ -72,6 +73,7 @@ import TechnicalDetails from "@/components/TechnicalDetails.vue";
 export default class ProductDetails extends Vue {
   mainImage = "";
   quantity = 1;
+  thumbnailsList: string[] = [];
 
   get product() {
     return (
@@ -81,12 +83,16 @@ export default class ProductDetails extends Vue {
         price: 0,
         images: this.defaultImages,
         description: "Brak dostępnych szczegółów dla tego produktu.",
+        mainImage: null,
       }
     );
   }
 
   get images() {
-    return this.product.images || this.defaultImages;
+    if (this.product.images && this.product.images.length > 0) {
+      return this.product.images;
+    }
+    return this.defaultImages;
   }
 
   get defaultImages() {
@@ -124,9 +130,29 @@ export default class ProductDetails extends Vue {
   async fetchProduct(productId: number) {
     try {
       await this.$store.dispatch("products/fetchProduct", productId);
-      this.mainImage = this.images[0] || "";
+
+      const images = [...this.images];
+
+      if (this.product.mainImage?.name) {
+        const response = await storageAPI.getFile(this.product.mainImage.name);
+        const mainImageUrl = window.URL.createObjectURL(
+          new Blob([response.data])
+        );
+        this.product.mainImage.url = mainImageUrl;
+        this.mainImage = mainImageUrl;
+
+        this.thumbnailsList = [
+          mainImageUrl,
+          ...images.filter((img) => img !== mainImageUrl),
+        ];
+      } else {
+        this.mainImage = images[0];
+        this.thumbnailsList = images;
+      }
+
+      this.thumbnailsList = this.thumbnailsList.slice(0, 4);
     } catch (error) {
-      console.error("Error fetching product details:", error);
+      console.error("Błąd podczas pobierania szczegółów produktu:", error);
     }
   }
 
@@ -135,16 +161,17 @@ export default class ProductDetails extends Vue {
   }
 
   nextImage() {
-    const currentIndex = this.images.indexOf(this.mainImage);
-    const nextIndex = (currentIndex + 1) % this.images.length;
-    this.mainImage = this.images[nextIndex];
+    const currentIndex = this.thumbnailsList.indexOf(this.mainImage);
+    const nextIndex = (currentIndex + 1) % this.thumbnailsList.length;
+    this.mainImage = this.thumbnailsList[nextIndex];
   }
 
   prevImage() {
-    const currentIndex = this.images.indexOf(this.mainImage);
+    const currentIndex = this.thumbnailsList.indexOf(this.mainImage);
     const prevIndex =
-      (currentIndex - 1 + this.images.length) % this.images.length;
-    this.mainImage = this.images[prevIndex];
+      (currentIndex - 1 + this.thumbnailsList.length) %
+      this.thumbnailsList.length;
+    this.mainImage = this.thumbnailsList[prevIndex];
   }
 
   goBack() {
@@ -157,7 +184,7 @@ export default class ProductDetails extends Vue {
       await this.$store.dispatch("cart/addItem", cartItem);
       this.$router.push("/cart");
     } catch (error) {
-      console.error("Error adding product to cart:", error);
+      console.error("Błąd podczas dodawania produktu do koszyka:", error);
     }
   }
 

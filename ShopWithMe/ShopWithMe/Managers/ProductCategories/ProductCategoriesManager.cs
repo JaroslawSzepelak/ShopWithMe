@@ -17,7 +17,7 @@ namespace ShopWithMe.Managers.ProductCategories
 
             if (loadWithProducts == true)
             {
-                query = query.Include(q => q.Products.Take(10));
+                query = query.Include(q => q.Products.Take(10)).ThenInclude( p => p.MainImage);
             }
 
             return await query.ToListAsync();

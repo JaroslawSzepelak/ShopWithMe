@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosProgressEvent } from "axios";
 
 const adminAxios = axios.create({
   baseURL: "http://localhost:5000/api/admin",
@@ -33,18 +33,16 @@ export const productAPI = {
     price: number;
     categoryId: number;
     technicalData?: string;
+    mainImageId?: number;
   }) {
     const formattedTechnicalData = product.technicalData
       ? JSON.stringify(JSON.parse(product.technicalData))
       : null;
 
     return adminAxios.post("/Products", {
-      name: product.name,
-      lead: product.lead,
-      description: product.description,
-      price: product.price,
-      categoryId: product.categoryId,
+      ...product,
       technicalData: formattedTechnicalData,
+      mainImage: null,
     });
   },
   updateProduct(product: {
@@ -55,20 +53,16 @@ export const productAPI = {
     categoryId: number;
     description?: string;
     technicalData?: string;
+    mainImageId?: number;
   }) {
-    // Konwersja danych technicznych do JSON string
     const formattedTechnicalData = product.technicalData
       ? JSON.stringify(JSON.parse(product.technicalData))
       : null;
 
     return adminAxios.put("/Products", {
-      id: product.id,
-      name: product.name,
-      lead: product.lead,
-      price: product.price,
-      categoryId: product.categoryId,
-      description: product.description,
+      ...product,
       technicalData: formattedTechnicalData,
+      mainImage: null,
     });
   },
   deleteProduct(id: number) {
@@ -160,6 +154,30 @@ export const accountAPI = {
   },
   getAdminUser() {
     return adminAxios.get("Account/get-user");
+  },
+};
+
+// API dla zarządzania plikami w admin
+export const storageAPI = {
+  uploadFile(
+    file: File,
+    onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+  ) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return adminAxios.post("/Storage", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress,
+    });
+  },
+
+  getFile(fileName: string) {
+    return axios.get(`http://localhost:5000/api/Storage/${fileName}`, {
+      responseType: "blob",
+    });
   },
 };
 

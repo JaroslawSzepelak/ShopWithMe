@@ -28,8 +28,15 @@
               @click="goToProductDetails(product.id)"
             >
               <img
-                :src="product.image || placeholderImage"
+                v-if="product.mainImage?.url"
+                :src="product.mainImage.url"
                 alt="Zdjęcie produktu"
+                class="product-image"
+              />
+              <img
+                v-else
+                :src="placeholderImage"
+                alt="Obraz zastępczy"
                 class="product-image"
               />
               <div class="product-info">
@@ -47,6 +54,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { storageAPI } from "@/plugins/shopAxios";
 
 @Component
 export default class CategoryDropdown extends Vue {
@@ -79,8 +87,28 @@ export default class CategoryDropdown extends Vue {
     this.isOpen = !this.isOpen;
   }
 
-  fetchProducts(category: { id: number; name: string }) {
+  async fetchProducts(category: { id: number; name: string; products: any[] }) {
     this.selectedCategory = category;
+
+    const products = this.products;
+
+    for (const product of products) {
+      if (product.mainImage?.name) {
+        try {
+          const response = await storageAPI.getFile(product.mainImage.name);
+
+          const imageUrl = window.URL.createObjectURL(
+            new Blob([response.data])
+          );
+          this.$set(product.mainImage, "url", imageUrl);
+        } catch (error) {
+          console.error(
+            `Błąd podczas pobierania zdjęcia dla produktu ${product.id}:`,
+            error
+          );
+        }
+      }
+    }
   }
 
   goToProductDetails(productId: number) {

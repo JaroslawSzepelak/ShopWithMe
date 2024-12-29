@@ -1,22 +1,27 @@
 import { Module } from "vuex";
-import { productAPI } from "@/plugins/shopAxios";
+import { productAPI, storageAPI } from "@/plugins/shopAxios";
 
 interface Product {
   id: number;
   name: string;
   lead: string;
   price: number;
-  categoryId: number;
+  categoryId: number | null;
   description?: string;
   technicalDetails?: string;
-  images: string[];
+  mainImage?: {
+    id: number;
+    name: string;
+    path: string;
+    contentType: string;
+    url?: string;
+  };
 }
 
 interface ProductsState {
   products: Product[];
   paginatedProducts: Product[];
   suggestedProducts: Product[];
-
   selectedProduct: Product | null;
   loading: boolean;
   error: string | null;
@@ -78,6 +83,21 @@ const productsModule: Module<ProductsState, any> = {
     SET_TOTAL_SUGGESTED_ROWS(state, total: number) {
       state.totalSuggestedRows = total;
     },
+    SET_MAIN_IMAGE_URL(
+      state,
+      { productId, url }: { productId: number; url: string }
+    ) {
+      const product = state.products.find((p) => p.id === productId);
+      if (product && product.mainImage) {
+        product.mainImage.url = url;
+      }
+      if (
+        state.selectedProduct?.id === productId &&
+        state.selectedProduct.mainImage
+      ) {
+        state.selectedProduct.mainImage.url = url;
+      }
+    },
   },
   actions: {
     async fetchProducts({ commit, state }) {
@@ -91,7 +111,19 @@ const productsModule: Module<ProductsState, any> = {
         );
         const { result, pager } = response.data;
 
-        commit("SET_PAGINATED_PRODUCTS", result);
+        const processedProducts = result.map((product: any) => ({
+          ...product,
+          mainImage: product.mainImage
+            ? {
+                id: product.mainImage.id,
+                name: product.mainImage.name,
+                path: product.mainImage.path,
+                contentType: product.mainImage.contentType,
+              }
+            : null,
+        }));
+
+        commit("SET_PAGINATED_PRODUCTS", processedProducts);
         commit("SET_PAGER_INFO", {
           totalRows: pager.totalRows,
           totalPages: pager.totalPages,
@@ -109,7 +141,31 @@ const productsModule: Module<ProductsState, any> = {
 
       try {
         const response = await productAPI.getProduct(productId);
-        commit("SET_SELECTED_PRODUCT", response.data);
+
+        const product = response.data;
+        const processedProduct: Product = {
+          ...product,
+          mainImage: product.mainImage
+            ? {
+                id: product.mainImage.id,
+                name: product.mainImage.name,
+                path: product.mainImage.path,
+                contentType: product.mainImage.contentType,
+              }
+            : null,
+        };
+
+        commit("SET_SELECTED_PRODUCT", processedProduct);
+
+        if (processedProduct.mainImage?.name) {
+          const imageResponse = await storageAPI.getFile(
+            processedProduct.mainImage.name
+          );
+          const imageUrl = window.URL.createObjectURL(
+            new Blob([imageResponse.data])
+          );
+          commit("SET_MAIN_IMAGE_URL", { productId, url: imageUrl });
+        }
       } catch (error) {
         console.error("Error fetching product details:", error);
         commit("SET_ERROR", `Failed to fetch product with ID ${productId}`);
@@ -138,7 +194,19 @@ const productsModule: Module<ProductsState, any> = {
         );
         const { result, pager } = response.data;
 
-        commit("SET_SUGGESTED_PRODUCTS", result);
+        const processedProducts = result.map((product: any) => ({
+          ...product,
+          mainImage: product.mainImage
+            ? {
+                id: product.mainImage.id,
+                name: product.mainImage.name,
+                path: product.mainImage.path,
+                contentType: product.mainImage.contentType,
+              }
+            : null,
+        }));
+
+        commit("SET_SUGGESTED_PRODUCTS", processedProducts);
         commit("SET_TOTAL_SUGGESTED_ROWS", pager.totalRows);
       } catch (error) {
         console.error("Error fetching suggested products:", error);
@@ -150,18 +218,6 @@ const productsModule: Module<ProductsState, any> = {
 
     async refreshSuggestedProducts({ dispatch }) {
       await dispatch("fetchSuggestedProducts", 1);
-    },
-
-    updatePaginatedProducts({ state, commit }) {
-      const pageSize = Number(state.pageSize);
-      const currentPage = Number(state.currentPage);
-
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-
-      const paginated = state.products.slice(start, end);
-
-      commit("SET_PAGINATED_PRODUCTS", paginated);
     },
   },
   getters: {

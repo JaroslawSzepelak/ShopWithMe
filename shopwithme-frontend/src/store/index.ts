@@ -8,6 +8,7 @@ import deliveryMethods from "@/store/modules/deliveryMethods";
 import categoryModule from "@/store/modules/categories";
 import products from "./modules/products";
 import account from "./modules/account";
+import storage from "./modules/storage";
 import adminModule from "./modules/admin";
 
 Vue.use(Vuex);
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     paymentMethod,
     deliveryMethods,
     account,
+    storage,
     admin: adminModule,
   },
 });

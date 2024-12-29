@@ -120,4 +120,13 @@ export const orderAPI = {
   },
 };
 
+// API dla zarządzania plikami w sklepie
+export const storageAPI = {
+  getFile(fileName: string) {
+    return apiClient.get(`/Storage/${fileName}`, {
+      responseType: "blob",
+    });
+  },
+};
+
 export default apiClient;

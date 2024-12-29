@@ -62,6 +62,18 @@
           placeholder="Wprowadź dane techniczne w formacie JSON"
         ></textarea>
       </div>
+      <div class="form-group">
+        <label>Dodaj główne zdjęcie</label>
+        <input type="file" @change="onFileSelected" class="form-control-file" />
+      </div>
+      <div class="form-group" v-if="product.mainImage?.url">
+        <label>Obecne zdjęcie</label>
+        <img
+          :src="product.mainImage.url"
+          alt="Główne zdjęcie"
+          class="main-image-preview"
+        />
+      </div>
     </div>
     <div class="button-group">
       <router-link to="/admin/products" class="btn back-btn"
@@ -76,6 +88,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { storageAPI } from "@/plugins/adminAxios";
 
 @Component
 export default class ProductEditor extends Vue {
@@ -87,8 +100,10 @@ export default class ProductEditor extends Vue {
     categoryId: null,
     price: 0,
     technicalDetails: "",
+    mainImage: null,
   };
 
+  selectedFile: File | null = null;
   errorMessages: string[] = [];
 
   get editMode(): boolean {
@@ -128,7 +143,17 @@ export default class ProductEditor extends Vue {
             technicalDetails: product.technicalData
               ? JSON.stringify(JSON.parse(product.technicalData), null, 2)
               : "",
+            mainImage: product.mainImage || null,
           };
+
+          if (this.product.mainImage?.name) {
+            const response = await storageAPI.getFile(
+              this.product.mainImage.name
+            );
+            this.product.mainImage.url = window.URL.createObjectURL(
+              new Blob([response.data])
+            );
+          }
         }
       } catch (error) {
         console.error("Błąd podczas pobierania produktu:", error);
@@ -168,7 +193,7 @@ export default class ProductEditor extends Vue {
     if (!this.validateForm()) return;
 
     const action = this.editMode ? "updateProduct" : "createProduct";
-    const payload = {
+    const payload: any = {
       id: this.editMode ? this.product.id : undefined,
       name: this.product.name,
       lead: this.product.lead,
@@ -176,10 +201,23 @@ export default class ProductEditor extends Vue {
       price: this.product.price,
       categoryId: this.product.categoryId,
       technicalData: this.product.technicalDetails || null,
+      mainImageId: null,
     };
 
     try {
+      if (this.selectedFile) {
+        const fileResponse = await this.$store.dispatch(
+          "admin/adminStorage/uploadFile",
+          this.selectedFile
+        );
+
+        if (fileResponse && fileResponse.id) {
+          payload.mainImageId = fileResponse.id;
+        }
+      }
+
       await this.$store.dispatch(`admin/adminProducts/${action}`, payload);
+
       this.$router.push({
         name: "ProductAdmin",
         query: {
@@ -191,6 +229,23 @@ export default class ProductEditor extends Vue {
     } catch (error) {
       console.error("Błąd podczas zapisywania produktu:", error);
       this.errorMessages.push("Wystąpił błąd podczas zapisywania produktu.");
+    }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        if (this.product.mainImage) {
+          this.product.mainImage.url = e.target?.result as string;
+        } else {
+          this.product.mainImage = { url: e.target?.result as string };
+        }
+      };
+      fileReader.readAsDataURL(this.selectedFile);
     }
   }
 }
@@ -250,6 +305,18 @@ export default class ProductEditor extends Vue {
       background-color: #e9ecef;
       border-color: #ced4da;
       cursor: not-allowed;
+    }
+
+    .main-image-preview {
+      max-width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 

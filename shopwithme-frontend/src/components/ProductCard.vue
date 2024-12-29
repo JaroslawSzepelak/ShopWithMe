@@ -1,8 +1,15 @@
 <template>
   <div class="product-card">
     <img
-      :src="product.image || placeholderImage"
-      alt="Product Image"
+      v-if="product.mainImage?.url"
+      :src="product.mainImage.url"
+      alt="Zdjęcie produktu"
+      class="product-image"
+    />
+    <img
+      v-else
+      :src="placeholderImage"
+      alt="Obraz zastępczy"
       class="product-image"
     />
     <div class="product-details">
@@ -20,6 +27,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { storageAPI } from "@/plugins/shopAxios";
 
 @Component
 export default class ProductCard extends Vue {
@@ -28,10 +36,28 @@ export default class ProductCard extends Vue {
     name: string;
     lead: string;
     price: number;
-    image?: string;
+    mainImage?: {
+      name?: string;
+      url?: string;
+    };
   };
 
   placeholderImage = "https://placehold.co/300x300";
+
+  async mounted() {
+    if (this.product.mainImage?.name && !this.product.mainImage.url) {
+      try {
+        const response = await storageAPI.getFile(this.product.mainImage.name);
+        const imageUrl = window.URL.createObjectURL(new Blob([response.data]));
+        this.$set(this.product.mainImage, "url", imageUrl);
+      } catch (error) {
+        console.error(
+          `Błąd podczas pobierania zdjęcia dla produktu ${this.product.id}:`,
+          error
+        );
+      }
+    }
+  }
 
   goToProduct(productId: number) {
     this.$router.push({
@@ -67,6 +93,7 @@ export default class ProductCard extends Vue {
     height: 300px;
     object-fit: cover;
     flex-shrink: 0;
+    margin-right: 40px;
   }
 
   .product-details {
@@ -124,6 +151,7 @@ export default class ProductCard extends Vue {
 
     .product-image {
       margin-top: 40px;
+      margin-right: 0;
       width: 80%;
       height: auto;
     }
