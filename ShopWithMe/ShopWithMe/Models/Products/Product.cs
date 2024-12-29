@@ -19,6 +19,11 @@ namespace ShopWithMe.Models.Products
         public string TechnicalData { get; set; }
         [ForeignKey("StorageFile")]
         public long? MainImageId { get; set; }
+        [Column(TypeName = "decimal(8, 2)")]
+        public decimal? SalePrice { get; set; }
+        public DateTime? DateSaleFrom { get; set; }
+        public DateTime? DateSaleTo { get; set; }
+        public bool IsSaleOn {  get; set; }
 
 
         public virtual ProductCategory Category { get; set; }
