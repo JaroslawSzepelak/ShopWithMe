@@ -15,6 +15,10 @@ namespace ShopWithMe.Models.Products
             mapTo.CategoryId = mapFrom.CategoryId;
             mapTo.TechnicalData = mapFrom.TechnicalData;
             mapTo.MainImageId = mapFrom.MainImageId;
+            mapTo.SalePrice = mapFrom.SalePrice;
+            mapTo.DateSaleFrom = mapFrom.DateSaleFrom;
+            mapTo.DateSaleTo = mapFrom.DateSaleTo;
+            mapTo.IsSaleOn = mapFrom.IsSaleOn;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductFormModel mapTo)
@@ -29,6 +33,10 @@ namespace ShopWithMe.Models.Products
             mapTo.MainImageId = mapFrom.MainImageId;
             mapTo.MainImage = mapFrom.MainImage;
             mapTo.Images = mapFrom.Images.Select(i => i.StorageFile).ToList();
+            mapTo.SalePrice = mapFrom.SalePrice;
+            mapTo.DateSaleFrom = mapFrom.DateSaleFrom;
+            mapTo.DateSaleTo = mapFrom.DateSaleTo;
+            mapTo.IsSaleOn = mapFrom.IsSaleOn;
         }
 
         public void Map(Product mapFrom, AdminModel.ProductListModel mapTo)
@@ -56,6 +64,13 @@ namespace ShopWithMe.Models.Products
             mapTo.TechnicalData = mapFrom.TechnicalData;
             mapTo.MainImage = mapFrom.MainImage;
             mapTo.Images = mapFrom.Images.Select(i => i.StorageFile).ToList();
+
+            if (mapFrom.IsSaleOn &&
+                (!mapFrom.DateSaleFrom.HasValue || mapFrom.DateSaleFrom.Value <= DateTime.Now) &&
+                (!mapFrom.DateSaleTo.HasValue || mapFrom.DateSaleTo.Value > DateTime.Now))
+            {
+                mapTo.SalePrice = mapFrom.SalePrice;
+            }
         }
 
         public void Map(Product mapFrom, PublicModel.ProductListModel mapTo)
@@ -66,6 +81,13 @@ namespace ShopWithMe.Models.Products
             mapTo.Price = mapFrom.Price;
             mapTo.Category = mapFrom.Category?.Name;
             mapTo.MainImage = mapFrom.MainImage;
+
+            if (mapFrom.IsSaleOn && 
+                (!mapFrom.DateSaleFrom.HasValue || mapFrom.DateSaleFrom.Value <= DateTime.Now) &&
+                (!mapFrom.DateSaleTo.HasValue || mapFrom.DateSaleTo.Value > DateTime.Now))
+            {
+                mapTo.SalePrice = mapFrom.SalePrice;
+            }
         }
 
         public void Map(Product mapFrom, PublicModel.ProductAutocompleteModel mapTo)

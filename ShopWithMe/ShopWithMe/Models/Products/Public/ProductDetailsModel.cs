@@ -9,6 +9,7 @@ namespace ShopWithMe.Models.Products.Public
         public string Lead { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        public decimal? SalePrice { get; set; }
         public string Category { get; set; }
         public string TechnicalData { get; set; }
         public StorageFile MainImage { get; set; }

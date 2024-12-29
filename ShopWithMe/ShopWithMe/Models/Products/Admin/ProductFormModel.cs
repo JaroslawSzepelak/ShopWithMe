@@ -1,5 +1,6 @@
 ﻿using ShopWithMe.Models.Storage;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopWithMe.Models.Products.Admin
 {
@@ -17,6 +18,13 @@ namespace ShopWithMe.Models.Products.Admin
         public long? CategoryId { get; set; }
         public string TechnicalData  { get; set; }
         public long? MainImageId { get; set; }
+        [Range(0.00, double.MaxValue, ErrorMessage = "Proszę podać prawidłową cenę.")]
+        [RegularExpression("[0-9]?[0-9]?[0-9?]?[0-9]?[0-9]?[0-9]((,|.)[0-9][0-9]?)?", ErrorMessage = "Podano nieprawidłową cenę.")]
+        public decimal? SalePrice { get; set; }
+        public DateTime? DateSaleFrom { get; set; }
+        public DateTime? DateSaleTo { get; set; }
+        public bool IsSaleOn { get; set; }
+
         public StorageFile MainImage { get; set; }
         public List<StorageFile> Images { get; set; }
     }
