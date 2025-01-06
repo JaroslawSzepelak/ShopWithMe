@@ -26,14 +26,20 @@ export const productAPI = {
       params: { search },
     });
   },
+
   createProduct(product: {
     name: string;
     lead: string;
     description: string;
     price: number;
-    categoryId: number;
+    categoryId?: number;
     technicalData?: string;
     mainImageId?: number;
+    salePrice?: number;
+    dateSaleFrom?: string;
+    dateSaleTo?: string;
+    isSaleOn?: boolean;
+    images?: { id: number }[];
   }) {
     const formattedTechnicalData = product.technicalData
       ? JSON.stringify(JSON.parse(product.technicalData))
@@ -50,10 +56,15 @@ export const productAPI = {
     name: string;
     lead: string;
     price: number;
-    categoryId: number;
+    categoryId?: number;
     description?: string;
     technicalData?: string;
     mainImageId?: number;
+    salePrice?: number;
+    dateSaleFrom?: string;
+    dateSaleTo?: string;
+    isSaleOn?: boolean;
+    images?: { id: number }[];
   }) {
     const formattedTechnicalData = product.technicalData
       ? JSON.stringify(JSON.parse(product.technicalData))
@@ -67,6 +78,14 @@ export const productAPI = {
   },
   deleteProduct(id: number) {
     return adminAxios.delete(`/Products/${id}`);
+  },
+
+  addImage(productId: number, imageId: number) {
+    return adminAxios.post(`/Products/${productId}/images`, imageId);
+  },
+
+  removeImage(productId: number, imageId: number) {
+    return adminAxios.delete(`/Products/${productId}/images/${imageId}`);
   },
 };
 
@@ -154,6 +173,30 @@ export const accountAPI = {
   },
   getAdminUser() {
     return adminAxios.get("Account/get-user");
+  },
+  getUsers(pageIndex: number, pageSize: number) {
+    return adminAxios.get("/Account", {
+      params: { pageIndex, pageSize },
+    });
+  },
+
+  createUser(user: {
+    userName: string;
+    email: string;
+    password: string;
+    repeatPassword: string;
+  }) {
+    return adminAxios.post("/Account", user);
+  },
+
+  updateUser(user: {
+    id: string;
+    userName: string;
+    email: string;
+    password?: string;
+    repeatPassword?: string;
+  }) {
+    return adminAxios.put("/Account", user);
   },
 };
 

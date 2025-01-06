@@ -74,6 +74,44 @@
           class="main-image-preview"
         />
       </div>
+      <!-- Additional Images Section -->
+      <div class="form-group" v-if="editMode">
+        <label>Dodaj zdjęcia dodatkowe</label>
+        <div class="adding-image">
+          <button class="btn add-images-btn" @click="onAddImagesClick">
+            Dodaj zdjęcia
+          </button>
+        </div>
+        <input
+          type="file"
+          multiple
+          ref="additionalImagesInput"
+          style="display: none"
+          @change="onAdditionalFilesSelected"
+        />
+      </div>
+      <div class="form-group" v-if="editMode && product.images.length">
+        <label>Obecne zdjęcia dodatkowe</label>
+        <div class="additional-images">
+          <div
+            class="additional-image"
+            v-for="image in product.images"
+            :key="image.id"
+          >
+            <img
+              :src="image.url"
+              alt="Zdjęcie dodatkowe"
+              class="additional-image-preview"
+            />
+            <button
+              class="remove-image-btn"
+              @click="confirmImageRemoval(image.id)"
+            >
+              ✖
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="button-group">
       <router-link to="/admin/products" class="btn back-btn"
@@ -83,14 +121,31 @@
         {{ editMode ? "Zapisz zmiany" : "Utwórz produkt" }}
       </button>
     </div>
+    <AppModal
+      v-if="successModalVisible"
+      :visible="successModalVisible"
+      :message="successModalMessage"
+      @close="successModalVisible = false"
+    />
+    <ConfirmationModal
+      v-if="confirmationModalVisible"
+      :visible="confirmationModalVisible"
+      message="Czy na pewno chcesz usunąć to zdjęcie?"
+      @confirm="removeConfirmedImage"
+      @close="confirmationModalVisible = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { storageAPI } from "@/plugins/adminAxios";
+import AppModal from "@/components/modals/AppModal.vue";
+import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
-@Component
+@Component({
+  components: { AppModal, ConfirmationModal },
+})
 export default class ProductEditor extends Vue {
   product = {
     id: null,
@@ -101,10 +156,16 @@ export default class ProductEditor extends Vue {
     price: 0,
     technicalDetails: "",
     mainImage: null,
+    images: [],
   };
 
   selectedFile: File | null = null;
+  selectedAdditionalFiles: File[] = [];
   errorMessages: string[] = [];
+  successModalVisible = false;
+  successModalMessage = "";
+  confirmationModalVisible = false;
+  imageToRemoveId: number | null = null;
 
   get editMode(): boolean {
     return this.$route.name === "ProductEdit";
@@ -144,6 +205,10 @@ export default class ProductEditor extends Vue {
               ? JSON.stringify(JSON.parse(product.technicalData), null, 2)
               : "",
             mainImage: product.mainImage || null,
+            images: product.images.map((img: any) => ({
+              ...img,
+              url: null,
+            })),
           };
 
           if (this.product.mainImage?.name) {
@@ -154,12 +219,90 @@ export default class ProductEditor extends Vue {
               new Blob([response.data])
             );
           }
+
+          for (const image of this.product.images) {
+            const response = await storageAPI.getFile(image.name);
+            image.url = window.URL.createObjectURL(new Blob([response.data]));
+          }
         }
       } catch (error) {
         console.error("Błąd podczas pobierania produktu:", error);
         this.errorMessages.push("Nie udało się załadować danych produktu.");
       }
     }
+  }
+
+  async onAdditionalFilesSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.selectedAdditionalFiles = Array.from(input.files);
+      try {
+        for (const file of this.selectedAdditionalFiles) {
+          const fileResponse = await this.$store.dispatch(
+            "admin/adminStorage/uploadFile",
+            file
+          );
+          if (fileResponse && fileResponse.id) {
+            await this.$store.dispatch(
+              "admin/adminProducts/addImageToProduct",
+              {
+                productId: this.product.id,
+                imageId: fileResponse.id,
+              }
+            );
+          }
+        }
+        this.showSuccessModal("Zdjęcia zostały pomyślnie dodane.");
+        await this.$store.dispatch(
+          "admin/adminProducts/fetchProduct",
+          this.product.id
+        );
+      } catch (error) {
+        this.errorMessages.push("Nie udało się dodać zdjęć.");
+      }
+    }
+  }
+
+  confirmImageRemoval(imageId: number) {
+    this.imageToRemoveId = imageId;
+    this.confirmationModalVisible = true;
+  }
+
+  async removeConfirmedImage() {
+    if (this.imageToRemoveId !== null) {
+      try {
+        await this.$store.dispatch(
+          "admin/adminProducts/removeImageFromProduct",
+          {
+            productId: this.product.id,
+            imageId: this.imageToRemoveId,
+          }
+        );
+        this.showSuccessModal("Zdjęcie zostało pomyślnie usunięte.");
+        await this.$store.dispatch(
+          "admin/adminProducts/fetchProduct",
+          this.product.id
+        );
+      } catch (error) {
+        this.errorMessages.push("Nie udało się usunąć zdjęcia.");
+      } finally {
+        this.confirmationModalVisible = false;
+        this.imageToRemoveId = null;
+      }
+    }
+  }
+
+  onAddImagesClick() {
+    (this.$refs.additionalImagesInput as HTMLInputElement).click();
+  }
+
+  showSuccessModal(message: string) {
+    this.successModalMessage = message;
+    this.successModalVisible = true;
+
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
   }
 
   validateForm(): boolean {
@@ -317,6 +460,75 @@ export default class ProductEditor extends Vue {
       display: block;
       margin-left: auto;
       margin-right: auto;
+    }
+
+    .adding-image {
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .additional-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+
+      .additional-image {
+        box-sizing: border-box;
+        position: relative;
+        width: 150px;
+        height: 150px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .additional-image-preview {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .remove-image-btn {
+          box-sizing: border-box;
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          background-color: #c70a0a;
+          color: white;
+          border: none;
+          padding: 5px;
+          font-size: 0.8rem;
+          border-radius: 50%;
+          cursor: pointer;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background-color: #a60a0a;
+          }
+        }
+      }
+    }
+
+    .add-images-btn {
+      box-sizing: border-box;
+      background-color: #c70a0a;
+      color: white;
+      border: none;
+      width: 70%;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #a60a0a;
+      }
     }
   }
 

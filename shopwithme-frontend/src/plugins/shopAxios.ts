@@ -13,12 +13,25 @@ export const productAPI = {
   getProduct(id: number) {
     return apiClient.get(`/Products/${id}`);
   },
-  getProducts(pageIndex: number, pageSize: number) {
-    return apiClient.get(`/Products`, {
-      params: {
-        pageIndex,
-        pageSize,
-      },
+  getProducts(
+    pageIndex: number,
+    pageSize: number,
+    categoryId?: number,
+    search?: string
+  ) {
+    const params: any = { pageIndex, pageSize };
+    if (categoryId !== undefined) {
+      params.categoryId = categoryId;
+    }
+    if (search) {
+      params.search = search;
+    }
+    return apiClient.get(`/Products`, { params });
+  },
+
+  getProductsAutocomplete(search: string) {
+    return apiClient.get("/Products/get-autocomplete", {
+      params: { search },
     });
   },
 };

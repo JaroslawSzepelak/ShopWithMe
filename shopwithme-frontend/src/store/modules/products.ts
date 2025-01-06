@@ -5,10 +5,14 @@ interface Product {
   id: number;
   name: string;
   lead: string;
+  description: string;
   price: number;
+  salePrice?: number;
+  dateSaleFrom?: Date;
+  dateSaleTo?: Date;
+  isSaleOn: boolean;
   categoryId: number | null;
-  description?: string;
-  technicalDetails?: string;
+  technicalData?: string;
   mainImage?: {
     id: number;
     name: string;
@@ -16,10 +20,18 @@ interface Product {
     contentType: string;
     url?: string;
   };
+  images: Array<{
+    id: number;
+    name: string;
+    path: string;
+    contentType: string;
+    url?: string;
+  }>;
 }
 
 interface ProductsState {
   products: Product[];
+  autocompleteProducts: any[];
   paginatedProducts: Product[];
   suggestedProducts: Product[];
   selectedProduct: Product | null;
@@ -31,12 +43,17 @@ interface ProductsState {
   totalRows: number;
   totalPages: number;
   totalSuggestedRows: number;
+  filters: {
+    categoryId: number | null;
+    search: string | null;
+  };
 }
 
 const productsModule: Module<ProductsState, any> = {
   namespaced: true,
   state: {
     products: [],
+    autocompleteProducts: [],
     paginatedProducts: [],
     suggestedProducts: [],
     selectedProduct: null,
@@ -48,6 +65,10 @@ const productsModule: Module<ProductsState, any> = {
     totalSuggestedRows: 0,
     totalRows: 0,
     totalPages: 0,
+    filters: {
+      categoryId: null,
+      search: null,
+    },
   },
   mutations: {
     SET_PRODUCTS(state, products: Product[]) {
@@ -55,6 +76,9 @@ const productsModule: Module<ProductsState, any> = {
     },
     SET_PAGINATED_PRODUCTS(state, products: Product[]) {
       state.paginatedProducts = products;
+    },
+    SET_AUTOCOMPLETE_PRODUCTS(state, products: any[]) {
+      state.autocompleteProducts = products;
     },
     SET_SELECTED_PRODUCT(state, product: Product | null) {
       state.selectedProduct = product;
@@ -98,6 +122,12 @@ const productsModule: Module<ProductsState, any> = {
         state.selectedProduct.mainImage.url = url;
       }
     },
+    SET_FILTERS(
+      state,
+      filters: { categoryId: number | null; search: string | null }
+    ) {
+      state.filters = filters;
+    },
   },
   actions: {
     async fetchProducts({ commit, state }) {
@@ -107,7 +137,9 @@ const productsModule: Module<ProductsState, any> = {
       try {
         const response = await productAPI.getProducts(
           state.currentPage,
-          state.pageSize
+          state.pageSize,
+          state.filters.categoryId,
+          state.filters.search
         );
         const { result, pager } = response.data;
 
@@ -121,6 +153,7 @@ const productsModule: Module<ProductsState, any> = {
                 contentType: product.mainImage.contentType,
               }
             : null,
+          images: product.images || [],
         }));
 
         commit("SET_PAGINATED_PRODUCTS", processedProducts);
@@ -131,6 +164,20 @@ const productsModule: Module<ProductsState, any> = {
       } catch (error) {
         console.error("Error fetching products:", error);
         commit("SET_ERROR", "Failed to fetch products.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+    async fetchAutocompleteProducts({ commit }, search: string) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        const response = await productAPI.getProductsAutocomplete(search);
+        commit("SET_AUTOCOMPLETE_PRODUCTS", response.data);
+      } catch (error) {
+        console.error("Error fetching autocomplete products:", error);
+        commit("SET_ERROR", "Failed to fetch autocomplete products.");
       } finally {
         commit("SET_LOADING", false);
       }
@@ -153,6 +200,7 @@ const productsModule: Module<ProductsState, any> = {
                 contentType: product.mainImage.contentType,
               }
             : null,
+          images: product.images || [],
         };
 
         commit("SET_SELECTED_PRODUCT", processedProduct);
@@ -181,6 +229,13 @@ const productsModule: Module<ProductsState, any> = {
     setPageSize({ commit, dispatch }, size: number) {
       commit("SET_PAGE_SIZE", size);
       commit("SET_CURRENT_PAGE", 1);
+      dispatch("fetchProducts");
+    },
+    setFilters(
+      { commit, dispatch },
+      filters: { categoryId: number | null; search: string | null }
+    ) {
+      commit("SET_FILTERS", filters);
       dispatch("fetchProducts");
     },
     async fetchSuggestedProducts({ commit, state }, pageIndex: number) {
@@ -224,6 +279,9 @@ const productsModule: Module<ProductsState, any> = {
     paginatedProducts(state): Product[] {
       return state.paginatedProducts;
     },
+    autocompleteProducts(state) {
+      return state.autocompleteProducts || [];
+    },
     selectedProduct(state): Product | null {
       return state.selectedProduct;
     },
@@ -253,6 +311,9 @@ const productsModule: Module<ProductsState, any> = {
     },
     totalPages(state) {
       return state.totalPages;
+    },
+    filters(state) {
+      return state.filters;
     },
   },
 };

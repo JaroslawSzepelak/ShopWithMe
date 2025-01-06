@@ -81,21 +81,14 @@ export default class ProductDetails extends Vue {
         id: null,
         name: "Produkt zastępczy",
         price: 0,
-        images: this.defaultImages,
+        images: [],
         description: "Brak dostępnych szczegółów dla tego produktu.",
         mainImage: null,
       }
     );
   }
 
-  get images() {
-    if (this.product.images && this.product.images.length > 0) {
-      return this.product.images;
-    }
-    return this.defaultImages;
-  }
-
-  get defaultImages() {
+  get defaultThumbnails() {
     return [
       "https://placehold.co/400/abb7e7/7b8277",
       "https://placehold.co/400/abd4c7/7b8277",
@@ -131,28 +124,39 @@ export default class ProductDetails extends Vue {
     try {
       await this.$store.dispatch("products/fetchProduct", productId);
 
-      const images = [...this.images];
+      const product = this.product;
+      const imageUrls: string[] = [];
 
-      if (this.product.mainImage?.name) {
-        const response = await storageAPI.getFile(this.product.mainImage.name);
+      if (product.mainImage?.name) {
+        const response = await storageAPI.getFile(product.mainImage.name);
         const mainImageUrl = window.URL.createObjectURL(
           new Blob([response.data])
         );
-        this.product.mainImage.url = mainImageUrl;
+        product.mainImage.url = mainImageUrl;
         this.mainImage = mainImageUrl;
-
-        this.thumbnailsList = [
-          mainImageUrl,
-          ...images.filter((img) => img !== mainImageUrl),
-        ];
-      } else {
-        this.mainImage = images[0];
-        this.thumbnailsList = images;
+        imageUrls.push(mainImageUrl);
       }
 
-      this.thumbnailsList = this.thumbnailsList.slice(0, 4);
+      if (product.images && product.images.length > 0) {
+        for (const image of product.images) {
+          const response = await storageAPI.getFile(image.name);
+          const imageUrl = window.URL.createObjectURL(
+            new Blob([response.data])
+          );
+          imageUrls.push(imageUrl);
+        }
+      }
+
+      if (imageUrls.length === 0) {
+        this.mainImage = this.defaultThumbnails[0];
+        this.thumbnailsList = this.defaultThumbnails;
+      } else {
+        this.thumbnailsList = imageUrls;
+      }
     } catch (error) {
       console.error("Błąd podczas pobierania szczegółów produktu:", error);
+      this.mainImage = this.defaultThumbnails[0];
+      this.thumbnailsList = this.defaultThumbnails;
     }
   }
 

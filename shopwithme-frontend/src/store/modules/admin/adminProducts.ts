@@ -40,6 +40,11 @@ const adminProductsModule: Module<AdminProductState, any> = {
               contentType: product.mainImage.contentType,
             }
           : null,
+        salePrice: product.salePrice,
+        dateSaleFrom: product.dateSaleFrom,
+        dateSaleTo: product.dateSaleTo,
+        isSaleOn: product.isSaleOn,
+        images: product.images || [],
       }));
     },
     SET_AUTOCOMPLETE_PRODUCTS(state, products: any[]) {
@@ -58,6 +63,11 @@ const adminProductsModule: Module<AdminProductState, any> = {
                   url: null,
                 }
               : null,
+            salePrice: product.salePrice,
+            dateSaleFrom: product.dateSaleFrom,
+            dateSaleTo: product.dateSaleTo,
+            isSaleOn: product.isSaleOn,
+            images: product.images || [],
           }
         : null;
     },
@@ -163,6 +173,11 @@ const adminProductsModule: Module<AdminProductState, any> = {
                 url: null,
               }
             : null,
+          salePrice: product.salePrice,
+          dateSaleFrom: product.dateSaleFrom,
+          dateSaleTo: product.dateSaleTo,
+          isSaleOn: product.isSaleOn,
+          images: product.images || [],
         };
 
         commit("SET_SELECTED_PRODUCT", processedProduct);
@@ -186,13 +201,8 @@ const adminProductsModule: Module<AdminProductState, any> = {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
-      const payload = {
-        ...product,
-        mainImage: null,
-      };
-
       try {
-        await productAPI.createProduct(payload);
+        await productAPI.createProduct(product);
         await dispatch("fetchProducts");
       } catch (error) {
         console.error("Error creating product:", error);
@@ -206,13 +216,8 @@ const adminProductsModule: Module<AdminProductState, any> = {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
-      const payload = {
-        ...product,
-        mainImage: null,
-      };
-
       try {
-        await productAPI.updateProduct(payload);
+        await productAPI.updateProduct(product);
         await dispatch("fetchProducts");
       } catch (error) {
         console.error("Error updating product:", error);
@@ -231,6 +236,42 @@ const adminProductsModule: Module<AdminProductState, any> = {
       } catch (error) {
         console.error(`Error deleting product with id ${id}:`, error);
         commit("SET_ERROR", "Failed to delete product.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+
+    async addImageToProduct(
+      { dispatch, commit },
+      { productId, imageId }: { productId: number; imageId: number }
+    ) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        await productAPI.addImage(productId, imageId);
+        await dispatch("fetchProduct", productId);
+      } catch (error) {
+        console.error("Error adding image to product:", error);
+        commit("SET_ERROR", "Failed to add image to product.");
+      } finally {
+        commit("SET_LOADING", false);
+      }
+    },
+
+    async removeImageFromProduct(
+      { dispatch, commit },
+      { productId, imageId }: { productId: number; imageId: number }
+    ) {
+      commit("SET_LOADING", true);
+      commit("SET_ERROR", null);
+
+      try {
+        await productAPI.removeImage(productId, imageId);
+        await dispatch("fetchProduct", productId);
+      } catch (error) {
+        console.error("Error removing image from product:", error);
+        commit("SET_ERROR", "Failed to remove image from product.");
       } finally {
         commit("SET_LOADING", false);
       }
