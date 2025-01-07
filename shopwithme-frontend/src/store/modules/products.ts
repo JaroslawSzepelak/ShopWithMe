@@ -66,8 +66,10 @@ const productsModule: Module<ProductsState, any> = {
     totalRows: 0,
     totalPages: 0,
     filters: {
-      categoryId: null,
-      search: null,
+      categoryId: sessionStorage.getItem("categoryId")
+        ? Number(sessionStorage.getItem("categoryId"))
+        : null,
+      search: sessionStorage.getItem("search") || null,
     },
   },
   mutations: {
@@ -127,6 +129,8 @@ const productsModule: Module<ProductsState, any> = {
       filters: { categoryId: number | null; search: string | null }
     ) {
       state.filters = filters;
+      sessionStorage.setItem("categoryId", String(filters.categoryId || ""));
+      sessionStorage.setItem("search", filters.search || "");
     },
   },
   actions: {
@@ -161,6 +165,30 @@ const productsModule: Module<ProductsState, any> = {
           totalRows: pager.totalRows,
           totalPages: pager.totalPages,
         });
+
+        await Promise.all(
+          processedProducts.map(async (product) => {
+            if (product.mainImage?.name) {
+              try {
+                const imageResponse = await storageAPI.getFile(
+                  product.mainImage.name
+                );
+                const imageUrl = window.URL.createObjectURL(
+                  new Blob([imageResponse.data])
+                );
+                commit("SET_MAIN_IMAGE_URL", {
+                  productId: product.id,
+                  url: imageUrl,
+                });
+              } catch (error) {
+                console.error(
+                  `Error fetching image for product ${product.id}:`,
+                  error
+                );
+              }
+            }
+          })
+        );
       } catch (error) {
         console.error("Error fetching products:", error);
         commit("SET_ERROR", "Failed to fetch products.");

@@ -1,5 +1,29 @@
 <template>
   <div class="product-list">
+    <!-- Filtry -->
+    <div class="filters">
+      <div class="filters-container">
+        <input
+          type="text"
+          v-model="filters.search"
+          placeholder="Wprowadź frazę"
+          class="form-control filter-input"
+        />
+        <select v-model="filters.categoryId" class="form-control filter-input">
+          <option value="">Wszystkie kategorie</option>
+          <option
+            v-for="category in categories"
+            :key="category.id"
+            :value="category.id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+        <button @click="applyFilters" class="btn btn-dark filter-button">
+          Filtruj
+        </button>
+      </div>
+    </div>
     <h1>Produkty</h1>
 
     <!-- Ekranik ładowania -->
@@ -91,6 +115,10 @@ import ProductCard from "@/components/ProductCard.vue";
 export default class ProductList extends Vue {
   isLoading = false;
   error: string | null = null;
+  filters = {
+    search: sessionStorage.getItem("search") || "",
+    categoryId: sessionStorage.getItem("categoryId") || "",
+  };
 
   get products() {
     return this.$store.state.products.paginatedProducts || [];
@@ -108,6 +136,10 @@ export default class ProductList extends Vue {
     return this.$store.state.products.totalPages || 1;
   }
 
+  get categories() {
+    return this.$store.getters["categories/allCategories"];
+  }
+
   async created() {
     try {
       const savedPageSize = Number(sessionStorage.getItem("pageSize")) || 10;
@@ -116,6 +148,7 @@ export default class ProductList extends Vue {
       this.$store.commit("products/SET_PAGE_SIZE", savedPageSize);
       this.$store.commit("products/SET_CURRENT_PAGE", savedPageIndex);
 
+      await this.$store.dispatch("categories/fetchAllCategories");
       await this.fetchProducts(savedPageIndex, savedPageSize);
     } catch (error) {
       this.error = "Nie udało się załadować listy produktów.";
@@ -168,6 +201,14 @@ export default class ProductList extends Vue {
     }
   }
 
+  applyFilters() {
+    this.$store.dispatch("products/setFilters", {
+      categoryId: this.filters.categoryId || null,
+      search: this.filters.search || null,
+    });
+    location.reload();
+  }
+
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -209,6 +250,59 @@ export default class ProductList extends Vue {
 <style scoped lang="scss">
 .product-list {
   padding: 20px;
+
+  .filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 800px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .filter-input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      flex: 1;
+      min-width: 150px;
+      max-width: 300px;
+    }
+
+    .filter-button {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #555;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .filters-container {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .filter-input,
+    .filter-button {
+      width: 100%;
+    }
+  }
 
   h1 {
     font-size: 2rem;
