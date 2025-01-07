@@ -1,4 +1,4 @@
-import { cartAPI } from "@/plugins/shopAxios";
+import { cartAPI, storageAPI } from "@/plugins/shopAxios";
 import { Module } from "vuex";
 
 export interface CartItem {
@@ -6,6 +6,8 @@ export interface CartItem {
   name: string;
   quantity: number;
   price: number;
+  mainImageId?: number | null;
+  image?: string | null;
 }
 
 interface CartState {
@@ -35,11 +37,19 @@ const cartModule: Module<CartState, any> = {
         name: line.product.name,
         quantity: line.quantity,
         price: line.product.price,
+        mainImageId: line.product.mainImageId || null,
+        image: null,
       }));
-      state.total = lines.reduce(
-        (sum: number, line: any) => sum + line.product.price * line.quantity,
+      state.total = state.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
         0
       );
+    },
+    SET_PRODUCT_IMAGE(state, { productId, image }) {
+      const item = state.items.find((item) => item.productId === productId);
+      if (item) {
+        item.image = image;
+      }
     },
     UPDATE_ITEM_QUANTITY(state, { productId, quantity }) {
       const item = state.items.find((item) => item.productId === productId);
@@ -63,6 +73,28 @@ const cartModule: Module<CartState, any> = {
         const response = await cartAPI.getCart();
         if (response.data && response.data.lines) {
           commit("SET_CART", response.data.lines);
+
+          for (const line of response.data.lines) {
+            if (line.product.mainImage?.name) {
+              try {
+                const imageResponse = await storageAPI.getFile(
+                  line.product.mainImage.name
+                );
+                const imageUrl = URL.createObjectURL(
+                  new Blob([imageResponse.data])
+                );
+                commit("SET_PRODUCT_IMAGE", {
+                  productId: line.product.id,
+                  image: imageUrl,
+                });
+              } catch (error) {
+                console.error(
+                  `Błąd podczas pobierania zdjęcia dla produktu ${line.product.id}:`,
+                  error
+                );
+              }
+            }
+          }
         } else {
           console.warn("API zwróciło pusty lub nieoczekiwany format danych.");
           commit("SET_CART", []);

@@ -146,9 +146,35 @@ export default class Cart extends Vue {
   }
 
   mounted() {
-    this.$store.dispatch("cart/fetchCart").catch((error) => {
-      console.error("Błąd podczas pobierania koszyka:", error);
-    });
+    this.$store
+      .dispatch("cart/fetchCart")
+      .then(() => {
+        this.loadProductImages();
+      })
+      .catch((error) => {
+        console.error("Błąd podczas pobierania koszyka:", error);
+      });
+  }
+
+  async loadProductImages() {
+    for (const item of this.cartItems) {
+      if (item.image || !item.mainImageId) {
+        continue;
+      }
+
+      try {
+        const imageResponse = await this.$store.dispatch(
+          "cart/fetchProductImage",
+          item.mainImageId
+        );
+        item.image = URL.createObjectURL(new Blob([imageResponse.data]));
+      } catch (error) {
+        console.error(
+          `Błąd podczas pobierania zdjęcia dla produktu ${item.productId}:`,
+          error
+        );
+      }
+    }
   }
 
   async removeFromCart(productId: number) {

@@ -22,10 +22,6 @@
         <p class="delivery-info">
           Darmowa wysyłka w ciągu 2 dni | 2 lata gwarancji
         </p>
-        <div class="rating">
-          <i class="fas fa-star" v-for="n in 5" :key="n"></i>
-          <span class="reviews">4.5 | 392 opinii</span>
-        </div>
         <p class="price">{{ product.price }} zł</p>
         <div class="product-benefits">
           <p><i class="fas fa-check-circle"></i> Darmowy zwrot</p>
@@ -286,21 +282,6 @@ export default class ProductDetails extends Vue {
       color: #888;
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
-    }
-
-    .rating {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-
-      .fas.fa-star {
-        color: #ffd700;
-        margin-right: 0.2rem;
-      }
-
-      .reviews {
-        color: #888;
-        font-size: 0.9rem;
-      }
     }
 
     .price {

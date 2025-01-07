@@ -308,16 +308,15 @@ export default class ProductEditor extends Vue {
   validateForm(): boolean {
     this.errorMessages = [];
 
-    if (!this.product.name)
+    if (!this.product.name) {
       this.errorMessages.push("Pole 'Nazwa' jest wymagane.");
-    if (!this.product.lead)
-      this.errorMessages.push("Pole 'Lead' jest wymagane.");
-    if (!this.product.description)
-      this.errorMessages.push("Pole 'Opis' jest wymagane.");
-    if (!this.product.categoryId)
+    }
+    if (this.product.price == null || this.product.price <= 0) {
+      this.errorMessages.push("Cena jest wymagana i musi być większa niż 0.");
+    }
+    if (this.product.categoryId == null) {
       this.errorMessages.push("Pole 'Kategoria' jest wymagane.");
-    if (this.product.price <= 0)
-      this.errorMessages.push("Cena musi być większa niż 0.");
+    }
     if (this.product.technicalDetails) {
       try {
         JSON.parse(this.product.technicalDetails);

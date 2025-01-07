@@ -47,7 +47,7 @@ namespace ShopWithMe.Managers.Products
 
         public async Task<List<Product>> GetListAsync(bool loadLinkedData, Pager pager)
         {
-            return await GetListAsync(false, pager, 0, null);
+            return await GetListAsync(loadLinkedData, pager, 0, null);
         }
 
         public async Task<List<Product>> GetListAsync(bool loadLinkedData, Pager pager, long categoryId, string search)

@@ -37,6 +37,9 @@
                 <span class="custom-radio"></span>
                 Za pobraniem
               </label>
+              <p v-if="errors.selectedMethod" class="error-message">
+                {{ errors.selectedMethod }}
+              </p>
             </div>
 
             <div class="details" v-if="selectedMethod">
@@ -48,7 +51,11 @@
                   type="text"
                   placeholder="1234 5678 9101 1121"
                   v-model="cardNumber"
+                  :class="{ 'input-error': errors.cardNumber }"
                 />
+                <p v-if="errors.cardNumber" class="error-message">
+                  {{ errors.cardNumber }}
+                </p>
               </div>
               <div v-if="selectedMethod === 'bank_transfer'">
                 <h2>Podaj numer konta bankowego:</h2>
@@ -58,7 +65,11 @@
                   type="text"
                   placeholder="12345678901234567890123456"
                   v-model="accountNumber"
+                  :class="{ 'input-error': errors.accountNumber }"
                 />
+                <p v-if="errors.accountNumber" class="error-message">
+                  {{ errors.accountNumber }}
+                </p>
               </div>
               <div v-if="selectedMethod === 'cash_on_delivery'">
                 <h2>Informacja:</h2>
@@ -108,6 +119,16 @@ export default class PaymentMethod extends Vue {
   accountNumber = "";
   extraCost = 0;
 
+  errors: {
+    cardNumber: string;
+    accountNumber: string;
+    selectedMethod: string;
+  } = {
+    cardNumber: "",
+    accountNumber: "",
+    selectedMethod: "",
+  };
+
   get cartItems(): CartItem[] {
     return this.$store.getters["cart/cartItems"] || [];
   }
@@ -144,12 +165,30 @@ export default class PaymentMethod extends Vue {
   }
 
   confirmPaymentMethod(): void {
-    if (this.selectedMethod === "card" && !this.cardNumber) {
-      alert("Wprowadź numer karty!");
-      return;
+    this.resetErrors();
+
+    if (!this.selectedMethod) {
+      this.errors.selectedMethod = "Wybierz metodę płatności.";
     }
-    if (this.selectedMethod === "bank_transfer" && !this.accountNumber) {
-      alert("Wprowadź numer konta!");
+
+    if (this.selectedMethod === "card") {
+      if (!this.cardNumber) {
+        this.errors.cardNumber = "Wprowadź numer karty.";
+      } else if (!/^\d{4} \d{4} \d{4} \d{4}$/.test(this.cardNumber)) {
+        this.errors.cardNumber =
+          "Wprowadź poprawny numer karty (format: 1234 5678 9101 1121).";
+      }
+    }
+
+    if (this.selectedMethod === "bank_transfer") {
+      if (!this.accountNumber) {
+        this.errors.accountNumber = "Wprowadź numer konta.";
+      } else if (!/^\d{26}$/.test(this.accountNumber)) {
+        this.errors.accountNumber = "Wprowadź poprawny numer konta (26 cyfr).";
+      }
+    }
+
+    if (Object.values(this.errors).some((error) => error)) {
       return;
     }
 
@@ -160,6 +199,14 @@ export default class PaymentMethod extends Vue {
     });
 
     this.$router.push("/summary");
+  }
+
+  resetErrors(): void {
+    this.errors = {
+      cardNumber: "",
+      accountNumber: "",
+      selectedMethod: "",
+    };
   }
 
   goBack(): void {
@@ -229,6 +276,12 @@ export default class PaymentMethod extends Vue {
         background-color: #c70a0a;
       }
     }
+
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
   }
 
   .details {
@@ -236,6 +289,17 @@ export default class PaymentMethod extends Vue {
     padding: 15px;
     background-color: #f2f2f2;
     border-radius: 8px;
+
+    input.input-error {
+      border: 1px solid red;
+      background-color: #ffe6e6;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
 
     h2 {
       font-size: 1.2rem;

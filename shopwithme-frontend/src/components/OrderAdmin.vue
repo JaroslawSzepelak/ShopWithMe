@@ -9,14 +9,6 @@
 
     <!-- Orders Table -->
     <div v-else>
-      <div class="form-group text-center my-3">
-        <input
-          id="showShipped"
-          class="form-check-input"
-          type="checkbox"
-          v-model="showShipped"
-        />
-      </div>
       <table class="table table-striped table-bordered">
         <thead class="thead-dark">
           <tr>

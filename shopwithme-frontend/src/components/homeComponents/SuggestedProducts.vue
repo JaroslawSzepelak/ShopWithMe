@@ -35,7 +35,7 @@
                 {{ product.name || "Nazwa produktu" }}
               </a>
               <p class="product-description">
-                {{ product.lead || "Opis wstępny produktu" }}
+                {{ product.lead || "Brak opisu wstępnego produktu" }}
               </p>
               <p class="product-price">{{ product.price || "100,00" }} zł</p>
               <button
