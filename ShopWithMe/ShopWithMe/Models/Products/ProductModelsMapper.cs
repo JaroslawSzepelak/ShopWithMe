@@ -94,6 +94,16 @@ namespace ShopWithMe.Models.Products
         {
             mapTo.Id = mapFrom.Id;
             mapTo.Name = mapFrom.Name;
+            mapTo.Lead = mapFrom.Lead;
+            mapTo.Price = mapFrom.Price;
+            mapTo.MainImage = mapFrom.MainImage;
+
+            if (mapFrom.IsSaleOn &&
+                (!mapFrom.DateSaleFrom.HasValue || mapFrom.DateSaleFrom.Value <= DateTime.Now) &&
+                (!mapFrom.DateSaleTo.HasValue || mapFrom.DateSaleTo.Value > DateTime.Now))
+            {
+                mapTo.SalePrice = mapFrom.SalePrice;
+            }
         }
 
         public AdminModel.ProductFormModel MapToFormModel(Product mapFromList)

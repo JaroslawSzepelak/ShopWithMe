@@ -35,6 +35,7 @@ namespace ShopWithMe.Managers.Products
         {
             return await _repository.Entities
                 .Where(p => p.Name.Contains(search))
+                .Include(p => p.MainImage)
                 .Take(10)
                 .ToListAsync();
         }

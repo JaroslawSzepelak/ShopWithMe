@@ -170,7 +170,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import SearchAutocomplete from "@/components/SearchAutocomplete.vue";
+import SearchAutocomplete from "@/components/SearchAutocompleteOrderEditor.vue";
 import ConfirmationModal from "@/components/modals/ConfirmationModal.vue";
 
 @Component({

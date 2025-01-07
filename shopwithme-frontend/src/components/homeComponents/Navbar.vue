@@ -15,12 +15,21 @@
       </router-link>
       <CategoryDropdown @clicked="toggleDropdown" />
     </div>
+
     <div class="navbar-right">
+      <!-- Komponent wyszukiwania -->
       <div class="navbar-search">
-        <input type="text" placeholder="Szukaj" class="form-control" />
-        <button class="search-button">
-          <i class="fas fa-search"></i>
-        </button>
+        <SearchAutocomplete
+          :isAsync="true"
+          :isLoading="isSearchLoading"
+          :items="searchItems"
+          :isOpen="isSearchOpen"
+          :search="searchQuery"
+          @update:search="updateSearchQuery"
+          @select="goToProductDetails"
+          @update:isOpen="updateIsSearchOpen"
+          @update:items="updateSearchItems"
+        />
       </div>
       <i class="fas fa-shopping-cart cart-icon" @click="goToCart"></i>
       <div class="user-menu" @mouseleave="hideDropdown">
@@ -80,6 +89,7 @@ import CategoryDropdown from "@/components/homeComponents/CategoryDropdown.vue";
 import CategoryDropdownFullscreen from "@/components/homeComponents/CategoryDropdownFullscreen.vue";
 import AppModal from "@/components/modals/AppModal.vue";
 import UserProfileModal from "@/components/modals/UserProfileModal.vue";
+import SearchAutocomplete from "@/components/homeComponents/SearchAutocompleteNavbar.vue";
 
 @Component({
   components: {
@@ -87,12 +97,17 @@ import UserProfileModal from "@/components/modals/UserProfileModal.vue";
     CategoryDropdownFullscreen,
     AppModal,
     UserProfileModal,
+    SearchAutocomplete,
   },
 })
 export default class Navbar extends Vue {
   isDropdownVisible = false;
   showLogoutModal = false;
   isProfileModalVisible = false;
+  isSearchLoading = false;
+  searchQuery = "";
+  searchItems = [];
+  isSearchOpen = false;
   screenWidth = window.innerWidth;
 
   get isLoggedIn(): boolean {
@@ -130,7 +145,7 @@ export default class Navbar extends Vue {
         .dispatch("admin/adminAccount/fetchAdminUser")
         .catch((error) => {
           console.error(
-            "Błąd podczas pobierania danych administratora:",
+            "Błąd podczas pobierania danych administratora: ",
             error
           );
         });
@@ -143,6 +158,18 @@ export default class Navbar extends Vue {
 
   updateScreenWidth() {
     this.screenWidth = window.innerWidth;
+  }
+
+  updateSearchQuery(value: string) {
+    this.searchQuery = value;
+  }
+
+  updateSearchItems(items: any[]) {
+    this.searchItems = items;
+  }
+
+  updateIsSearchOpen(isOpen: boolean) {
+    this.isSearchOpen = isOpen;
   }
 
   toggleDropdown(isOpen: boolean) {
@@ -168,6 +195,15 @@ export default class Navbar extends Vue {
   goToCart() {
     if (this.$route.path !== "/cart") {
       this.$router.push("/cart");
+    }
+  }
+
+  goToProductDetails(product: any) {
+    if (product && product.id) {
+      this.$router.push({
+        name: "ProductDetails",
+        params: { id: product.id.toString() },
+      });
     }
   }
 
@@ -273,44 +309,6 @@ export default class Navbar extends Vue {
 
     &:hover .user-dropdown {
       display: block;
-    }
-  }
-
-  .navbar-search {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 320px;
-    background: linear-gradient(135deg, #ffffff, #f0f0f0);
-    border-radius: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-
-    input {
-      flex: 1;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 25px;
-      outline: none;
-      font-size: 1rem;
-      background: transparent;
-      color: #333;
-
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    .search-button {
-      background: none;
-      border: none;
-      color: red;
-      font-size: 1.2rem;
-      padding-right: 10px;
-      cursor: pointer;
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
     }
   }
 

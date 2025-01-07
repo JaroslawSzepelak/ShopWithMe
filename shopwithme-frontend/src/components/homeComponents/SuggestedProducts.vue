@@ -190,10 +190,6 @@ export default class SuggestedProducts extends Vue {
     return this.$store.getters["cart/isProductInCart"](productId);
   }
 
-  logImageLoaded(productId: number) {
-    console.log(`Zdjęcie dla produktu ${productId} zostało załadowane.`);
-  }
-
   logImageError(productId: number) {
     console.error(`Nie udało się załadować zdjęcia dla produktu ${productId}.`);
   }

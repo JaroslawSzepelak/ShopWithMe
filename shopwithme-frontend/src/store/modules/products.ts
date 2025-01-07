@@ -168,16 +168,18 @@ const productsModule: Module<ProductsState, any> = {
         commit("SET_LOADING", false);
       }
     },
-    async fetchAutocompleteProducts({ commit }, search: string) {
+    async fetchAutocomplete({ commit }, search: string) {
       commit("SET_LOADING", true);
       commit("SET_ERROR", null);
 
       try {
         const response = await productAPI.getProductsAutocomplete(search);
         commit("SET_AUTOCOMPLETE_PRODUCTS", response.data);
+        return response.data;
       } catch (error) {
         console.error("Error fetching autocomplete products:", error);
         commit("SET_ERROR", "Failed to fetch autocomplete products.");
+        throw error;
       } finally {
         commit("SET_LOADING", false);
       }
