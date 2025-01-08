@@ -133,8 +133,11 @@ export default class PaymentMethod extends Vue {
     return this.$store.getters["cart/cartItems"] || [];
   }
 
-  get cartTotal(): number {
-    return this.$store.getters["cart/cartTotal"] || 0;
+  get cartTotal() {
+    return this.cartItems.reduce(
+      (total, item) => total + item.quantity * this.getEffectivePrice(item),
+      0
+    );
   }
 
   get deliveryCost(): number {
@@ -156,6 +159,10 @@ export default class PaymentMethod extends Vue {
     } catch (error) {
       console.error("Błąd podczas ładowania danych metody płatności:", error);
     }
+  }
+
+  getEffectivePrice(item: CartItem): number {
+    return item.salePrice !== 0 ? item.salePrice : item.price;
   }
 
   handleMethodChange(): void {

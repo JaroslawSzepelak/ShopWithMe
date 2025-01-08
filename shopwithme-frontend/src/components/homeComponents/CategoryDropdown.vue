@@ -42,7 +42,18 @@
               <div class="product-info">
                 <h4>{{ product.name }}</h4>
                 <p>{{ product.lead }}</p>
-                <p><strong>Cena:</strong> {{ product.price }} PLN</p>
+                <p class="product-price">
+                  <span v-if="product.salePrice">
+                    <span class="original-price">{{ product.price }} zł</span>
+                    <span class="sale-price">{{ product.salePrice }} zł</span>
+                    <span class="discount"
+                      >(-{{ calculateDiscount(product) }}%)</span
+                    >
+                  </span>
+                  <span v-else>
+                    <strong>Cena:</strong> {{ product.price }} zł
+                  </span>
+                </p>
               </div>
             </div>
           </div>
@@ -109,6 +120,15 @@ export default class CategoryDropdown extends Vue {
         }
       }
     }
+  }
+
+  calculateDiscount(product: any): number {
+    if (product.price && product.salePrice) {
+      const discount =
+        ((product.price - product.salePrice) / product.price) * 100;
+      return Math.round(discount);
+    }
+    return 0;
   }
 
   goToProductDetails(productId: number) {
@@ -235,6 +255,29 @@ export default class CategoryDropdown extends Vue {
                 margin: 0;
                 font-size: 1rem;
                 color: #333;
+              }
+
+              .product-price {
+                font-size: 0.9rem;
+
+                .original-price {
+                  text-decoration: line-through;
+                  color: #777;
+                  font-size: 0.8rem;
+                  margin-right: 0.5rem;
+                }
+
+                .sale-price {
+                  color: #c70a0a;
+                  font-size: 1rem;
+                  font-weight: bold;
+                }
+
+                .discount {
+                  color: #555;
+                  font-size: 0.8rem;
+                  margin-left: 0.5rem;
+                }
               }
 
               p {

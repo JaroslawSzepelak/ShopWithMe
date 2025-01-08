@@ -6,6 +6,7 @@ export interface CartItem {
   name: string;
   quantity: number;
   price: number;
+  salePrice: number;
   mainImageId?: number | null;
   image?: string | null;
 }
@@ -37,6 +38,7 @@ const cartModule: Module<CartState, any> = {
         name: line.product.name,
         quantity: line.quantity,
         price: line.product.price,
+        salePrice: line.product.salePrice,
         mainImageId: line.product.mainImageId || null,
         image: null,
       }));

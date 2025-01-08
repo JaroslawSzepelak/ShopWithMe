@@ -104,7 +104,7 @@
             <tr v-for="line in order.lines" :key="line.id">
               <td>{{ line.product.name }}</td>
               <td>{{ line.quantity }}</td>
-              <td>{{ line.product.price }} PLN</td>
+              <td>{{ line.product.price }} zł</td>
               <td>
                 <button
                   @click="confirmRemoveCartLine(line)"

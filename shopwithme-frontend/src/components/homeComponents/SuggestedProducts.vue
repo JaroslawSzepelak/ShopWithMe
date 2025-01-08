@@ -37,7 +37,17 @@
               <p class="product-description">
                 {{ product.lead || "Brak opisu wstępnego produktu" }}
               </p>
-              <p class="product-price">{{ product.price || "100,00" }} zł</p>
+              <div class="product-price">
+                <span v-if="product.salePrice">
+                  <span class="original-price">{{ product.price }} zł</span>
+                  <span class="sale-price">{{ product.salePrice }} zł</span>
+                  <span class="discount"
+                    >(-{{ calculateDiscount(product) }}%)</span
+                  >
+                </span>
+                <span v-else>{{ product.price }} zł</span>
+              </div>
+
               <button
                 :class="[
                   'cart-btn',
@@ -159,6 +169,15 @@ export default class SuggestedProducts extends Vue {
 
   closeModal() {
     this.showModal = false;
+  }
+
+  calculateDiscount(product: any): number {
+    if (product.price && product.salePrice) {
+      const discount =
+        ((product.price - product.salePrice) / product.price) * 100;
+      return Math.round(discount);
+    }
+    return 0;
   }
 
   async addToCart(product: any) {
@@ -287,8 +306,26 @@ export default class SuggestedProducts extends Vue {
       .product-price {
         font-size: 1.2rem;
         font-weight: bold;
-        color: #c70a0a;
         margin-bottom: 15px;
+
+        .original-price {
+          text-decoration: line-through;
+          color: #777;
+          font-size: 0.9rem;
+          margin-right: 10px;
+        }
+
+        .sale-price {
+          color: #c70a0a;
+          font-size: 1.4rem;
+          font-weight: bold;
+        }
+
+        .discount {
+          color: #555;
+          font-size: 1rem;
+          margin-left: 5px;
+        }
       }
 
       .cart-btn {

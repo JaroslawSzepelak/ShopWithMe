@@ -56,9 +56,9 @@
                 <td>{{ line.product.name }}</td>
                 <td>{{ getCategoryName(line.product.categoryId) }}</td>
                 <td>{{ line.quantity }}</td>
-                <td>{{ line.product.price.toFixed(2) }} PLN</td>
+                <td>{{ line.product.price.toFixed(2) }} zł</td>
                 <td>
-                  {{ (line.quantity * line.product.price).toFixed(2) }} PLN
+                  {{ (line.quantity * line.product.price).toFixed(2) }} zł
                 </td>
               </tr>
             </tbody>
@@ -70,7 +70,7 @@
       <div class="order-summary">
         <p>
           <strong>Suma Zamówienia:</strong>
-          {{ calculateTotal(order).toFixed(2) }} PLN
+          {{ calculateTotal(order).toFixed(2) }} zł
         </p>
       </div>
 

@@ -19,7 +19,17 @@
               <div class="item-details">
                 <h3 class="product-name">{{ item.name }}</h3>
                 <p class="availability">Dostępny</p>
-                <p class="price-per-unit">{{ item.price }} zł za sztukę</p>
+                <div class="pricing">
+                  <p v-if="item.salePrice !== 0" class="sale-price">
+                    Promocja: {{ item.salePrice }} zł za sztukę
+                  </p>
+                  <p v-if="item.salePrice !== 0" class="regular-price">
+                    <s>{{ item.price }} zł</s>
+                  </p>
+                  <p v-else class="price-per-unit">
+                    {{ item.price }} zł za sztukę
+                  </p>
+                </div>
                 <div class="quantity-control">
                   <button @click="decreaseQuantity(item)" class="quantity-btn">
                     -
@@ -35,7 +45,9 @@
                     +
                   </button>
                 </div>
-                <p class="total-price">{{ item.quantity * item.price }} zł</p>
+                <p class="total-price">
+                  {{ item.quantity * getEffectivePrice(item) }} zł
+                </p>
                 <p
                   v-if="loadingProductId === item.productId"
                   class="loading-message"
@@ -55,7 +67,7 @@
             </div>
           </div>
           <div class="cart-summary">
-            <h2>Łączna wartość: {{ cartTotal }} PLN</h2>
+            <h2>Łączna wartość: {{ cartTotal }} zł</h2>
             <div class="summary-buttons">
               <button @click="checkout" class="checkout-btn">
                 Dostawa zamówienia
@@ -142,7 +154,10 @@ export default class Cart extends Vue {
   }
 
   get cartTotal(): number {
-    return this.$store.getters["cart/cartTotal"] || 0;
+    return this.cartItems.reduce(
+      (total, item) => total + item.quantity * this.getEffectivePrice(item),
+      0
+    );
   }
 
   mounted() {
@@ -154,6 +169,10 @@ export default class Cart extends Vue {
       .catch((error) => {
         console.error("Błąd podczas pobierania koszyka:", error);
       });
+  }
+
+  getEffectivePrice(item: CartItem): number {
+    return item.salePrice !== 0 ? item.salePrice : item.price;
   }
 
   async loadProductImages() {
@@ -352,6 +371,17 @@ export default class Cart extends Vue {
         font-size: 1rem;
         color: #555;
         margin-bottom: 10px;
+      }
+
+      .pricing .sale-price {
+        color: #c70a0a;
+        font-size: 1rem;
+      }
+
+      .pricing .regular-price {
+        color: #666;
+        font-size: 0.9rem;
+        text-decoration: line-through;
       }
 
       .quantity-control {

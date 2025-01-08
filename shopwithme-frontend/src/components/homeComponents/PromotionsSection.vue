@@ -25,7 +25,7 @@ export default class PromotionsSection extends Vue {
     { id: 3, discount: "-10%", description: "Specjalna oferta" },
     { id: 4, discount: "-25%", description: "Wybrane produkty" },
     { id: 5, discount: "-50%", description: "Promocja tygodnia" },
-    { id: 6, discount: "-15%", description: "Na zakupy powyżej 100 PLN" },
+    { id: 6, discount: "-15%", description: "Na zakupy powyżej 100 zł" },
   ];
 }
 </script>

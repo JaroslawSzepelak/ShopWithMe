@@ -15,9 +15,23 @@
     <div class="product-details">
       <h3 class="product-name">{{ product.name }}</h3>
       <p class="product-lead">{{ product.lead }}</p>
-      <p class="product-price">
-        <strong>Cena:</strong> {{ product.price }} PLN
-      </p>
+      <div class="product-pricing">
+        <p v-if="product.salePrice !== null" class="product-price sale-price">
+          <strong>Cena promocyjna:</strong> {{ product.salePrice }} zł
+          <span class="discount">
+            ({{ calculateDiscount(product.price, product.salePrice) }}% taniej)
+          </span>
+        </p>
+        <p
+          v-if="product.salePrice !== null"
+          class="product-price regular-price"
+        >
+          <s>{{ product.price }} zł</s>
+        </p>
+        <p v-else class="product-price">
+          <strong>Cena:</strong> {{ product.price }} zł
+        </p>
+      </div>
       <a @click="goToProduct(product.id)" class="details-btn">
         Zobacz szczegóły
       </a>
@@ -36,6 +50,7 @@ export default class ProductCard extends Vue {
     name: string;
     lead: string;
     price: number;
+    salePrice?: number | null;
     mainImage?: {
       name?: string;
       url?: string;
@@ -57,6 +72,10 @@ export default class ProductCard extends Vue {
         );
       }
     }
+  }
+
+  calculateDiscount(originalPrice: number, salePrice: number): number {
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
   }
 
   goToProduct(productId: number) {
@@ -114,11 +133,28 @@ export default class ProductCard extends Vue {
       margin-bottom: 10px;
     }
 
-    .product-price {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #c70a0a;
+    .product-pricing {
+      .product-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #c70a0a;
+
+        &.sale-price {
+          color: #c70a0a;
+        }
+
+        &.regular-price {
+          font-size: 1.2rem;
+          color: #666;
+        }
+
+        .discount {
+          font-size: 1rem;
+          color: #666;
+          margin-left: 10px;
+        }
+      }
     }
 
     .details-btn {
@@ -143,6 +179,7 @@ export default class ProductCard extends Vue {
   }
 }
 
+/* Responsive styling */
 @media (max-width: 900px) {
   .product-card {
     flex-direction: column;

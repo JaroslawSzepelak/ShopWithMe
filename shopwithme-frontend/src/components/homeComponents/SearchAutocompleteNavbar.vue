@@ -35,7 +35,19 @@
         <div class="result-info">
           <h4>{{ result.name }}</h4>
           <p>{{ result.lead }}</p>
-          <p class="price"><strong>Cena:</strong> {{ result.price }} PLN</p>
+          <div class="pricing">
+            <p v-if="result.salePrice !== null" class="sale-price">
+              Promocja: {{ result.salePrice }} zł
+              <span class="discount">
+                ({{ calculateDiscount(result.price, result.salePrice) }}%
+                taniej)
+              </span>
+            </p>
+            <p v-if="result.salePrice !== null" class="regular-price">
+              <s>{{ result.price }} zł</s>
+            </p>
+            <p v-else class="price">{{ result.price }} zł</p>
+          </div>
         </div>
       </li>
       <li
@@ -57,6 +69,7 @@ interface Product {
   name: string;
   lead: string;
   price: number;
+  salePrice?: number;
   mainImage?: {
     url?: string;
     name?: string;
@@ -154,6 +167,10 @@ export default class SearchAutocompleteNavbar extends Vue {
     this.$emit("update:search", result.name);
     this.$emit("update:isOpen", false);
     this.$emit("select", result);
+  }
+
+  calculateDiscount(originalPrice: number, salePrice: number): number {
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
   }
 
   handleOutsideClick(event: Event) {
@@ -259,8 +276,26 @@ export default class SearchAutocompleteNavbar extends Vue {
           color: #666;
         }
 
-        .price {
+        .pricing .price {
           margin-top: 20px;
+          font-size: 1rem;
+        }
+
+        .pricing .sale-price {
+          color: #c70a0a;
+          font-size: 1.2rem;
+        }
+
+        .pricing .regular-price {
+          color: #666;
+          font-size: 1rem;
+          text-decoration: line-through;
+        }
+
+        .pricing .discount {
+          color: #28a745;
+          font-size: 0.9rem;
+          margin-left: 5px;
         }
       }
     }

@@ -37,14 +37,33 @@
             @click="goToProductDetails(product.id)"
           >
             <img
-              :src="product.image || placeholderImage"
+              v-if="product.mainImage?.url"
+              :src="product.mainImage.url"
               alt="Zdjęcie produktu"
               class="product-image"
             />
+            <img
+              v-else
+              :src="placeholderImage"
+              alt="Obraz zastępczy"
+              class="product-image"
+            />
+
             <div class="product-info">
               <h4>{{ product.name }}</h4>
               <p>{{ product.lead }}</p>
-              <p><strong>Cena:</strong> {{ product.price }} PLN</p>
+              <p class="product-price">
+                <span v-if="product.salePrice">
+                  <span class="original-price">{{ product.price }} zł</span>
+                  <span class="sale-price">{{ product.salePrice }} zł</span>
+                  <span class="discount"
+                    >(-{{ calculateDiscount(product) }}%)</span
+                  >
+                </span>
+                <span v-else>
+                  <strong>Cena:</strong> {{ product.price }} zł
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -54,6 +73,7 @@
 </template>
 
 <script lang="ts">
+import { storageAPI } from "@/plugins/shopAxios";
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
@@ -84,9 +104,38 @@ export default class CategoryDropdownFullScreen extends Vue {
     this.showProducts = false;
   }
 
-  fetchProducts(category: { id: number; name: string }) {
+  async fetchProducts(category: { id: number; name: string; products: any[] }) {
     this.selectedCategory = category;
     this.showProducts = true;
+
+    const products = this.products;
+
+    for (const product of products) {
+      if (product.mainImage?.name) {
+        try {
+          const response = await storageAPI.getFile(product.mainImage.name);
+
+          const imageUrl = window.URL.createObjectURL(
+            new Blob([response.data])
+          );
+          this.$set(product.mainImage, "url", imageUrl);
+        } catch (error) {
+          console.error(
+            `Błąd podczas pobierania zdjęcia dla produktu ${product.id}:`,
+            error
+          );
+        }
+      }
+    }
+  }
+
+  calculateDiscount(product: any): number {
+    if (product.price && product.salePrice) {
+      const discount =
+        ((product.price - product.salePrice) / product.price) * 100;
+      return Math.round(discount);
+    }
+    return 0;
   }
 
   goBack() {
@@ -224,6 +273,29 @@ export default class CategoryDropdownFullScreen extends Vue {
           .product-info {
             h4 {
               margin: 0;
+            }
+
+            .product-price {
+              font-size: 0.9rem;
+
+              .original-price {
+                text-decoration: line-through;
+                color: #777;
+                font-size: 0.8rem;
+                margin-right: 0.5rem;
+              }
+
+              .sale-price {
+                color: #c70a0a;
+                font-size: 1rem;
+                font-weight: bold;
+              }
+
+              .discount {
+                color: #555;
+                font-size: 0.8rem;
+                margin-left: 0.5rem;
+              }
             }
 
             p {

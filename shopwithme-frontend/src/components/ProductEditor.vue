@@ -47,7 +47,7 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Cena (PLN)</label>
+        <label>Cena (zł)</label>
         <input
           type="number"
           class="form-control"
@@ -157,6 +157,10 @@ export default class ProductEditor extends Vue {
     technicalDetails: "",
     mainImage: null,
     images: [],
+    isSaleOn: false,
+    salePrice: null,
+    dateSaleFrom: "",
+    dateSaleTo: "",
   };
 
   selectedFile: File | null = null;
@@ -209,6 +213,10 @@ export default class ProductEditor extends Vue {
               ...img,
               url: null,
             })),
+            isSaleOn: product.isSaleOn || false,
+            salePrice: product.salePrice || null,
+            dateSaleFrom: product.dateSaleFrom || "",
+            dateSaleTo: product.dateSaleTo || "",
           };
 
           if (this.product.mainImage?.name) {
@@ -344,6 +352,10 @@ export default class ProductEditor extends Vue {
       categoryId: this.product.categoryId,
       technicalData: this.product.technicalDetails || null,
       mainImageId: null,
+      isSaleOn: this.product.isSaleOn,
+      salePrice: this.product.salePrice,
+      dateSaleFrom: this.product.dateSaleFrom,
+      dateSaleTo: this.product.dateSaleTo,
     };
 
     try {

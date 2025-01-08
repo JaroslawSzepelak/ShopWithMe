@@ -43,10 +43,20 @@
                 <strong>{{ item.name }}</strong>
               </p>
               <p>
-                {{ item.quantity }} szt. - {{ item.price * item.quantity }} zł
+                <template v-if="item.salePrice !== 0">
+                  {{ item.quantity }} szt. -
+                  {{ item.quantity * item.salePrice }} zł
+                  <span class="discount-info">
+                    (promocja: {{ item.salePrice }} zł/szt)
+                  </span>
+                </template>
+                <template v-else>
+                  {{ item.quantity }} szt. - {{ item.quantity * item.price }} zł
+                </template>
               </p>
             </div>
           </div>
+
           <button class="change-btn" @click="editCart">Zmień koszyk</button>
         </div>
 
@@ -174,7 +184,12 @@ export default class SummaryView extends Vue {
   }
 
   get cartTotal(): number {
-    return this.$store.getters["cart/cartTotal"] || 0;
+    return this.cartItems.reduce(
+      (total, item) =>
+        total +
+        item.quantity * (item.salePrice !== 0 ? item.salePrice : item.price),
+      0
+    );
   }
 
   get totalCost(): number {

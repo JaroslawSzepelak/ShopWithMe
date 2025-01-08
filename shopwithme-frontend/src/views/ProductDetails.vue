@@ -22,7 +22,19 @@
         <p class="delivery-info">
           Darmowa wysyłka w ciągu 2 dni | 2 lata gwarancji
         </p>
-        <p class="price">{{ product.price }} zł</p>
+        <div class="pricing">
+          <p v-if="product.salePrice !== null" class="price sale-price">
+            Cena promocyjna: {{ product.salePrice }} zł
+            <span class="discount">
+              ({{ calculateDiscount(product.price, product.salePrice) }}%
+              taniej)
+            </span>
+          </p>
+          <p v-if="product.salePrice !== null" class="price regular-price">
+            <s>{{ product.price }} zł</s>
+          </p>
+          <p v-else class="price">{{ product.price }} zł</p>
+        </div>
         <div class="product-benefits">
           <p><i class="fas fa-check-circle"></i> Darmowy zwrot</p>
           <p><i class="fas fa-check-circle"></i> Kontakt 24/7</p>
@@ -156,6 +168,10 @@ export default class ProductDetails extends Vue {
     }
   }
 
+  calculateDiscount(originalPrice: number, salePrice: number): number {
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+  }
+
   setMainImage(image: string) {
     this.mainImage = image;
   }
@@ -287,8 +303,26 @@ export default class ProductDetails extends Vue {
     .price {
       font-size: 2rem;
       font-weight: bold;
-      color: #c70a0a;
       margin-bottom: 1rem;
+    }
+
+    .pricing .sale-price {
+      color: #c70a0a;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing .regular-price {
+      color: #666;
+      font-size: 1.2rem;
+      text-decoration: line-through;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing .discount {
+      color: #28a745;
+      font-size: 1rem;
+      margin-left: 10px;
     }
 
     .product-benefits {

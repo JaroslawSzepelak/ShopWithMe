@@ -55,8 +55,8 @@
             <tr v-for="line in order.lines" :key="line.id">
               <td>{{ line.product.name }}</td>
               <td>{{ line.quantity }}</td>
-              <td>{{ line.product.price.toFixed(2) }} PLN</td>
-              <td>{{ (line.quantity * line.product.price).toFixed(2) }} PLN</td>
+              <td>{{ line.product.price.toFixed(2) }} zł</td>
+              <td>{{ (line.quantity * line.product.price).toFixed(2) }} zł</td>
             </tr>
           </tbody>
         </table>
@@ -64,7 +64,7 @@
 
       <!-- Podsumowanie -->
       <div class="order-summary">
-        <p><strong>Suma:</strong> {{ calculateTotal(order).toFixed(2) }} PLN</p>
+        <p><strong>Suma:</strong> {{ calculateTotal(order).toFixed(2) }} zł</p>
       </div>
 
       <!-- Akcje -->

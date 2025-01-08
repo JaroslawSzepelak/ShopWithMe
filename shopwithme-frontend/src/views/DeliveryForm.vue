@@ -198,7 +198,10 @@ export default class DeliveryForm extends Vue {
   }
 
   get cartTotal() {
-    return this.$store.getters["cart/cartTotal"] || 0;
+    return this.cartItems.reduce(
+      (total, item) => total + item.quantity * this.getEffectivePrice(item),
+      0
+    );
   }
 
   get totalCost() {
@@ -228,6 +231,10 @@ export default class DeliveryForm extends Vue {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  getEffectivePrice(item: CartItem): number {
+    return item.salePrice !== 0 ? item.salePrice : item.price;
   }
 
   updateDeliveryCost() {

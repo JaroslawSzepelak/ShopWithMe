@@ -27,7 +27,7 @@
             <td>{{ product.id }}</td>
             <td>{{ product.name }}</td>
             <td>{{ product.category }}</td>
-            <td class="text-right">{{ product.price.toFixed(2) }} PLN</td>
+            <td class="text-right">{{ product.price.toFixed(2) }} zł</td>
             <td class="text-center">
               <button
                 class="btn btn-sm btn-danger mx-1"
@@ -40,6 +40,12 @@
                 class="btn btn-sm btn-warning mx-1"
               >
                 Edytuj
+              </router-link>
+              <router-link
+                :to="{ name: 'SetPromotion', params: { id: product.id } }"
+                class="btn btn-sm btn-success mx-1"
+              >
+                Promocja
               </router-link>
             </td>
           </tr>

@@ -14,6 +14,7 @@ import PaymentMethod from "@/views/PaymentMethod.vue";
 import SummaryView from "@/views/SummaryView.vue";
 import AdminPanel from "@/views/AdminPanel.vue";
 import ProductEditor from "@/components/ProductEditor.vue";
+import SetPromotion from "@/components/SetPromotion.vue";
 import CategoryEditor from "@/components/CategoryEditor.vue";
 import ProductAdmin from "@/components/ProductAdmin.vue";
 import CategoryAdmin from "@/components/CategoryAdmin.vue";
@@ -103,6 +104,12 @@ const routes = [
         name: "ProductEdit",
         component: ProductEditor,
         props: { op: "edit" },
+      },
+      {
+        path: "products/promotion/:id",
+        name: "SetPromotion",
+        component: SetPromotion,
+        props: true,
       },
       {
         path: "categories/create",
