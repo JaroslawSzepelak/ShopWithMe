@@ -268,7 +268,7 @@ export default class SuggestedProducts extends Vue {
     .product-image {
       width: 100%;
       height: auto;
-      max-height: 200px;
+      max-height: 300px;
       object-fit: cover;
       border-radius: 8px;
       margin-bottom: 1rem;

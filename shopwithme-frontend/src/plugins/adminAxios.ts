@@ -70,12 +70,31 @@ export const productAPI = {
       ? JSON.stringify(JSON.parse(product.technicalData))
       : null;
 
-    return adminAxios.put("/Products", {
+    const payload = {
       ...product,
       technicalData: formattedTechnicalData,
       mainImage: null,
-    });
+    };
+
+    return adminAxios
+      .put("/Products", payload)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.error("Wystąpił błąd podczas wysyłania żądania PUT.");
+        if (error.response) {
+          console.error("Kod statusu:", error.response.status);
+          console.error("Treść odpowiedzi błędu:", error.response.data);
+        } else if (error.request) {
+          console.error("Brak odpowiedzi serwera. Żądanie:", error.request);
+        } else {
+          console.error("Błąd:", error.message);
+        }
+        throw error;
+      });
   },
+
   deleteProduct(id: number) {
     return adminAxios.delete(`/Products/${id}`);
   },

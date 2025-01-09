@@ -7,7 +7,7 @@
     >
       <div class="carousel-track" :style="trackStyle">
         <div class="carousel-slide">
-          <router-link to="/special-offers">
+          <router-link to="/special-offer-electronics">
             <img
               src="@/assets/banners/Offers1.png"
               alt="Special Offers"
@@ -16,7 +16,7 @@
           </router-link>
         </div>
         <div class="carousel-slide">
-          <router-link to="/special-offers">
+          <router-link to="/special-offer-agd">
             <img
               src="@/assets/banners/Offers2.png"
               alt="Special Offers"
@@ -25,7 +25,7 @@
           </router-link>
         </div>
         <div class="carousel-slide">
-          <router-link to="/special-offers">
+          <router-link to="/special-offer-work-enjoy">
             <img
               src="@/assets/banners/Offers3.png"
               alt="Special Offers"

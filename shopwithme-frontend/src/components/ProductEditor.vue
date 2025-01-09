@@ -199,38 +199,26 @@ export default class ProductEditor extends Vue {
           this.$store.getters["admin/adminProducts/selectedProduct"];
         if (product) {
           this.product = {
-            id: product.id || null,
-            name: product.name || "",
-            lead: product.lead || "",
-            description: product.description || "",
-            categoryId: product.categoryId || null,
-            price: product.price || 0,
+            ...product,
             technicalDetails: product.technicalData
               ? JSON.stringify(JSON.parse(product.technicalData), null, 2)
               : "",
-            mainImage: product.mainImage || null,
             images: product.images.map((img: any) => ({
               ...img,
               url: null,
             })),
-            isSaleOn: product.isSaleOn || false,
-            salePrice: product.salePrice || null,
-            dateSaleFrom: product.dateSaleFrom || "",
-            dateSaleTo: product.dateSaleTo || "",
           };
 
           if (this.product.mainImage?.name) {
             const response = await storageAPI.getFile(
               this.product.mainImage.name
             );
-            this.product.mainImage.url = window.URL.createObjectURL(
-              new Blob([response.data])
-            );
+            this.product.mainImage.url = response.request.responseURL;
           }
 
           for (const image of this.product.images) {
             const response = await storageAPI.getFile(image.name);
-            image.url = window.URL.createObjectURL(new Blob([response.data]));
+            image.url = response.request.responseURL;
           }
         }
       } catch (error) {
@@ -351,7 +339,7 @@ export default class ProductEditor extends Vue {
       price: this.product.price,
       categoryId: this.product.categoryId,
       technicalData: this.product.technicalDetails || null,
-      mainImageId: null,
+      mainImageId: this.product.mainImage?.id || null,
       isSaleOn: this.product.isSaleOn,
       salePrice: this.product.salePrice,
       dateSaleFrom: this.product.dateSaleFrom,

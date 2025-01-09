@@ -22,6 +22,9 @@ import OrderAdmin from "@/components/OrderAdmin.vue";
 import OrderDetailsAdmin from "@/components/OrderDetailsAdmin.vue";
 import OrderEditAdmin from "@/components/OrderEditAdmin.vue";
 import NotFound from "@/views/NotFound.vue";
+import ElectronicsOffer from "@/views/offers/ElectronicsOffer.vue";
+import AgdOffer from "@/views/offers/AgdOffer.vue";
+import WorkEnjoyOffer from "@/views/offers/WorkEnjoyOffer.vue";
 
 Vue.use(Router);
 
@@ -60,6 +63,18 @@ const routes = [
     name: "CustomerOrderDetails",
     component: CustomerOrderDetails,
     props: true,
+  },
+  {
+    path: "/special-offer-electronics",
+    component: ElectronicsOffer,
+  },
+  {
+    path: "/special-offer-agd",
+    component: AgdOffer,
+  },
+  {
+    path: "/special-offer-work-enjoy",
+    component: WorkEnjoyOffer,
   },
   {
     path: "/admin",
