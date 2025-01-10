@@ -56,9 +56,9 @@
                 <td>{{ line.product.name }}</td>
                 <td>{{ getCategoryName(line.product.categoryId) }}</td>
                 <td>{{ line.quantity }}</td>
-                <td>{{ line.product.price.toFixed(2) }} zł</td>
+                <td>{{ getLinePrice(line).toFixed(2) }} zł</td>
                 <td>
-                  {{ (line.quantity * line.product.price).toFixed(2) }} zł
+                  {{ (line.quantity * getLinePrice(line)).toFixed(2) }} zł
                 </td>
               </tr>
             </tbody>
@@ -113,11 +113,15 @@ export default class CustomerOrderDetails extends Vue {
     return category ? category.name : "Nieznana Kategoria";
   }
 
+  getLinePrice(line: any): number {
+    return line.price > 0 ? line.price : line.product.price;
+  }
+
   calculateTotal(order: any): number {
     if (order?.lines && Array.isArray(order.lines)) {
       return order.lines.reduce((total: number, line: any) => {
         const quantity = line.quantity || 0;
-        const price = line.product?.price || 0;
+        const price = this.getLinePrice(line);
         return total + quantity * price;
       }, 0);
     }

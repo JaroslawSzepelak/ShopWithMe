@@ -97,6 +97,7 @@
               <th>Produkt</th>
               <th>Ilość</th>
               <th>Cena</th>
+              <th>Cena Łączna</th>
               <th>Akcje</th>
             </tr>
           </thead>
@@ -104,7 +105,8 @@
             <tr v-for="line in order.lines" :key="line.id">
               <td>{{ line.product.name }}</td>
               <td>{{ line.quantity }}</td>
-              <td>{{ line.product.price }} zł</td>
+              <td>{{ getLinePrice(line).toFixed(2) }} zł</td>
+              <td>{{ (line.quantity * getLinePrice(line)).toFixed(2) }} zł</td>
               <td>
                 <button
                   @click="confirmRemoveCartLine(line)"
@@ -219,6 +221,10 @@ export default class OrderEditAdmin extends Vue {
     });
   }
 
+  getLinePrice(line: any): number {
+    return line.price > 0 ? line.price : line.product.price;
+  }
+
   async fetchOrderDetails() {
     const orderId = Number(this.$route.params.id);
     await this.$store.dispatch("admin/adminOrders/fetchOrder", orderId);
@@ -280,6 +286,7 @@ export default class OrderEditAdmin extends Vue {
       location.reload();
     }
   }
+
   async saveOrder() {
     try {
       const updatedOrder = {

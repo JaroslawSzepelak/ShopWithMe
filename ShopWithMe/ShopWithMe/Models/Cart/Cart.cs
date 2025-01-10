@@ -20,7 +20,8 @@ namespace ShopWithMe.Models.Cart
                 Lines.Add(new CartLine
                 {
                     Product = product,
-                    Quantity = quantity
+                    Quantity = quantity,
+                    Price = product.SalePrice != 0 ? product.SalePrice.Value : product.Price
                 });
             }
             else
