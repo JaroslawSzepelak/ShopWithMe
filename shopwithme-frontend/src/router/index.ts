@@ -19,8 +19,10 @@ import CategoryEditor from "@/components/CategoryEditor.vue";
 import ProductAdmin from "@/components/ProductAdmin.vue";
 import CategoryAdmin from "@/components/CategoryAdmin.vue";
 import OrderAdmin from "@/components/OrderAdmin.vue";
+import UsersAdmin from "@/components/UsersAdmin.vue";
 import OrderDetailsAdmin from "@/components/OrderDetailsAdmin.vue";
 import OrderEditAdmin from "@/components/OrderEditAdmin.vue";
+import UsersEditor from "@/components/UsersEditor.vue";
 import NotFound from "@/views/NotFound.vue";
 import ElectronicsOffer from "@/views/offers/ElectronicsOffer.vue";
 import AgdOffer from "@/views/offers/AgdOffer.vue";
@@ -97,6 +99,11 @@ const routes = [
         component: OrderAdmin,
       },
       {
+        path: "users",
+        name: "UsersAdmin",
+        component: UsersAdmin,
+      },
+      {
         path: "orders/details/:id",
         name: "OrderDetailsAdmin",
         component: OrderDetailsAdmin,
@@ -118,6 +125,18 @@ const routes = [
         path: "products/edit/:id",
         name: "ProductEdit",
         component: ProductEditor,
+        props: { op: "edit" },
+      },
+      {
+        path: "users/create",
+        name: "UserCreate",
+        component: UsersEditor,
+        props: { op: "create" },
+      },
+      {
+        path: "users/edit/:id",
+        name: "UserEdit",
+        component: UsersEditor,
         props: { op: "edit" },
       },
       {

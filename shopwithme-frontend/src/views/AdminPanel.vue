@@ -22,10 +22,17 @@
         </router-link>
         <router-link
           to="/admin/orders"
-          class="btn btn-secondary btn-block"
+          class="btn btn-secondary btn-block mb-3"
           active-class="active"
         >
           Zamówienia
+        </router-link>
+        <router-link
+          to="/admin/users"
+          class="btn btn-secondary btn-block"
+          active-class="active"
+        >
+          Użytkownicy
         </router-link>
       </aside>
 
@@ -165,6 +172,7 @@ h4 {
     padding: 10px;
 
     .btn {
+      box-sizing: border-box;
       width: 60%;
       text-align: center;
       font-size: 0.9rem;

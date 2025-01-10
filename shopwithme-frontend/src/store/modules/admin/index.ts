@@ -4,6 +4,7 @@ import adminCategoriesModule, { AdminCategoryState } from "./adminCategories";
 import adminAccountModule, { AdminAccountState } from "./adminAccount";
 import adminOrdersModule from "./adminOrders";
 import adminStorageModule, { AdminStorageState } from "./adminStorage";
+import adminUsersModule from "./adminUsers";
 
 interface AdminState {
   adminProducts: AdminProductState;
@@ -20,6 +21,7 @@ const adminModule: Module<AdminState, any> = {
     adminAccount: adminAccountModule,
     adminOrders: adminOrdersModule,
     adminStorage: adminStorageModule,
+    adminUsers: adminUsersModule,
   },
 };
 

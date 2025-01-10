@@ -109,7 +109,7 @@ namespace ShopWithMe.Controllers.Admin
 
         #region Create()
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserFormModel loginModel)
+        public async Task<IActionResult> Create([FromBody] UserCreateModel loginModel)
         {
             if (loginModel.Password != loginModel.RepeatPassword)
             {
@@ -168,7 +168,7 @@ namespace ShopWithMe.Controllers.Admin
 
             var user = await userManager.FindByNameAsync(model.UserName);
 
-            if (user.Id != editedUser.Id)
+            if (user != null && user.Id != editedUser.Id)
             {
                 ModelState.AddModelError("UserName", "Użytkownik o takiej nazwie już istnieje.");
                 return UnprocessableEntity(ModelState);
@@ -176,7 +176,7 @@ namespace ShopWithMe.Controllers.Admin
 
             user = await userManager.FindByEmailAsync(model.Email);
 
-            if (user.Id != editedUser.Id)
+            if (user != null && user.Id != editedUser.Id)
             {
                 ModelState.AddModelError("Email", "Podany adres e-mail jest już zajęty.");
                 return UnprocessableEntity(ModelState);
@@ -185,15 +185,15 @@ namespace ShopWithMe.Controllers.Admin
             editedUser.Email = model.Email;
             editedUser.UserName = model.UserName;
 
-            var result = await userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(editedUser);
 
             var passwordResult = (IdentityResult)null;
 
             if (!string.IsNullOrEmpty(model.Password))
             {
-                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                var token = await userManager.GeneratePasswordResetTokenAsync(editedUser);
 
-                passwordResult = await userManager.ResetPasswordAsync(user, token, model.Password);
+                passwordResult = await userManager.ResetPasswordAsync(editedUser, token, model.Password);
             }
 
             if (result.Succeeded && (passwordResult == null || passwordResult.Succeeded))

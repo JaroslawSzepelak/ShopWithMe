@@ -38,7 +38,9 @@ namespace ShopWithMe
             builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
             // Dodanie obsługi Identity Core
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppIdentityDbContext>()
+                .AddDefaultTokenProviders(); ;
 
             // Configure session with appropriate settings
             builder.Services.AddDistributedMemoryCache();

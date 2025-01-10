@@ -324,7 +324,7 @@ export default class Cart extends Vue {
     display: flex;
     flex-direction: row;
     gap: 20px;
-    max-width: 1200px;
+    max-width: 1300px;
     width: 100%;
   }
 
