@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopWithMe.Models;
+using ShopWithMe.Managers.Products;
 using ShopWithMe.Models.Products;
+using ShopWithMe.Models.Products.Public;
+using ShopWithMe.Tools.Models;
 
 namespace ShopWithMe.Controllers
 {
@@ -9,20 +10,44 @@ namespace ShopWithMe.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        protected DefaultContext _context;
+        protected ProductsManager _manager;
+        protected ProductModelsMapper _mapper;
 
         #region ProductsController()
-        public ProductsController(DefaultContext context) 
+        public ProductsController(ProductsManager manager, ProductModelsMapper mapper)
         {
-            _context = context;
+            _manager = manager;
+            _mapper = mapper;
         }
         #endregion
 
         #region GetList()
         [HttpGet]
-        public IAsyncEnumerable<Product> GetList()
+        public async Task<ResultModel<ProductListModel>> GetList(
+            [FromQuery] int pageIndex, 
+            [FromQuery] int pageSize,
+            [FromQuery] int categoryId,
+            [FromQuery] string search)
         {
-            return _context.Products.AsAsyncEnumerable();
+            var pager = new Pager()
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+
+            var entries = await _manager.GetListAsync(true, pager, categoryId, search);
+
+            return new ResultModel<ProductListModel>(_mapper.MapToPublicListModel(entries), pager);
+        }
+        #endregion
+
+        #region GetAutocomplete()
+        [HttpGet("get-autocomplete")]
+        public async Task<List<ProductAutocompleteModel>> GetAutocomplete([FromQuery] string search)
+        {
+            var entries = await _manager.GetListAsync(search);
+
+            return _mapper.MapToPublicAutocompleteModel(entries);
         }
         #endregion
 
@@ -30,58 +55,12 @@ namespace ShopWithMe.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(long id)
         {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var entity = await _manager.GetAsync(id, true);
 
             if (entity == null)
-            {
                 return NotFound();
-            }
 
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Create()
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
-        {
-            var entity = product;
-
-            await _context.Products.AddAsync(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Update()
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] Product product)
-        {
-            var entity = product;
-
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok(entity);
-        }
-        #endregion
-
-        #region Delete()
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
-        {
-            var entity = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            return Ok(_mapper.MapToDetailsModel(entity));
         }
         #endregion
     }

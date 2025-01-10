@@ -1,5 +1,5 @@
 ﻿using ShopWithMe.Models.Cart;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 
 namespace ShopWithMe.Models.Orders
 {
@@ -14,6 +14,9 @@ namespace ShopWithMe.Models.Orders
         public string Address { get; set; }
         public string City { get; set; }
         public string Zip { get; set; }
+        public DateTime DateCreated { get; set; }
+        public string UserId { get; set; }
+        public OrderStatus Status { get; set; }
 
         #region Order()
         public Order() { }
@@ -28,7 +31,16 @@ namespace ShopWithMe.Models.Orders
             Address = contactData.Address;
             City = contactData.City;
             Zip = contactData.Zip;
+            Status = OrderStatus.Pending; // Domyślny status
         }
         #endregion
+    }
+
+    public enum OrderStatus
+    {
+        Pending,    // Zlecone
+        Shipped,    // Wysłane
+        Completed,  // Zakończone
+        Canceled    // Anulowane
     }
 }

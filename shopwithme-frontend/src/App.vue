@@ -1,38 +1,67 @@
 <template>
-  <div id="app">
+  <div class="app">
     <Navbar />
     <main>
-      <router-view></router-view>
+      <router-view :key="$route.params.id"></router-view>
     </main>
     <Footer />
+    <AppModal
+      :visible="modalVisible"
+      :message="modalMessage"
+      @close="closeModal"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Navbar from "./components/Navbar.vue";
-import Footer from "./components/Footer.vue";
+import Navbar from "./components/homeComponents/Navbar.vue";
+import Footer from "./components/homeComponents/Footer.vue";
+import AppModal from "@/components/modals/AppModal.vue";
 
 @Component({
   components: {
     Navbar,
     Footer,
+    AppModal,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  modalVisible = false;
+  modalMessage = "";
+
+  created() {
+    //sessionStorage.clear();
+  }
+
+  mounted() {
+    this.$root.$on("showModal", (message: string) => {
+      this.modalMessage = message;
+      this.modalVisible = true;
+    });
+  }
+
+  closeModal() {
+    this.modalVisible = false;
+    this.$router.go(-1);
+  }
+
+  beforeDestroy() {
+    this.$root.$off("showModal");
+  }
+}
 </script>
 
 <style lang="scss">
 @import "./assets/styles.scss";
 
-#app {
+.app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Cała wysokość ekranu */
+  min-height: 100vh;
 }
 
 main {
   flex-grow: 1;
-  padding: 20px;
 }
 </style>

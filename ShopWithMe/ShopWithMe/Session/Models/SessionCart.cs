@@ -1,6 +1,6 @@
 ﻿using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.Products;
-using ShopWithMe.Tools.Interfaces;
+using ShopWithMe.Tools.Abstractions;
 using ShopWithMe.Utils.Extensions;
 using System.Text.Json.Serialization;
 
@@ -27,6 +27,14 @@ namespace SportsStore.Models
         public override void AddItem(Product product, int quantity)
         {
             base.AddItem(product, quantity);
+            Session.SetJson(SessionKey, this);
+        }
+        #endregion
+
+        #region UpdateItem()
+        public override void UpdateItem(CartLine line, int? quantity)
+        {
+            base.UpdateItem(line, quantity);
             Session.SetJson(SessionKey, this);
         }
         #endregion
