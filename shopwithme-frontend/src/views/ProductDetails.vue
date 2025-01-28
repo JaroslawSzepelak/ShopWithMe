@@ -483,20 +483,14 @@ export default class ProductDetails extends Vue {
       font-size: 1.6rem;
     }
 
-    .quantity-control .quantity-btn {
-      width: 30px;
-      height: 30px;
-      font-size: 1rem;
-    }
-
-    .quantity-control .quantity-input {
-      width: 40px;
-      height: 30px;
+    .quantity-control {
+      align-self: center;
     }
   }
 
   .buttons {
     flex-direction: column;
+    align-self: center;
 
     .cart-btn,
     .back-btn {

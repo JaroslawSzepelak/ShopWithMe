@@ -1,6 +1,9 @@
 <template>
   <div class="category-admin">
-    <router-link to="/admin/categories/create" class="btn btn-primary my-3">
+    <router-link
+      to="/admin/categories/create"
+      class="btn btn-primary my-3 add-btn"
+    >
       Utwórz kategorię
     </router-link>
 
@@ -48,12 +51,12 @@
       <!-- Pagination Controls -->
       <div class="pagination-container">
         <div class="page-size-selector">
-          <label for="pageSize">Ilość kategorii na stronę:</label>
+          <label for="pageSize">Ilość produktów na stronę:</label>
           <select
             id="pageSize"
             class="page-size-select"
             :value="pageSize"
-            @change="changePageSize($event)"
+            @change="changePageSize($event.target.value)"
           >
             <option value="10">10 na stronę</option>
             <option value="20">20 na stronę</option>
@@ -215,7 +218,7 @@ export default class CategoryAdmin extends Vue {
 
 <style scoped lang="scss">
 .category-admin {
-  .btn {
+  .add-btn {
     margin-bottom: 15px;
   }
 
@@ -302,7 +305,7 @@ export default class CategoryAdmin extends Vue {
     .pagination-container {
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 30px;
     }
 
     .page-size-selector {
@@ -329,30 +332,19 @@ export default class CategoryAdmin extends Vue {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .category-admin {
+    .add-btn {
+      margin-left: 15vw;
+    }
+
     .table {
       font-size: 0.85rem;
+      margin-left: 15vw;
       th,
       td {
         padding: 0.5rem;
         white-space: nowrap;
-      }
-    }
-
-    .pagination-container {
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-
-      .pagination-controls {
-        flex-wrap: wrap;
-        justify-content: center;
-
-        .btn {
-          padding: 8px 12px;
-          font-size: 0.9rem;
-        }
       }
     }
   }
@@ -381,14 +373,23 @@ export default class CategoryAdmin extends Vue {
     }
 
     .pagination-container {
-      gap: 10px;
-
       .pagination-controls {
         .btn {
-          padding: 6px 10px;
-          font-size: 0.8rem;
+          padding: 5px 10px;
         }
       }
+    }
+  }
+}
+
+@media (max-width: 450px) {
+  .category-admin {
+    .add-btn {
+      margin-left: 10vw;
+    }
+
+    .table {
+      margin-left: 10vw;
     }
   }
 }

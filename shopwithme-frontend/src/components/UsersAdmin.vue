@@ -253,4 +253,64 @@ export default class UsersAdmin extends Vue {
     }
   }
 }
+
+@media (max-width: 1250px) {
+  .users-admin {
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .page-size-selector {
+      margin-top: 10px;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .users-admin {
+    .table {
+      display: block;
+      width: 700px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .users-admin {
+    .table {
+      th,
+      td {
+        white-space: nowrap;
+        font-size: 0.8rem;
+      }
+    }
+
+    .page-size-selector {
+      select {
+        font-size: 0.8rem;
+      }
+
+      label {
+        font-size: 0.8rem;
+      }
+    }
+
+    .pagination-container {
+      .pagination-controls {
+        .btn {
+          padding: 5px 10px;
+        }
+      }
+    }
+  }
+}
 </style>

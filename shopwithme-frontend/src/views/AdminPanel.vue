@@ -168,7 +168,7 @@ h4 {
     align-items: center;
     max-width: 100%;
     min-width: 100%;
-    max-height: 230px;
+    max-height: 270px;
     padding: 10px;
 
     .btn {
