@@ -1,57 +1,80 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using ShopWithMe.Controllers;
+using ShopWithMe.Managers.Orders;
 using ShopWithMe.Models.Cart;
 using ShopWithMe.Models.ContactData;
 using ShopWithMe.Models.Orders;
+using ShopWithMe.Models.Orders.Public;
+using ShopWithMe.Tools.Models;
 using ShopWithMe.Models.Products;
 
 namespace ShopWithMe.Tests
 {
     public class OrdersControllerTests
     {/*
+        private Mock<IOrderRepository> _mockRepository;
+        private Mock<OrdersManager> _mockManager;
+        private Mock<OrderModelsMapper> _mockMapper;
+        private Mock<UserManager<IdentityUser>> _mockUserManager;
+        private Cart _cart;
+        private ContactData _contactData;
+
+        public OrdersControllerTests()
+        {
+            _mockRepository = new Mock<IOrderRepository>();
+            _mockManager = new Mock<OrdersManager>();
+            _mockMapper = new Mock<OrderModelsMapper>();
+            _cart = new Cart();
+            _contactData = new ContactData();
+            _mockUserManager = new Mock<UserManager<IdentityUser>>(
+                Mock.Of<IUserStore<IdentityUser>>(),
+                null, null, null, null, null, null, null, null
+            );
+        }
+
         #region Can_GetList()
         [Fact]
         public async Task Can_GetList()
         {
             // Przygotowanie
-            var mock = new Mock<IOrderRepository>();
-            var orders = new List<Order>()
+            var orders = new List<Order>
             {
-                new Order()
+                new Order
                 {
-                    Lines = new List<CartLine>()
+                    Lines = new List<CartLine>
                     {
-                        new CartLine() { Product = new Product() { Name = "P1" } },
-                        new CartLine() { Product = new Product() { Name = "P2" } }
+                        new CartLine { Product = new Product { Name = "P1" } },
+                        new CartLine { Product = new Product { Name = "P2" } }
                     }
                 },
-                new Order()
+                new Order
                 {
-                    Lines = new List<CartLine>()
+                    Lines = new List<CartLine>
                     {
-                        new CartLine() { Product = new Product() { Name = "P3" } }
+                        new CartLine { Product = new Product { Name = "P3" } }
                     }
                 }
             };
 
-            mock.Setup(m => m.GetList()).Returns(Task.FromResult(orders.AsEnumerable()));
+            _mockManager.Setup(m => m.GetListAsync(It.IsAny<string>(), It.IsAny<Pager>()))
+                .ReturnsAsync(orders);
 
-            var cart = new Cart();
-            var contactData = new ContactData();
-            var target = new OrdersController(mock.Object, cart, contactData);
+            _mockMapper.Setup(m => m.MapToPublicListModel(It.IsAny<List<Order>>()))
+                .Returns(orders.Select(o => new OrderListModel()).ToList());
 
-            // Działąnie
-            var result = await target.GetList();
+
+            _mockUserManager.Setup(m => m.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .ReturnsAsync(new IdentityUser { Id = "user-id" });
+
+            var target = new OrdersController(_mockRepository.Object, _mockManager.Object, _mockMapper.Object, _cart, _contactData, _mockUserManager.Object);
+
+            // Działanie
+            var result = await target.GetList(1, 10);
 
             // Assercja
             Assert.IsType<OkObjectResult>(result);
-
-            var ordersResult = ((result as OkObjectResult).Value as IEnumerable<Order>).ToList();
-
-            Assert.Equal(2, ordersResult[0].Lines.Count);
-            Assert.Equal(1, ordersResult[1].Lines.Count);
-            Assert.Equal(orders[0].Lines.First().Product.Name, ordersResult[0].Lines.First().Product.Name);
-            Assert.Equal(orders[1].Lines.First().Product.Name, ordersResult[1].Lines.First().Product.Name);
+            _mockManager.Verify(m => m.GetListAsync("user-id", It.IsAny<Pager>()), Times.Once);
         }
         #endregion
 
@@ -60,38 +83,29 @@ namespace ShopWithMe.Tests
         public void Can_GetSummary()
         {
             // Przygotowanie
-            var mock = new Mock<IOrderRepository>();
-            var cart = new Cart();
-            var product = new Product() { Name = "P1" };
-            cart.AddItem(product, 1);
-            var contactData = new ContactData()
-            {
-                Firstname = "Imię",
-                Lastname = "Nazwisko",
-                Email = "test@example.com",
-                PhoneNumber = "123456789",
-                Address = "Test 1",
-                City = "Test",
-                Zip = "00-000"
-            };
-            var target = new OrdersController(mock.Object, cart, contactData);
+            var product = new Product { Name = "P1", Price = 100M, SalePrice = 90M };
+            _cart.AddItem(product, 1);
 
-            // Działąnie
+            _contactData.Firstname = "Imię";
+            _contactData.Lastname = "Nazwisko";
+            _contactData.Email = "test@example.com";
+            _contactData.PhoneNumber = "123456789";
+            _contactData.Address = "Test 1";
+            _contactData.City = "Test";
+            _contactData.Zip = "00-000";
+
+            var target = new OrdersController(_mockRepository.Object, _mockManager.Object, _mockMapper.Object, _cart, _contactData, _mockUserManager.Object);
+
+            // Działanie
             var result = target.GetSummary();
 
             // Assercja
             Assert.IsType<OkObjectResult>(result);
-
             var resultModel = ((result as OkObjectResult).Value as OrderSummaryModel);
 
-            Assert.Equal(product.Name, actual: resultModel.Lines.FirstOrDefault().Product.Name);
-            Assert.Equal(contactData.Firstname, resultModel.Firstname);
-            Assert.Equal(contactData.Lastname, resultModel.Lastname);
-            Assert.Equal(contactData.Email, resultModel.Email);
-            Assert.Equal(contactData.PhoneNumber, resultModel.PhoneNumber);
-            Assert.Equal(contactData.Address, resultModel.Address);
-            Assert.Equal(contactData.City, resultModel.City);
-            Assert.Equal(contactData.Zip, resultModel.Zip);
+            Assert.Equal(product.Name, resultModel.Lines.FirstOrDefault().Product.Name);
+            Assert.Equal(_contactData.Firstname, resultModel.Firstname);
+            Assert.Equal(_contactData.Lastname, resultModel.Lastname);
         }
         #endregion
 
@@ -100,40 +114,22 @@ namespace ShopWithMe.Tests
         public async Task Can_SaveOrder()
         {
             // Przygotowanie
-            var mock = new Mock<IOrderRepository>();
-            var cart = new Cart();
-            var product = new Product() { Name = "P1" };
-            cart.AddItem(product, 1);
-            var contactData = new ContactData();
-            var target = new OrdersController(mock.Object, cart, contactData);
+            var product = new Product { Name = "P1", Price = 100M, SalePrice = 90M };
+            _cart.AddItem(product, 1);
 
-            // Działąnie
+            _mockUserManager.Setup(m => m.GetUserAsync(It.IsAny<System.Security.Claims.ClaimsPrincipal>()))
+                .ReturnsAsync(new IdentityUser { Id = "user-id" });
+
+            var target = new OrdersController(_mockRepository.Object, _mockManager.Object, _mockMapper.Object, _cart, _contactData, _mockUserManager.Object);
+
+            // Działanie
             var result = await target.Create();
-            
+
             // Assercja
-            mock.Verify(m => m.SaveOrder(It.IsAny<Order>()), Times.Once);
+            _mockRepository.Verify(m => m.SaveOrder(It.IsAny<Order>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(product.Name, actual: ((result as OkObjectResult).Value as Order).Lines.FirstOrDefault().Product.Name);
         }
         #endregion
-
-        #region Can_Delete_Order()
-        [Fact]
-        public async Task Can_Delete_Order()
-        {
-            // Przygotowanie
-            var mock = new Mock<IOrderRepository>();
-            var cart = new Cart();
-            var contactData = new ContactData();
-            var target = new OrdersController(mock.Object, cart, contactData);
-
-            // Działąnie
-            var result = await target.Delete(1);
-
-            // Assercja
-            mock.Verify(m => m.Delete(It.IsAny<long>()), Times.Once);
-            Assert.IsType<OkResult>(result);
-        }
-        #endregion*/
+        */
     }
 }

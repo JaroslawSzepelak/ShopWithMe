@@ -10,8 +10,8 @@ namespace ShopWithMe.CartTests
         public void Can_Add_New_Lines()
         {
             // Przygotowanie
-            var p1 = new Product { Id = 1, Name = "P1" };
-            var p2 = new Product { Id = 2, Name = "P2" };
+            var p1 = new Product { Id = 1, Name = "P1", Price = 100M, SalePrice = 90M };
+            var p2 = new Product { Id = 2, Name = "P2", Price = 50M, SalePrice = 45M };
 
             var target = new Cart();
 
@@ -32,8 +32,8 @@ namespace ShopWithMe.CartTests
         public void Can_Add_Quantity_For_Existing_Lines()
         {
             // Przygotowanie
-            var p1 = new Product { Id = 1, Name = "P1" };
-            var p2 = new Product { Id = 2, Name = "P2" };
+            var p1 = new Product { Id = 1, Name = "P1", Price = 100M, SalePrice = 90M };
+            var p2 = new Product { Id = 2, Name = "P2", Price = 50M, SalePrice = 45M };
 
             var target = new Cart();
 
@@ -55,9 +55,9 @@ namespace ShopWithMe.CartTests
         public void Can_Remove_Line()
         {
             // Przygotowanie
-            var p1 = new Product { Id = 1, Name = "P1" };
-            var p2 = new Product { Id = 2, Name = "P2" };
-            var p3 = new Product { Id = 3, Name = "P3" };
+            var p1 = new Product { Id = 1, Name = "P1", Price = 100M, SalePrice = 90M };
+            var p2 = new Product { Id = 2, Name = "P2", Price = 50M, SalePrice = 45M };
+            var p3 = new Product { Id = 3, Name = "P3", Price = 30M, SalePrice = 25M };
 
             var target = new Cart();
 
@@ -80,8 +80,8 @@ namespace ShopWithMe.CartTests
         public void Calculate_Cart_Total()
         {
             // Przygotowanie
-            var p1 = new Product { Id = 1, Name = "P1", Price = 100M };
-            var p2 = new Product { Id = 2, Name = "P2", Price = 50M };
+            var p1 = new Product { Id = 1, Name = "P1", Price = 100M, SalePrice = 90M };
+            var p2 = new Product { Id = 2, Name = "P2", Price = 50M, SalePrice = 45M };
 
             var target = new Cart();
 
@@ -101,8 +101,8 @@ namespace ShopWithMe.CartTests
         public void Can_Clear_Contents()
         {
             // Przygotowanie
-            var p1 = new Product { Id = 1, Name = "P1", Price = 100M };
-            var p2 = new Product { Id = 2, Name = "P2", Price = 50M };
+            var p1 = new Product { Id = 1, Name = "P1", Price = 100M, SalePrice = 90M };
+            var p2 = new Product { Id = 2, Name = "P2", Price = 50M, SalePrice = 45M };
 
             var target = new Cart();
             target.AddItem(p1, 1);

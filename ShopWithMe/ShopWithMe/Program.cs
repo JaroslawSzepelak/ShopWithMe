@@ -48,8 +48,8 @@ namespace ShopWithMe
             {
                 options.IdleTimeout = TimeSpan.FromHours(builder.Configuration.GetValue<int>("Session:Timeout"));
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.None; // Wymagane dla po��cze� cross-origin
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // U�ywaj Always, je�li korzystasz z HTTPS
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
             // Set up session cart and other scoped services
@@ -72,7 +72,7 @@ namespace ShopWithMe
                         .WithOrigins("http://localhost:8080") // Frontend URL
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials(); // Umo�liwienie przesy�ania ciasteczek
+                        .AllowCredentials(); // Umożliwienie przesyłania ciasteczek
                 });
             });
 
@@ -97,7 +97,7 @@ namespace ShopWithMe
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseSession(); // Musi by� po `UseCors` i przed `MapControllers`
+            app.UseSession(); // Musi być po `UseCors` i przed `MapControllers`
 
             app.MapControllers();
 
